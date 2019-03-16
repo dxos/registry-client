@@ -1,0 +1,16 @@
+{
+  "presets": [
+    ["env", {
+      "debug": false,
+      "targets": {
+        "browser": "chrome"
+      }
+    }],
+
+    "stage-0"
+  ],
+
+  "plugins": [
+    "transform-runtime"
+  ]
+}
