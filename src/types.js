@@ -4,23 +4,36 @@
 
 import { Util } from './util';
 
+/**
+ * Resource.
+ */
 export class Resource {
-  constructor(id, type, ownerAccount, systemAttributes = null, attributes = null, links = null) {
+  /**
+   * New Resource.
+   * @param {object} resource
+   * @param {object} ownerAccount
+   */
+  constructor(resource, ownerAccount) {
+    let { id, type, systemAttributes = null, attributes = null, links = null } = resource;
+
     this.id = id;
     this.type = type;
-    this.ownerAccount = ownerAccount;
     this.systemAttributes = Util.sortJSON(systemAttributes);
     this.attributes = Util.sortJSON(attributes);
     this.links = Util.sortJSON(links);
+    this.ownerAccount = ownerAccount;
   }
 
+  /**
+   * Serialize Resource.
+   */
   serialize() {
     return Util.sortJSON({
       "id": this.id.toString(),
       "type": this.type.toString(),
       "owner": {
         "id": "",
-        "address": this.ownerAccount.wirechainAddress
+        "address": this.ownerAccount.registryAddress
       },
       "systemAttributes": btoa(JSON.stringify(this.systemAttributes)),
       "attributes": btoa(JSON.stringify(this.attributes)),
@@ -28,13 +41,16 @@ export class Resource {
     });
   }
 
+  /**
+   * Get message to calculate resource signature.
+   */
   getMessageToSign() {
     return {
       "id": this.id.toString(),
       "type": this.type.toString(),
       "owner": {
         "id": "",
-        "address": this.ownerAccount.wirechainAddress
+        "address": this.ownerAccount.registryAddress
       },
       "systemAttributes": this.systemAttributes,
       "attributes": this.attributes,
@@ -43,12 +59,23 @@ export class Resource {
   }
 }
 
+/**
+ * Resource Signature.
+ */
 export class Signature {
+  /**
+   * New Signature.
+   * @param {string} pubKey
+   * @param {string} sig
+   */
   constructor(pubKey, sig) {
     this.pubKey = pubKey;
     this.sig = sig;
   }
 
+  /**
+   * Serialize Signature.
+   */
   serialize() {
     return Util.sortJSON({
       "pubKey": this.pubKey,
@@ -57,12 +84,23 @@ export class Signature {
   }
 }
 
+/**
+ * Message Payload.
+ */
 export class Payload {
+  /**
+   * New Payload.
+   * @param {object} resource
+   * @param  {...any} signatures
+   */
   constructor(resource, ...signatures) {
     this.resource = resource;
     this.signatures = signatures;
   }
 
+  /**
+   * Serialize Payload.
+   */
   serialize() {
     return Util.sortJSON({
       "resource": this.resource.serialize(),
@@ -71,12 +109,23 @@ export class Payload {
   }
 }
 
+/**
+ * Transaction Message.
+ */
 export class Msg {
+  /**
+   * New Message.
+   * @param {object} payload
+   * @param {string} signer
+   */
   constructor(payload, signer) {
     this.payload = payload;
     this.signer = signer;
   }
 
+  /**
+   * Serialize Message.
+   */
   serialize() {
     return Util.sortJSON({
       "Payload": this.payload.serialize(),
@@ -85,8 +134,19 @@ export class Msg {
   }
 }
 
-
+/**
+ * Transaction.
+ */
 export class Transaction {
+  /**
+   * New Transaction.
+   * @param {object} message
+   * @param {object} account
+   * @param {object} fee
+   * @param {string} signature
+   * @param {string} accountNumber
+   * @param {string} accountSequence
+   */
   constructor(message, account, fee, signature, accountNumber, accountSequence) {
     fee.gas = parseInt(fee.gas);
 
@@ -98,13 +158,16 @@ export class Transaction {
     this.accountSequence = parseInt(accountSequence);
   }
 
+  /**
+   * Serialize Transaction.
+   */
   serialize() {
     return Util.sortJSON({
       "msg": [this.message.serialize()],
       "fee": this.fee,
       "signatures": [
         {
-          "pub_key": this.account.wirechainPublicKey,
+          "pub_key": this.account.registryPublicKey,
           "signature": this.signature.toString('base64'),
           "account_number": this.accountNumber,
           "sequence": this.accountSequence

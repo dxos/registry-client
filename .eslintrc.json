@@ -1,0 +1,31 @@
+{
+  "root": true,
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true,
+    "jest": true
+  },
+  "extends": [
+    "jest-enzyme",
+    "eslint:recommended",
+    "plugin:prettier/recommended"
+  ],
+  "plugins": ["jsx-a11y", "prettier"],
+  "settings": {},
+  "rules": {
+    "jsx-a11y/href-no-hash": "off",
+    "prettier/prettier": [
+      "warn",
+      {
+        "singleQuote": true,
+        "semi": true,
+        "bracketSpacing": true,
+        "printWidth": 120
+      }
+    ],
+    "no-console": "off"
+  }
+}
