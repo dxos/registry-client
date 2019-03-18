@@ -39,6 +39,22 @@ export class Registry {
   }
 
   /**
+   * Get bots by names.
+   * @param {array} names
+   */
+  async getBots(names) {
+    return this.client.getBots(names);
+  }
+
+  /**
+   * Get accounts by addresses.
+   * @param {array} names
+   */
+  async getPseudonyms(names) {
+    return this.client.getPseudonyms(names);
+  }
+
+  /**
    * Publish resource.
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} resource

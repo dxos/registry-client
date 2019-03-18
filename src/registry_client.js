@@ -119,7 +119,35 @@ export class RegistryClient {
    * @param {array} name
    */
   getBots(name) {
-    throw new Error('Not implemented.');
+    console.assert(name);
+    console.assert(name.length);
+
+    let query = `query ($name: [String!]) {
+      getBots(name: $name) {
+        resource {
+          id
+          type
+          owner {
+            id
+            address
+          }
+          systemAttributes
+          attributes
+          links {
+            id
+            attributes
+          }
+        }
+        name
+        dsinvite
+      }
+    }`
+
+    let variables = {
+      name
+    }
+
+    return this._getResult(this.graph(query)(variables), 'getBots');
   }
 
   /**
@@ -127,7 +155,35 @@ export class RegistryClient {
    * @param {array} name
    */
   getPseudonyms(name) {
-    throw new Error('Not implemented.');
+    console.assert(name);
+    console.assert(name.length);
+
+    let query = `query ($name: [String!]) {
+      getPseudonyms(name: $name) {
+        resource {
+          id
+          type
+          owner {
+            id
+            address
+          }
+          systemAttributes
+          attributes
+          links {
+            id
+            attributes
+          }
+        }
+        name
+        dsinvite
+      }
+    }`
+
+    let variables = {
+      name
+    }
+
+    return this._getResult(this.graph(query)(variables), 'getPseudonyms');
   }
 
   /**

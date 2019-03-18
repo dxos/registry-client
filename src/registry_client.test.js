@@ -26,4 +26,4 @@ test.skip('List resources.', async () => {
   let resources = await registry.listResources([RES_ID]);
 
   console.log(JSON.stringify(resources, null, 4));
-})
+});
