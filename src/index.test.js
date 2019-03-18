@@ -15,17 +15,17 @@ const RESOURCE_OBJ = {
   },
   attributes: {
     label: 'Weather',
-    test: "bar"
+    test: 'bar'
   }
-}
+};
 
 jest.setTimeout(15000);
 
 test.skip('Register resource.', async () => {
   let registry = new Registry();
 
-  let result = await registry.setResource(PRIVATE_KEY_BOB, RESOURCE_OBJ, PRIVATE_KEY_ALICE);
+  await registry.setResource(PRIVATE_KEY_BOB, RESOURCE_OBJ, PRIVATE_KEY_ALICE);
 
   let resources = await registry.getResources([RESOURCE_OBJ.id]);
-  console.log(resources)
-})
+  console.log(resources);
+});

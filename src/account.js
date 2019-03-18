@@ -2,7 +2,7 @@
 // Copyright 2019 Wireline, Inc.
 //
 
-import sha256  from 'js-sha256';
+import sha256 from 'js-sha256';
 import ripemd160 from 'ripemd160';
 import secp256k1 from 'secp256k1/elliptic';
 import bip39 from 'bip39';

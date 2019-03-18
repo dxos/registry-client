@@ -20,7 +20,7 @@ export class Registry {
 
   /**
    * Get accounts by addresses.
-   * @param {array} addresses 
+   * @param {array} addresses
    */
   async getAccounts(addresses) {
     return this.client.getAccounts(addresses);
@@ -28,7 +28,7 @@ export class Registry {
 
   /**
    * Get resources by ids.
-   * @param {array} ids 
+   * @param {array} ids
    */
   async getResources(ids) {
     if (ids && ids.length) {
@@ -61,7 +61,7 @@ export class Registry {
     // 3. Generate transaction.
     let { num, seq } = signingAccountDetails[0];
     let transaction = TxBuilder.createTransaction(payload, signingAccount, num.toString(), seq.toString(), CHAIN);
-    
+
     let tx = btoa(JSON.stringify(transaction, null, 2));
 
     // 4. Send transaction.

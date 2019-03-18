@@ -11,19 +11,19 @@ test.skip('Get accounts.', async () => {
   let registry = new RegistryClient();
   let accounts = await registry.getAccounts([ADDR]);
 
-  console.log(JSON.stringify(accounts, null, 4))
-})
+  console.log(JSON.stringify(accounts, null, 4));
+});
 
 test.skip('Get resources.', async () => {
   let registry = new RegistryClient();
   let resources = await registry.getResources([RES_ID]);
 
-  console.log(JSON.stringify(resources, null, 4))
-})
+  console.log(JSON.stringify(resources, null, 4));
+});
 
 test.skip('List resources.', async () => {
   let registry = new RegistryClient();
   let resources = await registry.listResources([RES_ID]);
 
-  console.log(JSON.stringify(resources, null, 4))
+  console.log(JSON.stringify(resources, null, 4));
 })

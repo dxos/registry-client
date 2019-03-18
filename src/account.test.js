@@ -15,44 +15,43 @@ const REGISTRY_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
 
 const RESOURCE_SIGNATURE = 'Nee+GG0/+Z9ue77Cox684Arn8Nw13kNnf/VwTuObFZEaoaaWLNv4f3UceP6KvgaeiOIQDlIf8AG4DQfPbsKyhQ==';
 
-
 test('Generate account from private key.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY, 'hex'));
   expect(acc.publicKey.toString('hex')).toBe(PUBLIC_KEY);
   expect(acc.cosmosAddress).toBe(ADDRESS);
   expect(acc.formattedCosmosAddress).toBe(FORMATTED_ADDRESS);
-})
+});
 
 test('Generate account from mnenonic.', () => {
   let mnenonic = Account.generateMnemonic();
   let acc1 = Account.generateFromMnemonic(mnenonic);
   let acc2 = Account.generateFromMnemonic(mnenonic);
   expect(acc1.formattedCosmosAddress).toBe(acc2.formattedCosmosAddress);
-})
+});
 
 test('Generate registry specific public key and address.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
   expect(acc.registryPublicKey).toBe(REGISTRY_PUBLIC_KEY);
   expect(acc.registryAddress).toBe(REGISTRY_ADDRESS);
-})
+});
 
 test('Ability to sign resource obj.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
   let resource = {
-    id: "05013527-30ef-4aee-85d5-a71e1722f255",
-    type: "Service",
+    id: '05013527-30ef-4aee-85d5-a71e1722f255',
+    type: 'Service',
     owner: {
-      id: "",
+      id: '',
       address: acc.registryAddress
     },
     systemAttributes: {
-      uri: "https://api.example.org/service"
+      uri: 'https://api.example.org/service'
     },
     attributes: {
-      label: "Weather"
+      label: 'Weather'
     },
     links: null
-  }
+  };
   let signature = acc.signResource(resource);
   expect(signature.toString('base64')).toBe(RESOURCE_SIGNATURE);
-})
+});

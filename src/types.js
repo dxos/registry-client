@@ -8,7 +8,6 @@ import { Util } from './util';
  * Resource.
  */
 export class Resource {
-
   /**
    * New Resource.
    * @param {object} resource
@@ -64,7 +63,6 @@ export class Resource {
  * Resource Signature.
  */
 export class Signature {
-
   /**
    * New Signature.
    * @param {string} pubKey
@@ -90,7 +88,6 @@ export class Signature {
  * Message Payload.
  */
 export class Payload {
-
   /**
    * New Payload.
    * @param {object} resource
@@ -136,7 +133,6 @@ export class Msg {
     });
   }
 }
-
 
 /**
  * Transaction.

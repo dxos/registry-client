@@ -22,8 +22,7 @@ const RESOURCE_OBJ = {
   attributes: {
     label: 'Weather'
   }
-}
-
+};
 
 const TRANS_SIG = 'UuFvM/xpPkHgcQ4pWarqW+MIjSkCV6IijQZumQ92zrtmQNKOJd0b5sNcXe9eZUHynAo2NyeNow4Pty3+ts0p1Q==';
 
@@ -36,4 +35,4 @@ test('Generate proper transaction signature.', () => {
 
   let transaction = TxBuilder.createTransaction(payload, acc, ACC_NUM, ACC_SEQ, CHAIN);
   expect(transaction.signatures[0].signature).toBe(TRANS_SIG);
-})
+});

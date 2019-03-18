@@ -20,7 +20,6 @@ const FEE = {
  * Transaction builder.
  */
 export class TxBuilder {
-
   /**
    * Generates registry message.
    * @param {object} resource
@@ -56,16 +55,16 @@ export class TxBuilder {
       account_number: accountNumber,
       chain_id: chainID,
       fee: FEE,
-      memo: "",
+      memo: '',
       msgs: [message.serialize()],
-      sequence: accountSequence,
-    }
+      sequence: accountSequence
+    };
 
     // 2. Calculate Signature.
     let transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
     let transactionSig = account.sign(transactionDataToSign);
 
-    let transaction = new Transaction(message, account, FEE, transactionSig, accountNumber, accountSequence)
+    let transaction = new Transaction(message, account, FEE, transactionSig, accountNumber, accountSequence);
 
     return transaction.serialize();
   }
