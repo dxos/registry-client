@@ -8,10 +8,10 @@ import { Signature, Payload, Msg, Transaction } from './types';
 // TODO(egorgripasov): Requirement for fees has been removed. Can keep this code but update to set zero fees.
 const FEE = {
   "amount": [
-    {
-      "amount": "201",
-      "denom": "wire"
-    }
+    // {
+    //   "amount": "201",
+    //   "denom": "wire"
+    // }
   ],
   "gas": "200000"
 }
