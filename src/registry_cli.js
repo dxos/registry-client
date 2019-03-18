@@ -7,9 +7,11 @@ import graphql from 'graphql.js';
 /**
  * Registry
  */
+// TODO(egor): Rename to Client or RegistryClient. Cli reminds one of 'command line interface'.
 export class RegistryCli {
   static DEFAULT_ENDPOINT = 'http://localhost:8080/query';
 
+  // TODO(egor): Comment.
   constructor(endpoint) {
     this.endpoint = endpoint || RegistryCli.DEFAULT_ENDPOINT;
     this.graph = graphql(this.endpoint, {
@@ -26,6 +28,7 @@ export class RegistryCli {
     return [];
   }
 
+  // TODO(egor): Comment.
   async getAccounts(addresses) {
     console.assert(addresses);
     console.assert(addresses.length);
@@ -50,6 +53,7 @@ export class RegistryCli {
     return this._getResult(this.graph(query)(variables), 'getAccounts');
   }
 
+  // TODO(egor): Comment.
   async getResources(ids) {
     console.assert(ids);
     console.assert(ids.length);
@@ -78,6 +82,7 @@ export class RegistryCli {
     return this._getResult(this.graph(query)(variables), 'getResources');
   }
 
+  // TODO(egor): Comment.
   async listResources() {
     let query = `query {
       listResources {
@@ -99,19 +104,22 @@ export class RegistryCli {
     return this._getResult(this.graph(query)(variables), 'listResources');
   }
 
+  // TODO(egor): Comment.
   getBots(name) {
     throw new Error('Not implemented.');
   }
 
+  // TODO(egor): Comment.
   getPseudonyms(name) {
     throw new Error('Not implemented.');
   }
 
+  // TODO(egor): Comment.
   async broadcastTxCommit(tx) {
     console.assert(tx);
 
     let mutation = `mutation ($tx: String!) {
-      broadcastTxCommit(tx: $tx) 
+      broadcastTxCommit(tx: $tx)
     }`
 
     let variables = {

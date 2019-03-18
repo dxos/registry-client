@@ -4,8 +4,12 @@
 
 import { Util } from './util';
 
+// TODO(egor): Comment.
 export class Resource {
+
+  // TODO(egor): Comment.
   constructor(id, type, ownerAccount, systemAttributes = null, attributes = null, links = null) {
+    // TODO(egor): That's a lot of params. Consider passing in an object.
     this.id = id;
     this.type = type;
     this.ownerAccount = ownerAccount;
@@ -14,6 +18,7 @@ export class Resource {
     this.links = Util.sortJSON(links);
   }
 
+  // TODO(egor): Comment.
   serialize() {
     return Util.sortJSON({
       "id": this.id.toString(),
@@ -28,6 +33,7 @@ export class Resource {
     });
   }
 
+  // TODO(egor): Comment.
   getMessageToSign() {
     return {
       "id": this.id.toString(),
@@ -43,12 +49,16 @@ export class Resource {
   }
 }
 
+// TODO(egor): Comment.
 export class Signature {
+
+  // TODO(egor): Comment.
   constructor(pubKey, sig) {
     this.pubKey = pubKey;
     this.sig = sig;
   }
 
+  // TODO(egor): Comment.
   serialize() {
     return Util.sortJSON({
       "pubKey": this.pubKey,
@@ -57,12 +67,16 @@ export class Signature {
   }
 }
 
+// TODO(egor): Comment.
 export class Payload {
+
+  // TODO(egor): Comment.
   constructor(resource, ...signatures) {
     this.resource = resource;
     this.signatures = signatures;
   }
 
+  // TODO(egor): Comment.
   serialize() {
     return Util.sortJSON({
       "resource": this.resource.serialize(),
@@ -71,12 +85,15 @@ export class Payload {
   }
 }
 
+// TODO(egor): Comment.
 export class Msg {
+  // TODO(egor): Comment.
   constructor(payload, signer) {
     this.payload = payload;
     this.signer = signer;
   }
 
+  // TODO(egor): Comment.
   serialize() {
     return Util.sortJSON({
       "Payload": this.payload.serialize(),
@@ -86,7 +103,9 @@ export class Msg {
 }
 
 
+// TODO(egor): Comment.
 export class Transaction {
+  // TODO(egor): Comment.
   constructor(message, account, fee, signature, accountNumber, accountSequence) {
     fee.gas = parseInt(fee.gas);
 
@@ -98,6 +117,7 @@ export class Transaction {
     this.accountSequence = parseInt(accountSequence);
   }
 
+  // TODO(egor): Comment.
   serialize() {
     return Util.sortJSON({
       "msg": [this.message.serialize()],
