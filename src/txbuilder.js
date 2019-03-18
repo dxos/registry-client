@@ -5,7 +5,6 @@
 import { Signature, Payload, Msg, Transaction } from './types';
 
 // TODO(egorgripasov): class for fees.
-// TODO(egorgripasov): Requirement for fees has been removed. Can keep this code but update to set zero fees.
 const FEE = {
   "amount": [
     // {
