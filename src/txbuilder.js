@@ -27,11 +27,11 @@ export class TxBuilder {
    */
   static generatePayload(resource) {
     // TODO(Ashwin): message type.
-    // Wirechain signature.
+    // Registry signature.
     let { ownerAccount: account } = resource;
     let messageToSign = resource.getMessageToSign();
     let sig = account.signResource(messageToSign);
-    let signature = new Signature(account.wirechainPublicKey, sig.toString('base64'));
+    let signature = new Signature(account.registryPublicKey, sig.toString('base64'));
 
     let payload = new Payload(resource, signature);
     return payload;

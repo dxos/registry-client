@@ -4,28 +4,37 @@
 
 import { Util } from './util';
 
-// TODO(egor): Comment.
+/**
+ * Resource.
+ */
 export class Resource {
 
-  // TODO(egor): Comment.
-  constructor(id, type, ownerAccount, systemAttributes = null, attributes = null, links = null) {
-    // TODO(egor): That's a lot of params. Consider passing in an object.
+  /**
+   * New Resource.
+   * @param {object} resource
+   * @param {object} ownerAccount
+   */
+  constructor(resource, ownerAccount) {
+    let { id, type, systemAttributes = null, attributes = null, links = null } = resource;
+
     this.id = id;
     this.type = type;
-    this.ownerAccount = ownerAccount;
     this.systemAttributes = Util.sortJSON(systemAttributes);
     this.attributes = Util.sortJSON(attributes);
     this.links = Util.sortJSON(links);
+    this.ownerAccount = ownerAccount;
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Serialize Resource.
+   */
   serialize() {
     return Util.sortJSON({
       "id": this.id.toString(),
       "type": this.type.toString(),
       "owner": {
         "id": "",
-        "address": this.ownerAccount.wirechainAddress
+        "address": this.ownerAccount.registryAddress
       },
       "systemAttributes": btoa(JSON.stringify(this.systemAttributes)),
       "attributes": btoa(JSON.stringify(this.attributes)),
@@ -33,14 +42,16 @@ export class Resource {
     });
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Get message to calculate resource signature.
+   */
   getMessageToSign() {
     return {
       "id": this.id.toString(),
       "type": this.type.toString(),
       "owner": {
         "id": "",
-        "address": this.ownerAccount.wirechainAddress
+        "address": this.ownerAccount.registryAddress
       },
       "systemAttributes": this.systemAttributes,
       "attributes": this.attributes,
@@ -49,16 +60,24 @@ export class Resource {
   }
 }
 
-// TODO(egor): Comment.
+/**
+ * Resource Signature.
+ */
 export class Signature {
 
-  // TODO(egor): Comment.
+  /**
+   * New Signature.
+   * @param {string} pubKey
+   * @param {string} sig
+   */
   constructor(pubKey, sig) {
     this.pubKey = pubKey;
     this.sig = sig;
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Serialize Signature.
+   */
   serialize() {
     return Util.sortJSON({
       "pubKey": this.pubKey,
@@ -67,16 +86,24 @@ export class Signature {
   }
 }
 
-// TODO(egor): Comment.
+/**
+ * Message Payload.
+ */
 export class Payload {
 
-  // TODO(egor): Comment.
+  /**
+   * New Payload.
+   * @param {object} resource
+   * @param  {...any} signatures
+   */
   constructor(resource, ...signatures) {
     this.resource = resource;
     this.signatures = signatures;
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Serialize Payload.
+   */
   serialize() {
     return Util.sortJSON({
       "resource": this.resource.serialize(),
@@ -85,15 +112,23 @@ export class Payload {
   }
 }
 
-// TODO(egor): Comment.
+/**
+ * Transaction Message.
+ */
 export class Msg {
-  // TODO(egor): Comment.
+  /**
+   * New Message.
+   * @param {object} payload
+   * @param {string} signer
+   */
   constructor(payload, signer) {
     this.payload = payload;
     this.signer = signer;
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Serialize Message.
+   */
   serialize() {
     return Util.sortJSON({
       "Payload": this.payload.serialize(),
@@ -103,9 +138,19 @@ export class Msg {
 }
 
 
-// TODO(egor): Comment.
+/**
+ * Transaction.
+ */
 export class Transaction {
-  // TODO(egor): Comment.
+  /**
+   * New Transaction.
+   * @param {object} message
+   * @param {object} account
+   * @param {object} fee
+   * @param {string} signature
+   * @param {string} accountNumber
+   * @param {string} accountSequence
+   */
   constructor(message, account, fee, signature, accountNumber, accountSequence) {
     fee.gas = parseInt(fee.gas);
 
@@ -117,14 +162,16 @@ export class Transaction {
     this.accountSequence = parseInt(accountSequence);
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Serialize Transaction.
+   */
   serialize() {
     return Util.sortJSON({
       "msg": [this.message.serialize()],
       "fee": this.fee,
       "signatures": [
         {
-          "pub_key": this.account.wirechainPublicKey,
+          "pub_key": this.account.registryPublicKey,
           "signature": this.signature.toString('base64'),
           "account_number": this.accountNumber,
           "sequence": this.accountSequence

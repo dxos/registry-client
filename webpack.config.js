@@ -31,8 +31,8 @@ module.exports = {
 
   output: {
     path: path.resolve('./dist/'),
-    filename: 'wirechain.js',
-    library: 'wirechain',
+    filename: 'registry.js',
+    library: 'registry',
     libraryTarget: 'umd'
   },
 

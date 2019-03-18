@@ -35,28 +35,38 @@ export class Account {
 
     // 4. Generate registry formatted public key.
     let publicKeyInHex = AMINO_PREFIX + this.publicKey.toString('hex');
-
-    // TODO(egor): Rename wirechainPublicKey to registryPublicKey.
-    this.wirechainPublicKey = Buffer.from(publicKeyInHex, 'hex').toString('base64');
+    this.registryPublicKey = Buffer.from(publicKeyInHex, 'hex').toString('base64');
 
     // 5. Generate registry formatted address.
     publicKeySha256 = sha256(Buffer.from(publicKeyInHex, 'hex'));
-
-    // TODO(egor): Rename wirechainAddress to registryAddress.
-    this.wirechainAddress = new ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
+    this.registryAddress = new ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Get private key.
+   */
   getPrivateKey() {
     return this.privateKey.toString('hex');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Get public key.
+   */
   getPublicKey() {
     return this.publicKey.toString('hex');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Get cosmos address.
+   */
+  getCosmosAddress() {
+    return this.formattedCosmosAddress;
+  }
+
+  /**
+   * Get resource signature.
+   * @param {object} resource
+   */
   signResource(resource) {
     let resourceAsJson = JSON.stringify(resource, null, 2);
     // Double sha256.
@@ -65,7 +75,10 @@ export class Account {
     return this.sign(resourceBytesToSign);
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Sign message.
+   * @param {object} msg
+   */
   sign(msg) {
     let messageToSignSha256 = sha256(msg);
     let messageToSignSha256InBytes = Buffer.from(messageToSignSha256, 'hex');
@@ -74,12 +87,17 @@ export class Account {
     return sigObj.signature;
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Generate bip39 mnemonic.
+   */
   static generateMnemonic() {
     return bip39.generateMnemonic();
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Generate private key from mnemonic.
+   * @param {string} mnemonic
+   */
   static generateFromMnemonic(mnemonic) {
     // TODO(egorgripasov): proper key generation from bip39 mnemonic!
     let mnemonicSha256 = sha256(Buffer.from(mnemonic));

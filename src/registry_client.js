@@ -7,13 +7,15 @@ import graphql from 'graphql.js';
 /**
  * Registry
  */
-// TODO(egor): Rename to Client or RegistryClient. Cli reminds one of 'command line interface'.
-export class RegistryCli {
+export class RegistryClient {
   static DEFAULT_ENDPOINT = 'http://localhost:8080/query';
 
-  // TODO(egor): Comment.
+  /**
+   * New Client.
+   * @param {string} endpoint
+   */
   constructor(endpoint) {
-    this.endpoint = endpoint || RegistryCli.DEFAULT_ENDPOINT;
+    this.endpoint = endpoint || RegistryClient.DEFAULT_ENDPOINT;
     this.graph = graphql(this.endpoint, {
       method: "POST",
       asJSON: true
@@ -28,7 +30,10 @@ export class RegistryCli {
     return [];
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Fetch Accounts.
+   * @param {array} addresses
+   */
   async getAccounts(addresses) {
     console.assert(addresses);
     console.assert(addresses.length);
@@ -53,7 +58,10 @@ export class RegistryCli {
     return this._getResult(this.graph(query)(variables), 'getAccounts');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Fetch Resources.
+   * @param {array} ids
+   */
   async getResources(ids) {
     console.assert(ids);
     console.assert(ids.length);
@@ -82,7 +90,9 @@ export class RegistryCli {
     return this._getResult(this.graph(query)(variables), 'getResources');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * List Resources.
+   */
   async listResources() {
     let query = `query {
       listResources {
@@ -104,17 +114,26 @@ export class RegistryCli {
     return this._getResult(this.graph(query)(variables), 'listResources');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Fetch Bots.
+   * @param {array} name
+   */
   getBots(name) {
     throw new Error('Not implemented.');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Fetch Pseudonyms.
+   * @param {array} name
+   */
   getPseudonyms(name) {
     throw new Error('Not implemented.');
   }
 
-  // TODO(egor): Comment.
+  /**
+   * Broadcast transaction.
+   * @param {string} tx
+   */
   async broadcastTxCommit(tx) {
     console.assert(tx);
 

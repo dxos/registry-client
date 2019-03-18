@@ -10,10 +10,8 @@ const ADDRESS = '13e5d36d697c30bec5bb70251c7473935573ab55';
 const FORMATTED_ADDRESS = 'cosmos1z0jaxmtf0scta3dmwqj3carnjd2h8264ut9vvl';
 
 const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928bcd589dd';
-
-// TODO(egor): Rename WIRECHAIN to REGISTRY across all files.
-const WIRECHAIN_PUBLIC_KEY = '61rphyECRYVJ4HX4HwQy8pG4WuXWZn2oArJyicXUU8xA6X4Ycy8=';
-const WIRECHAIN_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
+const REGISTRY_PUBLIC_KEY = '61rphyECRYVJ4HX4HwQy8pG4WuXWZn2oArJyicXUU8xA6X4Ycy8=';
+const REGISTRY_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
 
 const RESOURCE_SIGNATURE = 'Nee+GG0/+Z9ue77Cox684Arn8Nw13kNnf/VwTuObFZEaoaaWLNv4f3UceP6KvgaeiOIQDlIf8AG4DQfPbsKyhQ==';
 
@@ -32,10 +30,10 @@ test('Generate account from mnenonic.', () => {
   expect(acc1.formattedCosmosAddress).toBe(acc2.formattedCosmosAddress);
 })
 
-test('Generate wirechain specific public key and address.', () => {
+test('Generate registry specific public key and address.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
-  expect(acc.wirechainPublicKey).toBe(WIRECHAIN_PUBLIC_KEY);
-  expect(acc.wirechainAddress).toBe(WIRECHAIN_ADDRESS);
+  expect(acc.registryPublicKey).toBe(REGISTRY_PUBLIC_KEY);
+  expect(acc.registryAddress).toBe(REGISTRY_ADDRESS);
 })
 
 test('Ability to sign resource obj.', () => {
@@ -45,7 +43,7 @@ test('Ability to sign resource obj.', () => {
     type: "Service",
     owner: {
       id: "",
-      address: acc.wirechainAddress
+      address: acc.registryAddress
     },
     systemAttributes: {
       uri: "https://api.example.org/service"
