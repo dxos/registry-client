@@ -7,8 +7,10 @@ import ripemd160 from 'ripemd160';
 import secp256k1 from 'secp256k1/elliptic';
 import bip39 from 'bip39';
 import bech32 from 'bech32';
+import hdkey from 'ethereumjs-wallet/hdkey';
 
 const AMINO_PREFIX = 'EB5AE98721';
+const HDPATH = "m/44'/118'/0'/0/0";
 /**
  * Registry account.
  */
@@ -99,10 +101,12 @@ export class Account {
    * @param {string} mnemonic
    */
   static generateFromMnemonic(mnemonic) {
-    // TODO(egorgripasov): proper key generation from bip39 mnemonic!
-    let mnemonicSha256 = sha256(Buffer.from(mnemonic));
-    let mnemonicInBytes = Buffer.from(mnemonicSha256, 'hex');
+    let seed = bip39.mnemonicToSeed(mnemonic);
 
-    return new Account(mnemonicInBytes);
+    let wallet = hdkey.fromMasterSeed(seed);
+    let account = wallet.derivePath(HDPATH);
+
+    let privateKey = account.getWallet().getPrivateKey();
+    return new Account(privateKey);
   }
 }
