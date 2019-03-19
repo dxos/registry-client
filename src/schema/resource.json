@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "/Resource",
+
+  "definitions": {
+
+    "systemAttributes": {
+      "type": "object",
+      "default": null
+    },
+
+    "attributes": {
+      "type": "object",
+      "default": null
+    },
+
+    "links": {
+      "type": "object",
+      "default": null
+    }
+  },
+
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string"
+    },
+    "systemAttributes": {
+      "$ref": "#/definitions/systemAttributes"
+    },
+    "attributes": {
+      "$ref": "#/definitions/attributes"
+    },
+    "links": {
+      "$ref": "#/definitions/links"
+    }
+  },
+
+  "required": [
+    "id",
+    "type"
+  ]
+}
