@@ -6,6 +6,7 @@
   "author": "",
   "license": "UNLICENSED",
   "browser": "dist/umd/index",
+  "module": "dist/es/index",
   "main": "src/index.js",
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -47,7 +48,9 @@
   "scripts": {
     "test": "jest",
     "clean": "rm -rf ./dist",
-    "build": "npm run clean && NODE_ENV=production webpack"
+    "build": "npm run clean && npm run build:node && npm run build:web",
+    "build:node": "NODE_ENV=production babel ./src --out-dir ./dist/es --ignore \"**/*.test.js\"",
+    "build:web": "NODE_ENV=production webpack"
   },
   "publishConfig": {
     "access": "public"
