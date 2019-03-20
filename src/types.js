@@ -2,6 +2,10 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import _ from 'lodash';
+import { Validator } from 'jsonschema';
+
+import ResourceSchema from './schema/resource.json';
 import { Util } from './util';
 
 /**
@@ -14,6 +18,13 @@ export class Resource {
    * @param {object} ownerAccount
    */
   constructor(resource, ownerAccount) {
+    let validator = new Validator();
+    let result = validator.validate(resource, ResourceSchema);
+    if (!result.valid) {
+      _.each(result.errors, err => console.error(err));
+      throw new Error('Invalid resource input.');
+    }
+
     let { id, type, systemAttributes = null, attributes = null, links = null } = resource;
 
     this.id = id;
