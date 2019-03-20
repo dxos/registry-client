@@ -1,6 +1,6 @@
 {
   "name": "@wirelineio/registry-client",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "Wireline Registry JavaScript SDK.",
   "repository": "https://github.com/wirelineio/registry-sdk",
   "author": "",
