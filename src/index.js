@@ -41,17 +41,19 @@ export class Registry {
   /**
    * Get bots by names.
    * @param {array} names
+   * @param {string} namespace
    */
-  async getBots(names) {
-    return this.client.getBots(names);
+  async getBots(names, namespace) {
+    return this.client.getBots(names, namespace);
   }
 
   /**
    * Get accounts by addresses.
    * @param {array} names
+   * @param {string} namespace
    */
-  async getPseudonyms(names) {
-    return this.client.getPseudonyms(names);
+  async getPseudonyms(names, namespace) {
+    return this.client.getPseudonyms(names, namespace);
   }
 
   /**
