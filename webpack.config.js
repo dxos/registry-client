@@ -3,38 +3,33 @@
 //
 
 const path = require('path');
-
 const webpack = require('webpack');
+const pkg = require('./package.json');
+
+const mode = process.env.NODE_ENV || 'development';
 
 module.exports = {
   target: 'web',
 
-  mode: 'development',
+  mode,
 
   stats: 'errors-only',
 
   // Source map shows the original source and line numbers (and works with hot loader).
   // https://webpack.github.io/docs/configuration.html#devtool
-  devtool: '#source-map',
-
-  // https://webpack.js.org/configuration/resolve
-  resolve: {
-    extensions: ['.js'],
-
-    // Resolve imports/requires.
-    modules: ['node_modules']
-  },
+  devtool: process.env.NODE_ENV !== 'production' ? '#source-map' : false,
 
   entry: {
-    app: [path.resolve('./src/index.js')]
+    index: [path.resolve('./src/index.js')]
   },
 
   output: {
-    path: path.resolve('./dist/'),
-    filename: 'registry.js',
-    library: 'registry',
+    path: path.resolve(__dirname, 'dist/umd'),
+    filename: '[name].js',
     libraryTarget: 'umd'
   },
+
+  externals: Object.keys(pkg.dependencies),
 
   // https://www.npmjs.com/package/html-webpack-plugin
   plugins: [
