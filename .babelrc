@@ -1,16 +1,19 @@
 {
   "presets": [
-    ["env", {
-      "debug": false,
-      "targets": {
-        "browser": "chrome"
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "chrome": "60" 
+        },
+        "modules": "commonjs"
       }
-    }],
-
-    "stage-0"
+    ],
+    "@babel/preset-react"
   ],
-
   "plugins": [
-    "transform-runtime"
+    "add-module-exports",
+    "@babel/plugin-transform-runtime",
+    "@babel/plugin-proposal-class-properties"
   ]
 }
