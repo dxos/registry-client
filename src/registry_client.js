@@ -117,13 +117,13 @@ export class RegistryClient {
   /**
    * Fetch Bots.
    * @param {array} name
+   * @param {string} namespace
    */
-  getBots(name) {
-    console.assert(name);
-    console.assert(name.length);
+  getBots(name, namespace) {
+    name = name || [];
 
-    let query = `query ($name: [String!]) {
-      getBots(name: $name) {
+    let query = `query ($namespace: String, $name: [String!]) {
+      getBots(namespace: $namespace, name: $name) {
         resource {
           id
           type
@@ -144,7 +144,8 @@ export class RegistryClient {
     }`
 
     let variables = {
-      name
+      name,
+      namespace
     }
 
     return this._getResult(this.graph(query)(variables), 'getBots');
@@ -153,13 +154,13 @@ export class RegistryClient {
   /**
    * Fetch Pseudonyms.
    * @param {array} name
+   * @param {string} namespace
    */
-  getPseudonyms(name) {
-    console.assert(name);
-    console.assert(name.length);
+  getPseudonyms(name, namespace) {
+    name = name || [];
 
-    let query = `query ($name: [String!]) {
-      getPseudonyms(name: $name) {
+    let query = `query ($namespace: String, $name: [String!]) {
+      getPseudonyms(namespace: $namespace, name: $name) {
         resource {
           id
           type
@@ -180,7 +181,8 @@ export class RegistryClient {
     }`
 
     let variables = {
-      name
+      name,
+      namespace
     }
 
     return this._getResult(this.graph(query)(variables), 'getPseudonyms');
