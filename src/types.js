@@ -2,7 +2,6 @@
 // Copyright 2019 Wireline, Inc.
 //
 
-import _ from 'lodash';
 import { Validator } from 'jsonschema';
 
 import ResourceSchema from './schema/resource.json';
@@ -21,7 +20,7 @@ export class Resource {
     let validator = new Validator();
     let result = validator.validate(resource, ResourceSchema);
     if (!result.valid) {
-      _.each(result.errors, err => console.error(err));
+      result.errors.map(console.error);
       throw new Error('Invalid resource input.');
     }
 
