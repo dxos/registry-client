@@ -1,9 +1,9 @@
-# registry-sdk
+# registry-client
 
 ## Usage
 
 ```
-import { Account, Registry } from 'registry-sdk';
+import { Account, Registry } from 'registry-client';
 const endpoint = 'http://localhost:8080/query';
 let registry = new Registry(endpoint);
 ```
