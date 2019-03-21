@@ -8,7 +8,7 @@ import graphql from 'graphql.js';
  * Registry
  */
 export class RegistryClient {
-  static DEFAULT_ENDPOINT = 'http://localhost:8080/query';
+  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/query';
 
   /**
    * New Client.

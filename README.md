@@ -4,7 +4,7 @@
 
 ```
 import { Account, Registry } from 'registry-client';
-const endpoint = 'http://localhost:8080/query';
+const endpoint = 'https://registry-testnet.wireline.ninja/query';
 let registry = new Registry(endpoint);
 ```
 
