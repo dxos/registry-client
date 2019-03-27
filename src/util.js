@@ -43,7 +43,7 @@ export class Util {
    * 
    * @param {object} object
    */
-  static getGQLVars(object) {
+  static toGQLAttributes(object) {
     let vars = [];
     for (let key in object) {
       if (object.hasOwnProperty(key)) {
@@ -61,5 +61,19 @@ export class Util {
       }
     }
     return vars;
+  }
+
+  static fromGQLAttributes(attributes) {
+    let res = {};
+    for (let attr of attributes) {
+      if (attr.value.null) {
+        res[attr.key] = null
+      } else {
+        let { values, null:n, ...types } = attr.value;
+        let value = Object.values(types).find(v => v !== null);
+        res[attr.key] = value;
+      }
+    }
+    return res;
   }
 }

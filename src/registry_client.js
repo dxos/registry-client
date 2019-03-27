@@ -25,12 +25,23 @@ export class RegistryClient {
     });
   }
 
-  async _getResult(query, key) {
+  async _getResult(query, key, modifier = null) {
     let result = await query;
     if (result && result[key] && result[key].length && result[key][0] !== null) {
+      if (modifier) {
+        return modifier(result[key]);
+      }
       return result[key];
     }
     return [];
+  }
+
+  _prepareAttributes(rows) {
+    let result = rows.map(r => {
+      r.attributes = Util.fromGQLAttributes(r.attributes);
+      return r;
+    });
+    return result;
   }
 
   /**
@@ -87,7 +98,7 @@ export class RegistryClient {
       ids
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByIds');
+    return this._getResult(this.graph(query)(variables), 'getRecordsByIds', this._prepareAttributes);
   }
 
   /**
@@ -118,10 +129,10 @@ export class RegistryClient {
     }`;
 
     let variables = {
-      attributes: Util.getGQLVars(attributes)
+      attributes: Util.toGQLAttributes(attributes)
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes');
+    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes', this._prepareAttributes);
   }
 
   /**
@@ -155,7 +166,7 @@ export class RegistryClient {
     }`;
 
     let variables = {
-      attributes: Util.getGQLVars(attributes)
+      attributes: Util.toGQLAttributes(attributes)
     };
 
     return this._getResult(this.graph(query)(variables), 'getBotsByAttributes');

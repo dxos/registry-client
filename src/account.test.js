@@ -13,7 +13,7 @@ const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928b
 const REGISTRY_PUBLIC_KEY = '61rphyECRYVJ4HX4HwQy8pG4WuXWZn2oArJyicXUU8xA6X4Ycy8=';
 const REGISTRY_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
 
-const RECORD_SIGNATURE = '1+CI/EcDwGXVoo8Crras1UASMmEaE9dRUGdiQeDWJ0kVdBMRpeUgCX+pW12g7igwwCiu/Oeiwm+oZ99GvT2e3g==';
+const RECORD_SIGNATURE = 'b6hDwJL8320CATsQDMUAWZ8bbo8A6voTTSXuyeLJRJ9bSOAP4RP8IihLWvEsA/ooZefQdMge85S7QXLIsOYFrw==';
 
 test('Generate account from private key.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY, 'hex'));
@@ -38,8 +38,8 @@ test('Generate registry specific public key and address.', () => {
 test('Ability to sign record obj.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
   let record = {
-    id: '05013527-30ef-4aee-85d5-a71e1722f255',
-    type: 'Service',
+    id: 'wrn:record:05013527-30ef-4aee-85d5-a71e1722f255',
+    type: 'wrn:registry-type:service',
     owner: acc.registryAddress,
     // systemAttributes: {
     //   uri: 'https://api.example.org/service'
