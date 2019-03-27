@@ -66,15 +66,15 @@ export class Account {
   }
 
   /**
-   * Get resource signature.
-   * @param {object} resource
+   * Get record signature.
+   * @param {object} record
    */
-  signResource(resource) {
-    let resourceAsJson = JSON.stringify(resource, null, 2);
+  signRecord(record) {
+    let recordAsJson = JSON.stringify(record, null, 2);
     // Double sha256.
-    let resourceBytesToSign = Buffer.from(sha256(Buffer.from(sha256(Buffer.from(resourceAsJson)), 'hex')), 'hex');
+    let recordBytesToSign = Buffer.from(sha256(Buffer.from(sha256(Buffer.from(recordAsJson)), 'hex')), 'hex');
 
-    return this.sign(resourceBytesToSign);
+    return this.sign(recordBytesToSign);
   }
 
   /**

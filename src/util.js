@@ -38,4 +38,28 @@ export class Util {
     }
     return newObject;
   }
+
+  /**
+   * 
+   * @param {object} object
+   */
+  static getGQLVars(object) {
+    let vars = [];
+    for (let key in object) {
+      if (object.hasOwnProperty(key)) {
+        let type = typeof key;
+        if (object[key] === null) {
+          vars.push({ key, value: { 'null': true }});
+        } else if (type === 'number') {
+          type = (object[key] % 1 === 0) ? 'int' : 'float';
+          vars.push({ key, value: { [type]: object[key] }});
+        } else if (type === 'string') {
+          vars.push({ key, value: { 'string': object[key] }});
+        } else if (type === 'boolean') {
+          vars.push({ key, value: { 'boolean': object[key] }});
+        }
+      }
+    }
+    return vars;
+  }
 }

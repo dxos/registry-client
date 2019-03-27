@@ -2,7 +2,10 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+// TODO(egorgripasov): replace with appolo client + fragments.
 import graphql from 'graphql.js';
+
+import { Util } from './util';
 
 /**
  * Registry
@@ -17,9 +20,9 @@ export class RegistryClient {
   constructor(endpoint) {
     this.endpoint = endpoint || RegistryClient.DEFAULT_ENDPOINT;
     this.graph = graphql(this.endpoint, {
-      method: "POST",
+      method: 'POST',
       asJSON: true
-    })
+    });
   }
 
   async _getResult(query, key) {
@@ -42,166 +45,136 @@ export class RegistryClient {
       getAccounts(addresses: $addresses) {
         address
         pubKey
-        num
-        seq
-        coins {
-          denom
+        number
+        sequence
+        balance {
+          type
           amount
         }
       }
-    }`
+    }`;
 
     let variables = {
       addresses
-    }
+    };
 
     return this._getResult(this.graph(query)(variables), 'getAccounts');
   }
 
-  /**
-   * Fetch Resources.
-   * @param {array} ids
-   */
-  async getResources(ids) {
+  async getRecordsByIds(ids) {
     console.assert(ids);
     console.assert(ids.length);
 
     let query = `query ($ids: [String!]) {
-      getResources(ids: $ids) {
+      getRecordsByIds(ids: $ids) {
         id
         type
-        owner {
-          id
-          address
-        }
-        systemAttributes
-        attributes
-        links {
-          id
-          attributes
+        owner
+        attributes {
+          key
+          value {
+            null
+            int
+            float
+            string
+            boolean
+          }
         }
       }
-    }`
+    }`;
 
     let variables = {
       ids
-    }
+    };
 
-    return this._getResult(this.graph(query)(variables), 'getResources');
+    return this._getResult(this.graph(query)(variables), 'getRecordsByIds');
   }
 
   /**
-   * List Resources.
+   * Get records by attributes.
+   * @param {object} attributes
    */
-  async listResources() {
-    let query = `query {
-      listResources {
+  async getRecordsByAttributes(attributes) {
+    if (!attributes) {
+      attributes = {};
+    }
+
+    let query = `query ($attributes: [KeyValueInput!]) {
+      getRecordsByAttributes(attributes: $attributes) {
         id
         type
-        owner {
-          id
-          address
-        }
-        systemAttributes
-        attributes
-        links {
-          id
-          attributes
-        }
-      }
-    }`
-
-    return this._getResult(this.graph(query)(variables), 'listResources');
-  }
-
-  /**
-   * Fetch Bots.
-   * @param {array} name
-   * @param {string} namespace
-   */
-  getBots(name, namespace) {
-    name = name || [];
-
-    let query = `query ($namespace: String, $name: [String!]) {
-      getBots(namespace: $namespace, name: $name) {
-        resource {
-          id
-          type
-          owner {
-            id
-            address
-          }
-          systemAttributes
-          attributes
-          links {
-            id
-            attributes
+        owner
+        attributes {
+          key
+          value {
+            null
+            int
+            float
+            string
+            boolean
           }
         }
-        name
-        dsinvite
       }
-    }`
+    }`;
 
     let variables = {
-      name,
-      namespace
-    }
+      attributes: Util.getGQLVars(attributes)
+    };
 
-    return this._getResult(this.graph(query)(variables), 'getBots');
+    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes');
   }
 
   /**
-   * Fetch Pseudonyms.
-   * @param {array} name
-   * @param {string} namespace
+   * Get bots by attributes.
+   * @param {object} attributes
    */
-  getPseudonyms(name, namespace) {
-    name = name || [];
+  async getBotsByAttributes(attributes) {
+    console.assert(attributes);
+    console.assert(Object.keys(attributes).length);
 
-    let query = `query ($namespace: String, $name: [String!]) {
-      getPseudonyms(namespace: $namespace, name: $name) {
-        resource {
+    let query = `query ($attributes: [KeyValueInput!]) {
+      getBotsByAttributes(attributes: $attributes) {
+        name
+        accessKey
+        record {
           id
           type
-          owner {
-            id
-            address
-          }
-          systemAttributes
-          attributes
-          links {
-            id
-            attributes
+          owner
+          attributes {
+            key
+            value {
+              null
+              int
+              float
+              string
+              boolean
+            }
           }
         }
-        name
-        dsinvite
       }
-    }`
+    }`;
 
     let variables = {
-      name,
-      namespace
-    }
+      attributes: Util.getGQLVars(attributes)
+    };
 
-    return this._getResult(this.graph(query)(variables), 'getPseudonyms');
+    return this._getResult(this.graph(query)(variables), 'getBotsByAttributes');
   }
 
   /**
-   * Broadcast transaction.
+   * Submit transaction.
    * @param {string} tx
    */
-  async broadcastTxCommit(tx) {
+  async submit(tx) {
     console.assert(tx);
 
     let mutation = `mutation ($tx: String!) {
-      broadcastTxCommit(tx: $tx)
-    }`
+      submit(tx: $tx)
+    }`;
 
     let variables = {
       tx
-    }
+    };
 
     return this.graph(mutation)(variables);
   }

@@ -13,7 +13,7 @@ const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928b
 const REGISTRY_PUBLIC_KEY = '61rphyECRYVJ4HX4HwQy8pG4WuXWZn2oArJyicXUU8xA6X4Ycy8=';
 const REGISTRY_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
 
-const RESOURCE_SIGNATURE = 'Nee+GG0/+Z9ue77Cox684Arn8Nw13kNnf/VwTuObFZEaoaaWLNv4f3UceP6KvgaeiOIQDlIf8AG4DQfPbsKyhQ==';
+const RECORD_SIGNATURE = '1+CI/EcDwGXVoo8Crras1UASMmEaE9dRUGdiQeDWJ0kVdBMRpeUgCX+pW12g7igwwCiu/Oeiwm+oZ99GvT2e3g==';
 
 test('Generate account from private key.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY, 'hex'));
@@ -35,23 +35,20 @@ test('Generate registry specific public key and address.', () => {
   expect(acc.registryAddress).toBe(REGISTRY_ADDRESS);
 });
 
-test('Ability to sign resource obj.', () => {
+test('Ability to sign record obj.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
-  let resource = {
+  let record = {
     id: '05013527-30ef-4aee-85d5-a71e1722f255',
     type: 'Service',
-    owner: {
-      id: '',
-      address: acc.registryAddress
-    },
-    systemAttributes: {
-      uri: 'https://api.example.org/service'
-    },
+    owner: acc.registryAddress,
+    // systemAttributes: {
+    //   uri: 'https://api.example.org/service'
+    // },
     attributes: {
       label: 'Weather'
     },
-    links: null
+    // links: null
   };
-  let signature = acc.signResource(resource);
-  expect(signature.toString('base64')).toBe(RESOURCE_SIGNATURE);
+  let signature = acc.signRecord(record);
+  expect(signature.toString('base64')).toBe(RECORD_SIGNATURE);
 });
