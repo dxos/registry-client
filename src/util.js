@@ -38,4 +38,46 @@ export class Util {
     }
     return newObject;
   }
+
+  /**
+   * Marshal object into gql 'attributes' variable.
+   * @param {object} object
+   */
+  static toGQLAttributes(object) {
+    let vars = [];
+    for (let key in object) {
+      if (object.hasOwnProperty(key)) {
+        let type = typeof key;
+        if (object[key] === null) {
+          vars.push({ key, value: { 'null': true }});
+        } else if (type === 'number') {
+          type = (object[key] % 1 === 0) ? 'int' : 'float';
+          vars.push({ key, value: { [type]: object[key] }});
+        } else if (type === 'string') {
+          vars.push({ key, value: { 'string': object[key] }});
+        } else if (type === 'boolean') {
+          vars.push({ key, value: { 'boolean': object[key] }});
+        }
+      }
+    }
+    return vars;
+  }
+
+  /**
+   * Unmarshal attributes array to object.
+   * @param {array} attributes
+   */
+  static fromGQLAttributes(attributes) {
+    let res = {};
+    for (let attr of attributes) {
+      if (attr.value.null) {
+        res[attr.key] = null;
+      } else {
+        let { values, null:n, ...types } = attr.value;
+        let value = Object.values(types).find(v => v !== null);
+        res[attr.key] = value;
+      }
+    }
+    return res;
+  }
 }

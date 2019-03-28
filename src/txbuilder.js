@@ -21,17 +21,17 @@ const FEE = {
 export class TxBuilder {
   /**
    * Generates registry message.
-   * @param {object} resource
+   * @param {object} record
    */
-  static generatePayload(resource) {
+  static generatePayload(record) {
     // TODO(Ashwin): message type.
     // Registry signature.
-    let { ownerAccount: account } = resource;
-    let messageToSign = resource.getMessageToSign();
-    let sig = account.signResource(messageToSign);
+    let { ownerAccount: account } = record;
+    let messageToSign = record.getMessageToSign();
+    let sig = account.signRecord(messageToSign);
     let signature = new Signature(account.registryPublicKey, sig.toString('base64'));
 
-    let payload = new Payload(resource, signature);
+    let payload = new Payload(record, signature);
     return payload;
   }
 

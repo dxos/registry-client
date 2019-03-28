@@ -4,7 +4,7 @@
 
 import { Account } from './account';
 import { TxBuilder } from './txbuilder';
-import { Resource } from './types';
+import { Record } from './types';
 
 const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928bcd589dd';
 const CHAIN = 'wireline';
@@ -13,25 +13,25 @@ const CHAIN = 'wireline';
 const ACC_NUM = '1';
 const ACC_SEQ = '4';
 
-const RESOURCE_OBJ = {
-  id: '05013527-30ef-4aee-85d5-a71e1722f255',
-  type: 'Service',
-  systemAttributes: {
-    uri: 'https://api.example.org/service'
-  },
+const RECORD_OBJ = {
+  id: 'wrn:record:05013527-30ef-4aee-85d5-a71e1722f255',
+  type: 'wrn:registry-type:service',
+  // systemAttributes: {
+  //   uri: 'https://api.example.org/service'
+  // },
   attributes: {
     label: 'Weather'
   }
 };
 
-const TRANS_SIG = 'MS1EAsnWGrSbjpytErp+dImwnmXoBa2vI15O9JtZqwtQS54MvZ3iRxfa6sx/nx3ZQet2Hz1WDCTa+XlLoIjXqg==';
+const TRANS_SIG = 'PydOioz/+yytMhDo7d2tGljgXUdBQDe9kZJABxSc1tMTm4NEV3wLsbeDZpJaAYg6UOK2gT0DyXI7s2FUE9HZow==';
 
 test('Generate proper transaction signature.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
 
-  let resource = new Resource(RESOURCE_OBJ, acc);
+  let record = new Record(RECORD_OBJ, acc);
 
-  let payload = TxBuilder.generatePayload(resource);
+  let payload = TxBuilder.generatePayload(record);
 
   let transaction = TxBuilder.createTransaction(payload, acc, ACC_NUM, ACC_SEQ, CHAIN);
   expect(transaction.signatures[0].signature).toBe(TRANS_SIG);

@@ -4,73 +4,67 @@
 
 import { Validator } from 'jsonschema';
 
-import ResourceSchema from './schema/resource.json';
+import RecordSchema from './schema/record.json';
 import { Util } from './util';
 
 /**
- * Resource.
+ * Record.
  */
-export class Resource {
+export class Record {
   /**
-   * New Resource.
-   * @param {object} resource
+   * New Record.
+   * @param {object} record
    * @param {object} ownerAccount
    */
-  constructor(resource, ownerAccount) {
+  constructor(record, ownerAccount) {
     let validator = new Validator();
-    let result = validator.validate(resource, ResourceSchema);
+    let result = validator.validate(record, RecordSchema);
     if (!result.valid) {
       result.errors.map(console.error);
-      throw new Error('Invalid resource input.');
+      throw new Error('Invalid record input.');
     }
 
-    let { id, type, systemAttributes = null, attributes = null, links = null } = resource;
+    let { id, type, /* systemAttributes = null, */ attributes = null /*, links = null */ } = record;
 
     this.id = id;
     this.type = type;
-    this.systemAttributes = Util.sortJSON(systemAttributes);
+    // this.systemAttributes = Util.sortJSON(systemAttributes);
     this.attributes = Util.sortJSON(attributes);
-    this.links = Util.sortJSON(links);
+    // this.links = Util.sortJSON(links);
     this.ownerAccount = ownerAccount;
   }
 
   /**
-   * Serialize Resource.
+   * Serialize record.
    */
   serialize() {
     return Util.sortJSON({
       "id": this.id.toString(),
       "type": this.type.toString(),
-      "owner": {
-        "id": "",
-        "address": this.ownerAccount.registryAddress
-      },
-      "systemAttributes": btoa(JSON.stringify(this.systemAttributes)),
+      "owner": this.ownerAccount.registryAddress,
+      // "systemAttributes": btoa(JSON.stringify(this.systemAttributes)),
       "attributes": btoa(JSON.stringify(this.attributes)),
-      "links": btoa(JSON.stringify(this.links))
+      // "links": btoa(JSON.stringify(this.links))
     });
   }
 
   /**
-   * Get message to calculate resource signature.
+   * Get message to calculate record signature.
    */
   getMessageToSign() {
     return {
       "id": this.id.toString(),
       "type": this.type.toString(),
-      "owner": {
-        "id": "",
-        "address": this.ownerAccount.registryAddress
-      },
-      "systemAttributes": this.systemAttributes,
+      "owner": this.ownerAccount.registryAddress,
+      // "systemAttributes": this.systemAttributes,
       "attributes": this.attributes,
-      "links": this.links
+      // "links": this.links
     }
   }
 }
 
 /**
- * Resource Signature.
+ * Record Signature.
  */
 export class Signature {
   /**
@@ -100,11 +94,11 @@ export class Signature {
 export class Payload {
   /**
    * New Payload.
-   * @param {object} resource
+   * @param {object} record
    * @param  {...any} signatures
    */
-  constructor(resource, ...signatures) {
-    this.resource = resource;
+  constructor(record, ...signatures) {
+    this.record = record;
     this.signatures = signatures;
   }
 
@@ -113,7 +107,7 @@ export class Payload {
    */
   serialize() {
     return Util.sortJSON({
-      "resource": this.resource.serialize(),
+      "record": this.record.serialize(),
       "signatures": this.signatures.map(s => s.serialize())
     });
   }
@@ -164,6 +158,7 @@ export class Transaction {
     this.account = account;
     this.fee = fee;
     this.signature = signature;
+    // TODO(egorgripasov): use BigInt.
     this.accountNumber = parseInt(accountNumber);
     this.accountSequence = parseInt(accountSequence);
   }

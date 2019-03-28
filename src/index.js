@@ -6,7 +6,7 @@ import { RegistryClient } from './registry_client';
 
 import { Account } from './account';
 import { TxBuilder } from './txbuilder';
-import { Resource } from './types';
+import { Record } from './types';
 
 const CHAIN = 'wireline';
 
@@ -27,42 +27,32 @@ export class Registry {
   }
 
   /**
-   * Get resources by ids.
+   * Get records by ids.
    * @param {array} ids
    */
-  async getResources(ids) {
-    if (ids && ids.length) {
-      return this.client.getResources(ids);
-    } else {
-      return this.client.listResources();
-    }
+  async getRecordsByIds(ids) {
+    return this.client.getRecordsByIds(ids);
   }
 
   /**
-   * Get bots by names.
-   * @param {array} names
-   * @param {string} namespace
+   * Get records by attributes.
+   * @param {object} attributes
    */
-  async getBots(names, namespace) {
-    return this.client.getBots(names, namespace);
+  async getRecordsByAttributes(attributes) {
+    return this.client.getRecordsByAttributes(attributes);
+  }
+
+  async getBotsByAttributes(attributes) {
+    return this.client.getBotsByAttributes(attributes);
   }
 
   /**
-   * Get accounts by addresses.
-   * @param {array} names
-   * @param {string} namespace
-   */
-  async getPseudonyms(names, namespace) {
-    return this.client.getPseudonyms(names, namespace);
-  }
-
-  /**
-   * Publish resource.
+   * Publish record.
    * @param {string} privateKey - private key in HEX to sign message.
-   * @param {object} resource
+   * @param {object} record
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
-  async setResource(privateKey, resource, transactionPrivateKey) {
+  async setRecord(privateKey, record, transactionPrivateKey) {
     // 1. Get account details.
     let account = new Account(Buffer.from(privateKey, 'hex'));
     let accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
@@ -73,17 +63,17 @@ export class Registry {
     console.assert(signingAccountDetails.length, 'Can not find account to sign the transaction in registry.');
 
     // 2. Generate message.
-    let registryResource = new Resource(resource, account);
-    let payload = TxBuilder.generatePayload(registryResource);
+    let registryRecord = new Record(record, account);
+    let payload = TxBuilder.generatePayload(registryRecord);
 
     // 3. Generate transaction.
-    let { num, seq } = signingAccountDetails[0];
-    let transaction = TxBuilder.createTransaction(payload, signingAccount, num.toString(), seq.toString(), CHAIN);
+    let { number, sequence } = signingAccountDetails[0];
+    let transaction = TxBuilder.createTransaction(payload, signingAccount, number.toString(), sequence.toString(), CHAIN);
 
     let tx = btoa(JSON.stringify(transaction, null, 2));
 
     // 4. Send transaction.
-    return this.client.broadcastTxCommit(tx);
+    return this.client.submit(tx);
   }
 }
 

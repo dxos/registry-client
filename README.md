@@ -29,25 +29,25 @@ let addresses = ['cosmos1sgdt4t6eq6thsewcpe2v9cu6c9ru837w7pj9lm'];
 let result = await registry.getAccounts(addresses);
 ```
 
-Get resources:
+Get records by ids:
 
 ```
 let ids = ['650f3ed2-f44e-43f2-9985-473422579fe6'];
-let result = await registry.getResources(ids);
+let result = await registry.getRecordsByIds(ids);
 ```
 
-Get bots:
+Get records by attributes:
 
 ```
-let names = ['testbot'];
-let result = await registry.getBots(names);
+let attributes = { label: 'Weather' };
+let result = await registry.getRecordsByAttributes(attributes);
 ```
 
-Get pseudonyms:
+Get bots by attributes:
 
 ```
-let names = ['dan'];
-let result = await registry.getPseudonyms(names);
+let attributes = { name: 'TestBot', tag: 'first-test' };
+let result = await registry.getBotsByAttributes(attributes);
 ```
 
 ### Publish to registry
@@ -56,16 +56,13 @@ let result = await registry.getPseudonyms(names);
 // Private key.
 let payloadKey = '31c90b358117ea94bb45f1e6bbef7dc5bb20b6cb39f71790dd510a2190fe222b';
 
-let resource = {
-  id: '05013527-30ef-4aee-85d5-a71e1722f255',
-  type: 'Service',
-  systemAttributes: {
-    uri: 'https://api.example.org/service'
-  },
+let record = {
+  id: 'wrn:record:05013527-30ef-4aee-85d5-a71e1722f255',
+  type: 'wrn:registry-type:service',
   attributes: {
     label: 'Weather'
   }
 };
 
-let result = await registry.setResource(payloadKey, resource);
+let result = await registry.setRecord(payloadKey, record);
 ```
