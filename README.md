@@ -46,7 +46,7 @@ let result = await registry.getRecordsByAttributes(attributes);
 Get bots by attributes:
 
 ```
-let attributes = { label: 'Weather' };
+let attributes = { name: 'TestBot', tag: 'first-test' };
 let result = await registry.getBotsByAttributes(attributes);
 ```
 
