@@ -4,6 +4,7 @@
 
 // TODO(egorgripasov): replace with appolo client + fragments.
 import graphql from 'graphql.js';
+import { get, set } from 'lodash';
 
 import { Util } from './util';
 
@@ -36,12 +37,14 @@ export class RegistryClient {
     return [];
   }
 
-  _prepareAttributes(rows) {
-    let result = rows.map(r => {
-      r.attributes = Util.fromGQLAttributes(r.attributes);
-      return r;
-    });
-    return result;
+  _prepareAttributes(path) {
+    return rows => {
+      let result = rows.map(r => {
+        set(r, path, Util.fromGQLAttributes(get(r, path)));
+        return r;
+      });
+      return result;
+    }
   }
 
   /**
@@ -98,7 +101,7 @@ export class RegistryClient {
       ids
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByIds', this._prepareAttributes);
+    return this._getResult(this.graph(query)(variables), 'getRecordsByIds', this._prepareAttributes('attributes'));
   }
 
   /**
@@ -132,7 +135,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes', this._prepareAttributes);
+    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes', this._prepareAttributes('attributes'));
   }
 
   /**
@@ -140,8 +143,9 @@ export class RegistryClient {
    * @param {object} attributes
    */
   async getBotsByAttributes(attributes) {
-    console.assert(attributes);
-    console.assert(Object.keys(attributes).length);
+    if (!attributes) {
+      attributes = {};
+    }
 
     let query = `query ($attributes: [KeyValueInput!]) {
       getBotsByAttributes(attributes: $attributes) {
@@ -169,7 +173,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return this._getResult(this.graph(query)(variables), 'getBotsByAttributes');
+    return this._getResult(this.graph(query)(variables), 'getBotsByAttributes', this._prepareAttributes('record.attributes'));
   }
 
   /**
