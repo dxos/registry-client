@@ -40,7 +40,7 @@ export class Util {
   }
 
   /**
-   * 
+   * Marshal object into gql 'attributes' variable.
    * @param {object} object
    */
   static toGQLAttributes(object) {
@@ -63,11 +63,15 @@ export class Util {
     return vars;
   }
 
+  /**
+   * Unmarshal attributes array to object.
+   * @param {array} attributes
+   */
   static fromGQLAttributes(attributes) {
     let res = {};
     for (let attr of attributes) {
       if (attr.value.null) {
-        res[attr.key] = null
+        res[attr.key] = null;
       } else {
         let { values, null:n, ...types } = attr.value;
         let value = Object.values(types).find(v => v !== null);

@@ -158,6 +158,7 @@ export class Transaction {
     this.account = account;
     this.fee = fee;
     this.signature = signature;
+    // TODO(egorgripasov): use BigInt.
     this.accountNumber = parseInt(accountNumber);
     this.accountSequence = parseInt(accountSequence);
   }
