@@ -150,8 +150,9 @@ export class Transaction {
    * @param {string} signature
    * @param {string} accountNumber
    * @param {string} accountSequence
+   * @param {string} operation
    */
-  constructor(message, account, fee, signature, accountNumber, accountSequence) {
+  constructor(message, account, fee, signature, accountNumber, accountSequence, operation = 'set') {
     fee.gas = parseInt(fee.gas);
 
     this.message = message;
@@ -161,6 +162,7 @@ export class Transaction {
     // TODO(egorgripasov): use BigInt.
     this.accountNumber = parseInt(accountNumber);
     this.accountSequence = parseInt(accountSequence);
+    this.operation = operation;
   }
 
   /**
@@ -178,7 +180,8 @@ export class Transaction {
           "sequence": this.accountSequence
         }
       ],
-      "memo": ""
+      "memo": "",
+      "operation": this.operation
     });
   }
 }
