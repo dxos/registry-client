@@ -42,8 +42,9 @@ export class TxBuilder {
    * @param {string} accountNumber
    * @param {string} accountSequence
    * @param {string} chainID
+   * @param {string} operation
    */
-  static createTransaction(payload, account, accountNumber, accountSequence, chainID) {
+  static createTransaction(payload, account, accountNumber, accountSequence, chainID, operation = 'set') {
     // 1. Generate message.
 
     // TODO(egor): Just take 'signer' param instead of 'account'?
@@ -63,7 +64,7 @@ export class TxBuilder {
     let transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
     let transactionSig = account.sign(transactionDataToSign);
 
-    let transaction = new Transaction(message, account, FEE, transactionSig, accountNumber, accountSequence);
+    let transaction = new Transaction(message, account, FEE, transactionSig, accountNumber, accountSequence, operation);
 
     return transaction.serialize();
   }

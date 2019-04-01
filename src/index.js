@@ -19,6 +19,37 @@ export class Registry {
   }
 
   /**
+   * Mutate registry.
+   * @param {string} privateKey - private key in HEX to sign message.
+   * @param {object} record
+   * @param {string} operation
+   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   */
+  async _submit(privateKey, record, operation, transactionPrivateKey) {
+    // 1. Get account details.
+    let account = new Account(Buffer.from(privateKey, 'hex'));
+    let accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
+    console.assert(accountDetails.length, 'Can not find account to sign the message in registry.');
+
+    let signingAccount = transactionPrivateKey ? new Account(Buffer.from(transactionPrivateKey, 'hex')) : account;
+    let signingAccountDetails = transactionPrivateKey ? await this.getAccounts([signingAccount.formattedCosmosAddress]) : accountDetails;
+    console.assert(signingAccountDetails.length, 'Can not find account to sign the transaction in registry.');
+
+    // 2. Generate message.
+    let registryRecord = new Record(record, account);
+    let payload = TxBuilder.generatePayload(registryRecord);
+
+    // 3. Generate transaction.
+    let { number, sequence } = signingAccountDetails[0];
+    let transaction = TxBuilder.createTransaction(payload, signingAccount, number.toString(), sequence.toString(), CHAIN, operation);
+
+    let tx = btoa(JSON.stringify(transaction, null, 2));
+
+    // 4. Send transaction.
+    return this.client.submit(tx);
+  }
+
+  /**
    * Get accounts by addresses.
    * @param {array} addresses
    */
@@ -53,27 +84,17 @@ export class Registry {
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
   async setRecord(privateKey, record, transactionPrivateKey) {
-    // 1. Get account details.
-    let account = new Account(Buffer.from(privateKey, 'hex'));
-    let accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
-    console.assert(accountDetails.length, 'Can not find account to sign the message in registry.');
+    return this._submit(privateKey, record, 'set', transactionPrivateKey);
+  }
 
-    let signingAccount = transactionPrivateKey ? new Account(Buffer.from(transactionPrivateKey, 'hex')) : account;
-    let signingAccountDetails = transactionPrivateKey ? await this.getAccounts([signingAccount.formattedCosmosAddress]) : accountDetails;
-    console.assert(signingAccountDetails.length, 'Can not find account to sign the transaction in registry.');
-
-    // 2. Generate message.
-    let registryRecord = new Record(record, account);
-    let payload = TxBuilder.generatePayload(registryRecord);
-
-    // 3. Generate transaction.
-    let { number, sequence } = signingAccountDetails[0];
-    let transaction = TxBuilder.createTransaction(payload, signingAccount, number.toString(), sequence.toString(), CHAIN);
-
-    let tx = btoa(JSON.stringify(transaction, null, 2));
-
-    // 4. Send transaction.
-    return this.client.submit(tx);
+  /**
+   * Delete record.
+   * @param {string} privateKey - private key in HEX to sign message.
+   * @param {object} record
+   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   */
+  async deleteRecord(privateKey, record, transactionPrivateKey) {
+    return this._submit(privateKey, record, 'delete', transactionPrivateKey);
   }
 }
 

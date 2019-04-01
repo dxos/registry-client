@@ -50,7 +50,9 @@ let attributes = { name: 'TestBot', tag: 'first-test' };
 let result = await registry.getBotsByAttributes(attributes);
 ```
 
-### Publish to registry
+### Write to registry
+
+Publish record:
 
 ```
 // Private key.
@@ -65,4 +67,21 @@ let record = {
 };
 
 let result = await registry.setRecord(payloadKey, record);
+```
+
+Delete record:
+
+```
+// Private key.
+let payloadKey = '31c90b358117ea94bb45f1e6bbef7dc5bb20b6cb39f71790dd510a2190fe222b';
+
+let record = {
+  id: 'wrn:record:05013527-30ef-4aee-85d5-a71e1722f255',
+  type: 'wrn:registry-type:service',
+  attributes: {
+    label: 'Weather'
+  }
+};
+
+let result = await registry.deleteRecord(payloadKey, record);
 ```
