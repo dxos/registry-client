@@ -3,6 +3,7 @@
 //
 
 import isUrl from 'is-url';
+import { resolve } from 'url';
 
 import { RegistryClient } from './registry_client';
 
@@ -18,9 +19,14 @@ const GQL_PATH = '/query';
  */
 export class Registry {
   constructor(url) {
-    if (!isUrl(url) || !url.endsWith(GQL_PATH)) {
+    if (!isUrl(url)) {
       throw new Error('Path to a registry GQL endpoint should be provided.');
     }
+
+    if (!url.endsWith(GQL_PATH)) {
+      url = resolve(url, GQL_PATH);
+    }
+
     this.client = new RegistryClient(url);
   }
 
