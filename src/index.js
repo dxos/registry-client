@@ -2,6 +2,8 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import isUrl from 'is-url';
+
 import { RegistryClient } from './registry_client';
 
 import { Account } from './account';
@@ -9,12 +11,16 @@ import { TxBuilder } from './txbuilder';
 import { Record } from './types';
 
 const CHAIN = 'wireline';
+const GQL_PATH = '/query';
 
 /**
  * Wireline registry SDK.
  */
 export class Registry {
   constructor(url) {
+    if (!isUrl(url) || !url.endsWith(GQL_PATH)) {
+      throw new Error('Path to a registry GQL endpoint should be provided.');
+    }
     this.client = new RegistryClient(url);
   }
 
@@ -26,6 +32,10 @@ export class Registry {
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
   async _submit(privateKey, record, operation, transactionPrivateKey) {
+    if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
+      throw new Error('Registry privateKey should be a hex string.');
+    }
+
     // 1. Get account details.
     let account = new Account(Buffer.from(privateKey, 'hex'));
     let accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
