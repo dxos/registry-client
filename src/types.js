@@ -132,8 +132,11 @@ export class Msg {
    */
   serialize() {
     return Util.sortJSON({
-      "Payload": this.payload.serialize(),
-      "Signer": this.signer.toString()
+      "type": "nameservice/SetRecord",
+      "value": {
+        "Payload": this.payload.serialize(),
+        "Signer": this.signer.toString()
+      }
     });
   }
 }
@@ -170,14 +173,15 @@ export class Transaction {
    */
   serialize() {
     return Util.sortJSON({
+      "account_number": this.accountNumber,
+      "chain_id": "wireline",
+      "sequence": this.accountSequence,
       "msg": [this.message.serialize()],
       "fee": this.fee,
       "signatures": [
         {
           "pub_key": this.account.registryPublicKey,
-          "signature": this.signature.toString('base64'),
-          "account_number": this.accountNumber,
-          "sequence": this.accountSequence
+          "signature": this.signature.toString('base64')
         }
       ],
       "memo": "",
