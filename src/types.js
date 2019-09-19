@@ -117,12 +117,20 @@ export class Payload {
  * Transaction Message.
  */
 export class Msg {
+  // Map operation to cosmos-sdk Message type.
+  static OPERATION_TO_MSG_TYPE = {
+    "set": "nameservice/SetRecord",
+    "delete": "nameservice/DeleteRecord"
+  };
+
   /**
    * New Message.
+   * @param {string} operation
    * @param {object} payload
    * @param {string} signer
    */
-  constructor(payload, signer) {
+  constructor(operation, payload, signer) {
+    this.operation = operation;
     this.payload = payload;
     this.signer = signer;
   }
@@ -132,7 +140,7 @@ export class Msg {
    */
   serialize() {
     return Util.sortJSON({
-      "type": "nameservice/SetRecord",
+      "type": Msg.OPERATION_TO_MSG_TYPE[this.operation],
       "value": {
         "Payload": this.payload.serialize(),
         "Signer": this.signer.toString()
@@ -153,9 +161,9 @@ export class Transaction {
    * @param {string} signature
    * @param {string} accountNumber
    * @param {string} accountSequence
-   * @param {string} operation
+   * @param {string} chainID
    */
-  constructor(message, account, fee, signature, accountNumber, accountSequence, operation = 'set') {
+  constructor(message, account, fee, signature, accountNumber, accountSequence, chainID) {
     fee.gas = parseInt(fee.gas);
 
     this.message = message;
@@ -165,7 +173,7 @@ export class Transaction {
     // TODO(egorgripasov): use BigInt.
     this.accountNumber = parseInt(accountNumber);
     this.accountSequence = parseInt(accountSequence);
-    this.operation = operation;
+    this.chainID = chainID;
   }
 
   /**
@@ -174,7 +182,7 @@ export class Transaction {
   serialize() {
     return Util.sortJSON({
       "account_number": this.accountNumber,
-      "chain_id": "wireline",
+      "chain_id": this.chainID,
       "sequence": this.accountSequence,
       "msg": [this.message.serialize()],
       "fee": this.fee,
@@ -184,8 +192,7 @@ export class Transaction {
           "signature": this.signature.toString('base64')
         }
       ],
-      "memo": "",
-      "operation": this.operation
+      "memo": ""
     });
   }
 }

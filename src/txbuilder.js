@@ -49,7 +49,7 @@ export class TxBuilder {
 
     // TODO(egor): Just take 'signer' param instead of 'account'?
 
-    let message = new Msg(payload, account.formattedCosmosAddress);
+    let message = new Msg(operation, payload, account.formattedCosmosAddress);
     // 1. Compose StdSignDoc.
     let stdSignDoc = {
       account_number: accountNumber,
@@ -64,7 +64,7 @@ export class TxBuilder {
     let transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
     let transactionSig = account.sign(transactionDataToSign);
 
-    let transaction = new Transaction(message, account, FEE, transactionSig, accountNumber, accountSequence, operation);
+    let transaction = new Transaction(message, account, FEE, transactionSig, accountNumber, accountSequence, chainID);
 
     return transaction.serialize();
   }
