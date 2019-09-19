@@ -24,7 +24,7 @@ const RECORD_OBJ = {
   }
 };
 
-const TRANS_SIG = 'PydOioz/+yytMhDo7d2tGljgXUdBQDe9kZJABxSc1tMTm4NEV3wLsbeDZpJaAYg6UOK2gT0DyXI7s2FUE9HZow==';
+const TRANS_SIG = 'ys3a5H9y08wRlJ2qEGjUoDXAi6vOrh+EP4bJOW68lddoLirryZg0Czbs1jHDMv4MqO2sBjoNOEh1uZCc9x5QNw==';
 
 test('Generate proper transaction signature.', () => {
   let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
