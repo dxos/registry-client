@@ -63,7 +63,7 @@ export class RegistryClient {
         sequence
         balance {
           type
-          amount
+          quantity
         }
       }
     }`;

@@ -4,17 +4,12 @@
 
   "definitions": {
 
-    "systemAttributes": {
-      "type": "object",
-      "default": null
-    },
-
     "attributes": {
       "type": "object",
       "default": null
     },
 
-    "links": {
+    "extension": {
       "type": "object",
       "default": null
     }
@@ -22,25 +17,16 @@
 
   "type": "object",
   "properties": {
-    "id": {
-      "type": "string"
-    },
-    "type": {
-      "type": "string"
-    },
-    "systemAttributes": {
-      "$ref": "#/definitions/systemAttributes"
-    },
     "attributes": {
       "$ref": "#/definitions/attributes"
     },
-    "links": {
-      "$ref": "#/definitions/links"
+    "extension": {
+      "$ref": "#/definitions/extension"
     }
   },
 
   "required": [
-    "id",
-    "type"
+    "attributes",
+    "extension"
   ]
 }

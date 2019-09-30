@@ -1,0 +1,11 @@
+record:
+  attributes:
+    type: wrn:pad
+    name: wireline.io/chess-pad
+    version: 5.1.4
+    protocol:
+      type: wrn:reference
+      id: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN
+  extension:
+    name: ChessPad
+

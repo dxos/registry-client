@@ -1,0 +1,7 @@
+record:
+  attributes:
+    type: wrn:protocol
+    name: wireline.io/chess
+    version: 1.0.4
+  extension:
+    name: Chess
