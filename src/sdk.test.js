@@ -3,6 +3,7 @@
 //
 
 import yaml from 'node-yaml';
+import semver from 'semver';
 
 import { Registry } from './index';
 
@@ -21,10 +22,18 @@ describe('Registering', () => {
 
   const registry = new Registry('http://localhost:9473/query');
 
+  const ensureConf = async path => {
+    const conf = await yaml.read(path);
+    conf.record.attributes.version = semver.inc(conf.record.attributes.version, 'patch');
+    await yaml.write(path, conf);
+
+    return conf;
+  };
+
   beforeAll(async () => {
-    bot = await yaml.read('./testing/bot.yml');
-    pad = await yaml.read('./testing/pad.yml');
-    protocol = await yaml.read('./testing/protocol.yml');
+    bot = await ensureConf('./testing/bot.yml');
+    pad = await ensureConf('./testing/pad.yml');
+    protocol = await ensureConf('./testing/protocol.yml');
   });
 
   test.skip('Register protocol.', async () => {

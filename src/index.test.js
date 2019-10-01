@@ -2,32 +2,51 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import yaml from 'node-yaml';
+
 import { Registry } from './index';
 
-const PRIVATE_KEY_BOB = '1dd3de39e732c8347761939b3de723a88caf8d048d55a47bac053899750eb787';
-const PRIVATE_KEY_ALICE = 'e2c6712ace4c0d927d98129fd16c140495d03a065c5a7bbe461d2a150e44afe4';
+const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 
-const TEST_ATTR_VAL = 'bar';
+const YML_PATH = './testing/bot.yml';
 
-const RECORD_OBJ = {
-  id: 'wrn:record:05013527-30ef-4aee-85d5-a71e1722f255',
-  type: 'wrn:registry-type:service',
-  // systemAttributes: {
-  //   uri: 'https://api.example.org/service'
-  // },
-  attributes: {
-    label: 'Weather',
-    test: TEST_ATTR_VAL
-  }
-};
+jest.setTimeout(10 * 1000);
 
-jest.setTimeout(15000);
+describe('Querying', () => {
+  let bot;
 
-test.skip('Register record.', async () => {
-  let registry = new Registry('http://localhost:8080/query');
+  const registry = new Registry('http://localhost:9473/query');
 
-  await registry.setRecord(PRIVATE_KEY_BOB, RECORD_OBJ, PRIVATE_KEY_ALICE);
+  beforeAll(async () => {
+    bot = await yaml.read(YML_PATH);
+    try {
+      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY);
+    } catch (err) {
+      console.log('Record exists.');
+    }
+  });
 
-  let records = await registry.getRecordsByAttributes({test:TEST_ATTR_VAL});
-  console.log(JSON.stringify(records, null, 4));
+  test('List records.', async () => {
+    const records = await registry.queryRecords({});
+    expect(records.length).toBeGreaterThanOrEqual(1);
+  });
+
+  test('Query records by attributes.', async () => {
+    const { attributes: { version, name } } = bot.record;
+    const records = await registry.queryRecords({ version, name });
+    expect(records.length).toBe(1);
+
+    const { version: recordVersion, name: recordName } = records[0];
+    expect(recordVersion).toBe(version);
+    expect(recordName).toBe(name);
+  });
+
+  test('Query records by reference.', async () => {
+    const { attributes: { protocol } } = bot.record;
+    const records = await registry.queryRecords({ protocol });
+    expect(records.length).toBeGreaterThanOrEqual(1);
+
+    const { attributes: { protocol: recordProtocol } } = records[0];
+    expect(protocol.id).toBe(recordProtocol.id);
+  });
 });

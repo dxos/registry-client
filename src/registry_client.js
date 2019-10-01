@@ -108,16 +108,18 @@ export class RegistryClient {
    * Get records by attributes.
    * @param {object} attributes
    */
-  async getRecordsByAttributes(attributes) {
+  async queryRecords(attributes) {
     if (!attributes) {
       attributes = {};
     }
 
     let query = `query ($attributes: [KeyValueInput!]) {
-      getRecordsByAttributes(attributes: $attributes) {
+      queryRecords(attributes: $attributes) {
         id
         type
-        owner
+        name
+        version
+        owners
         attributes {
           key
           value {
@@ -126,43 +128,8 @@ export class RegistryClient {
             float
             string
             boolean
-          }
-        }
-      }
-    }`;
-
-    let variables = {
-      attributes: Util.toGQLAttributes(attributes)
-    };
-
-    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes', this._prepareAttributes('attributes'));
-  }
-
-  /**
-   * Get bots by attributes.
-   * @param {object} attributes
-   */
-  async getBotsByAttributes(attributes) {
-    if (!attributes) {
-      attributes = {};
-    }
-
-    let query = `query ($attributes: [KeyValueInput!]) {
-      getBotsByAttributes(attributes: $attributes) {
-        name
-        accessKey
-        record {
-          id
-          type
-          owner
-          attributes {
-            key
-            value {
-              null
-              int
-              float
-              string
-              boolean
+            reference {
+              id
             }
           }
         }
@@ -173,7 +140,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return this._getResult(this.graph(query)(variables), 'getBotsByAttributes', this._prepareAttributes('record.attributes'));
+    return this._getResult(this.graph(query)(variables), 'queryRecords', this._prepareAttributes('attributes'));
   }
 
   /**

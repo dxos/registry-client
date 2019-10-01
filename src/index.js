@@ -85,12 +85,8 @@ export class Registry {
    * Get records by attributes.
    * @param {object} attributes
    */
-  async getRecordsByAttributes(attributes) {
-    return this.client.getRecordsByAttributes(attributes);
-  }
-
-  async getBotsByAttributes(attributes) {
-    return this.client.getBotsByAttributes(attributes);
+  async queryRecords(attributes) {
+    return this.client.queryRecords(attributes);
   }
 
   /**
