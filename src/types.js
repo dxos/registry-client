@@ -38,7 +38,7 @@ export class Record {
   serialize() {
     return Util.sortJSON({
       "attributes": btoa(JSON.stringify(this.attributes)),
-      "extension": btoa(JSON.stringify(this.attributes))
+      "extension": btoa(JSON.stringify(this.extension))
     });
   }
 

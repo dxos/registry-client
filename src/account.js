@@ -8,6 +8,7 @@ import secp256k1 from 'secp256k1/elliptic';
 import bip39 from 'bip39';
 import bech32 from 'bech32';
 import hdkey from 'ethereumjs-wallet/hdkey';
+import canonicalStringify from 'canonical-json';
 
 const AMINO_PREFIX = 'EB5AE98721';
 const HDPATH = "m/44'/118'/0'/0/0";
@@ -70,7 +71,7 @@ export class Account {
    * @param {object} record
    */
   signRecord(record) {
-    let recordAsJson = JSON.stringify(record, null, 2);
+    let recordAsJson = canonicalStringify(record);
     // Double sha256.
     let recordBytesToSign = Buffer.from(sha256(Buffer.from(sha256(Buffer.from(recordAsJson)), 'hex')), 'hex');
 
