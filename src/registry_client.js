@@ -83,7 +83,9 @@ export class RegistryClient {
       getRecordsByIds(ids: $ids) {
         id
         type
-        owner
+        name
+        version
+        owners
         attributes {
           key
           value {
@@ -92,6 +94,9 @@ export class RegistryClient {
             float
             string
             boolean
+            reference {
+              id
+            }
           }
         }
       }
