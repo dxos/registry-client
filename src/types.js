@@ -171,9 +171,9 @@ export class Transaction {
    */
   serialize() {
     return Util.sortJSON({
-      "account_number": this.accountNumber,
+      "account_number": this.accountNumber.toString(),
       "chain_id": this.chainID,
-      "sequence": this.accountSequence,
+      "sequence": this.accountSequence.toString(),
       "msg": [this.message.serialize()],
       "fee": this.fee,
       "signatures": [
