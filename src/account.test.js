@@ -2,7 +2,10 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import path from 'path';
+
 import { Account } from './account';
+import { getBaseConfig } from './testing/helper';
 
 const PRIVATE_KEY = '1c374e7c80d72faf0ac125432b9dfa93c1ee07c37fa99db5f81c81889fa9d07e';
 const PUBLIC_KEY = '0330a4d47fbaebf6b2d9abc2b5921b6a61a3262477ac2cb0daf2c36fbd24beb903';
@@ -13,42 +16,40 @@ const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928b
 const REGISTRY_PUBLIC_KEY = '61rphyECRYVJ4HX4HwQy8pG4WuXWZn2oArJyicXUU8xA6X4Ycy8=';
 const REGISTRY_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
 
-const RECORD_SIGNATURE = 'b6hDwJL8320CATsQDMUAWZ8bbo8A6voTTSXuyeLJRJ9bSOAP4RP8IihLWvEsA/ooZefQdMge85S7QXLIsOYFrw==';
+const RECORD_SIGNATURE = 'WPLVOhLIBHTlIyXKg5FzFfdFLZ97+oRal3siThVc5m8Nq+WULQGz4pkFOJxUYOMkFItwScg6u8cuEaRJ7EY8mg==';
 
-test('Generate account from private key.', () => {
-  let acc = new Account(Buffer.from(PRIVATE_KEY, 'hex'));
-  expect(acc.publicKey.toString('hex')).toBe(PUBLIC_KEY);
-  expect(acc.cosmosAddress).toBe(ADDRESS);
-  expect(acc.formattedCosmosAddress).toBe(FORMATTED_ADDRESS);
-});
+const YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
-test('Generate account from mnenonic.', () => {
-  let mnenonic = Account.generateMnemonic();
-  let acc1 = Account.generateFromMnemonic(mnenonic);
-  let acc2 = Account.generateFromMnemonic(mnenonic);
-  expect(acc1.formattedCosmosAddress).toBe(acc2.formattedCosmosAddress);
-});
+describe('Accounts', () => {
+  let bot;
 
-test('Generate registry specific public key and address.', () => {
-  let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
-  expect(acc.registryPublicKey).toBe(REGISTRY_PUBLIC_KEY);
-  expect(acc.registryAddress).toBe(REGISTRY_ADDRESS);
-});
+  beforeAll(async () => {
+    bot = await getBaseConfig(YML_PATH);
+  });
 
-test('Ability to sign record obj.', () => {
-  let acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
-  let record = {
-    id: 'wrn:record:05013527-30ef-4aee-85d5-a71e1722f255',
-    type: 'wrn:registry-type:service',
-    owner: acc.registryAddress,
-    // systemAttributes: {
-    //   uri: 'https://api.example.org/service'
-    // },
-    attributes: {
-      label: 'Weather'
-    },
-    // links: null
-  };
-  let signature = acc.signRecord(record);
-  expect(signature.toString('base64')).toBe(RECORD_SIGNATURE);
+  test('Generate account from private key.', () => {
+    const acc = new Account(Buffer.from(PRIVATE_KEY, 'hex'));
+    expect(acc.publicKey.toString('hex')).toBe(PUBLIC_KEY);
+    expect(acc.cosmosAddress).toBe(ADDRESS);
+    expect(acc.formattedCosmosAddress).toBe(FORMATTED_ADDRESS);
+  });
+
+  test('Generate account from mnenonic.', () => {
+    const mnenonic = Account.generateMnemonic();
+    const acc1 = Account.generateFromMnemonic(mnenonic);
+    const acc2 = Account.generateFromMnemonic(mnenonic);
+    expect(acc1.formattedCosmosAddress).toBe(acc2.formattedCosmosAddress);
+  });
+
+  test('Generate registry specific public key and address.', () => {
+    const acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
+    expect(acc.registryPublicKey).toBe(REGISTRY_PUBLIC_KEY);
+    expect(acc.registryAddress).toBe(REGISTRY_ADDRESS);
+  });
+
+  test('Ability to sign record obj.', () => {
+    const acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
+    const signature = acc.signRecord(bot.record);
+    expect(signature.toString('base64')).toBe(RECORD_SIGNATURE);
+  });
 });

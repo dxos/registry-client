@@ -8,7 +8,7 @@ import { Registry } from './index';
 
 const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 
-const YML_PATH = './testing/bot.yml';
+const YML_PATH = './testing/data/bot.yml';
 
 jest.setTimeout(10 * 1000);
 

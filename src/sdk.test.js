@@ -2,12 +2,16 @@
 // Copyright 2019 Wireline, Inc.
 //
 
-import yaml from 'node-yaml';
-import semver from 'semver';
+import path from 'path';
 
 import { Registry } from './index';
+import { ensureUpdatedConfig } from './testing/helper';
 
 const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
+
+const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
+const PAD_YML_PATH = path.join(__dirname, './testing/data/pad.yml');
+const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 
 jest.setTimeout(120 * 1000);
 
@@ -22,18 +26,10 @@ describe('Registering', () => {
 
   const registry = new Registry('http://localhost:9473/query');
 
-  const ensureConf = async path => {
-    const conf = await yaml.read(path);
-    conf.record.attributes.version = semver.inc(conf.record.attributes.version, 'patch');
-    await yaml.write(path, conf);
-
-    return conf;
-  };
-
   beforeAll(async () => {
-    bot = await ensureConf('./testing/bot.yml');
-    pad = await ensureConf('./testing/pad.yml');
-    protocol = await ensureConf('./testing/protocol.yml');
+    bot = await ensureUpdatedConfig(BOT_YML_PATH);
+    pad = await ensureUpdatedConfig(PAD_YML_PATH);
+    protocol = await ensureUpdatedConfig(PROTOCOL_YML_PATH);
   });
 
   test('Register protocol.', async () => {

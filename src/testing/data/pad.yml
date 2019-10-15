@@ -2,7 +2,7 @@ record:
   attributes:
     type: 'wrn:pad'
     name: wireline.io/chess-pad
-    version: 5.1.34
+    version: 5.1.40
     protocol:
       type: 'wrn:reference'
       id: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN
