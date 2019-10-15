@@ -851,6 +851,11 @@
     "@types/istanbul-lib-coverage" "^1.1.0"
     "@types/yargs" "^12.0.9"
 
+"@octetstream/promisify@2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@octetstream/promisify/-/promisify-2.0.2.tgz#29ac3bd7aefba646db670227f895d812c1a19615"
+  integrity sha512-7XHoRB61hxsz8lBQrjC1tq/3OEIgpvGWg6DKAdwi7WRzruwkmsdwmOoUXbU4Dtd4RSOMDwed0SkP3y8UlMt1Bg==
+
 "@types/babel__core@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.0.tgz#710f2487dda4dcfd010ca6abb2b4dc7394365c51"
@@ -1806,6 +1811,11 @@ caniuse-lite@^1.0.30000951:
   resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000951.tgz#c7c2fd4d71080284c8677dd410368df8d83688fe"
   integrity sha512-eRhP+nQ6YUkIcNQ6hnvdhMkdc7n3zadog0KXNRxAZTT2kHjUb1yGn71OrPhSn8MOvlX97g5CR97kGVj8fMsXWg==
 
+canonical-json@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/canonical-json/-/canonical-json-0.0.4.tgz#6579c072c3db5c477ec41dc978fbf2b8f41074a3"
+  integrity sha1-ZXnAcsPbXEd+xB3JePvyuPQQdKM=
+
 capture-exit@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/capture-exit/-/capture-exit-2.0.0.tgz#fb953bfaebeb781f62898239dabb426d08a509a4"
@@ -1912,7 +1922,7 @@ cliui@^4.0.0:
     strip-ansi "^4.0.0"
     wrap-ansi "^2.0.0"
 
-co@^4.6.0:
+co@4.6.0, co@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
   integrity sha1-bqa989hTrlTMuOR7+gvz+QMfsYQ=
@@ -4533,6 +4543,11 @@ jsx-ast-utils@^2.0.1:
   dependencies:
     array-includes "^3.0.3"
 
+junk@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/junk/-/junk-3.1.0.tgz#31499098d902b7e98c5d9b9c80f43457a88abfa1"
+  integrity sha512-pBxcB3LFc8QVgdggvZWyeys+hnrNWg4OcZIU/1X59k5jQdLBlCsYGRQaz234SqoRLTCgMH00fY0xRJH+F9METQ==
+
 keccak@^1.0.2:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/keccak/-/keccak-1.4.0.tgz#572f8a6dbee8e7b3aa421550f9e6408ca2186f80"
@@ -5103,6 +5118,15 @@ node-releases@^1.1.11:
   dependencies:
     semver "^5.3.0"
 
+node-yaml@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/node-yaml/-/node-yaml-4.0.1.tgz#3675d27c275fbea9c02e2b0faa18bb1699444cb3"
+  integrity sha512-ZPKi3OexXdiklsRW9g4P7jAxHAhoBRZCFmIDMQ89clLhMz+MTJuCM9y5f1R7Ru75H84hWJouwpxVOq1SdRTe7A==
+  dependencies:
+    co "4.6.0"
+    junk "3.1.0"
+    promise-fs "2.1.1"
+
 nopt@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/nopt/-/nopt-4.0.1.tgz#d0d4685afd5415193c8c7505602d0d17cd64474d"
@@ -5649,6 +5673,13 @@ progress@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
+
+promise-fs@2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/promise-fs/-/promise-fs-2.1.1.tgz#0b725a592c165ff16157d1f13640ba390637e557"
+  integrity sha512-43p7e4QzAQ3w6eyN0+gbBL7jXiZFWLWYITg9wIObqkBySu/a5K1EDcQ/S6UyB/bmiZWDA4NjTbcopKLTaKcGSw==
+  dependencies:
+    "@octetstream/promisify" "2.0.2"
 
 promise-inflight@^1.0.1:
   version "1.0.1"
@@ -6199,6 +6230,11 @@ selfsigned@^1.9.1:
   version "5.6.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.6.0.tgz#7e74256fbaa49c75aa7c7a205cc22799cac80004"
   integrity sha512-RS9R6R35NYgQn++fkDWaOmqGoj4Ek9gGs+DPxNUZKuwE183xjJroKvyo1IzVFeXvUrvmALy6FWD5xrdJT25gMg==
+
+semver@^6.3.0:
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
+  integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
 
 send@0.16.2:
   version "0.16.2"

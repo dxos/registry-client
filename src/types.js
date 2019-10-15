@@ -24,13 +24,11 @@ export class Record {
       throw new Error('Invalid record input.');
     }
 
-    let { id, type, /* systemAttributes = null, */ attributes = null /*, links = null */ } = record;
+    let { attributes, extension } = record;
 
-    this.id = id;
-    this.type = type;
-    // this.systemAttributes = Util.sortJSON(systemAttributes);
     this.attributes = Util.sortJSON(attributes);
-    // this.links = Util.sortJSON(links);
+    this.extension = Util.sortJSON(extension);
+
     this.ownerAccount = ownerAccount;
   }
 
@@ -39,12 +37,8 @@ export class Record {
    */
   serialize() {
     return Util.sortJSON({
-      "id": this.id.toString(),
-      "type": this.type.toString(),
-      "owner": this.ownerAccount.registryAddress,
-      // "systemAttributes": btoa(JSON.stringify(this.systemAttributes)),
       "attributes": btoa(JSON.stringify(this.attributes)),
-      // "links": btoa(JSON.stringify(this.links))
+      "extension": btoa(JSON.stringify(this.extension))
     });
   }
 
@@ -53,12 +47,8 @@ export class Record {
    */
   getMessageToSign() {
     return {
-      "id": this.id.toString(),
-      "type": this.type.toString(),
-      "owner": this.ownerAccount.registryAddress,
-      // "systemAttributes": this.systemAttributes,
       "attributes": this.attributes,
-      // "links": this.links
+      "extension": this.extension
     }
   }
 }
@@ -181,9 +171,9 @@ export class Transaction {
    */
   serialize() {
     return Util.sortJSON({
-      "account_number": this.accountNumber,
+      "account_number": this.accountNumber.toString(),
       "chain_id": this.chainID,
-      "sequence": this.accountSequence,
+      "sequence": this.accountSequence.toString(),
       "msg": [this.message.serialize()],
       "fee": this.fee,
       "signatures": [

@@ -47,7 +47,7 @@ export class Util {
     let vars = [];
     for (let key in object) {
       if (object.hasOwnProperty(key)) {
-        let type = typeof key;
+        let type = typeof object[key];
         if (object[key] === null) {
           vars.push({ key, value: { 'null': true }});
         } else if (type === 'number') {
@@ -57,6 +57,11 @@ export class Util {
           vars.push({ key, value: { 'string': object[key] }});
         } else if (type === 'boolean') {
           vars.push({ key, value: { 'boolean': object[key] }});
+        } else if (type === 'object') {
+          const nestedObject = object[key];
+          if (nestedObject.type && nestedObject.type === 'wrn:reference') {
+            vars.push({ key, value: { 'reference': { id: nestedObject.id }}});
+          }
         }
       }
     }
