@@ -7,6 +7,12 @@
   "license": "UNLICENSED",
   "browser": "dist/umd/index",
   "main": "dist/es/index",
+  "lint-staged": {
+    "*.js": "eslint --ignore-path .eslintignore"
+  },
+  "pre-commit": [
+    "lint:staged"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
@@ -19,15 +25,18 @@
     "babel-loader": "^8.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "copy-webpack-plugin": "^4.5.2",
-    "eslint": "^5.5.0",
-    "eslint-config-jest-enzyme": "^6.0.4",
-    "eslint-config-prettier": "^3.0.1",
-    "eslint-loader": "^2.0.0",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
-    "eslint-plugin-prettier": "^2.6.2",
+    "eslint": "^5.11.0",
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-config-jest-enzyme": "^7.0.1",
+    "eslint-config-prettier": "^4.0.0",
+    "eslint-loader": "^2.1.2",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.11.0",
     "jest": "^24.5.0",
+    "lint-staged": "^8.1.0",
     "node-yaml": "^4.0.1",
-    "prettier": "^1.14.2",
+    "pre-commit": "^1.2.2",
     "semver": "^6.3.0",
     "webpack": "^4.17.1",
     "webpack-bundle-analyzer": "^2.11.1",
@@ -46,7 +55,8 @@
     "is-url": "1.2.4",
     "js-sha256": "^0.9.0",
     "jsonschema": "^1.2.4",
-    "lodash": "^4.17.11",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2",
     "ripemd160": "^2.0.2",
     "secp256k1": "^3.6.2"
   },
@@ -55,7 +65,8 @@
     "clean": "rm -rf ./dist",
     "build": "npm run clean && npm run build:node && npm run build:web",
     "build:node": "NODE_ENV=production babel ./src --out-dir ./dist/es --ignore \"**/*.test.js\"  --copy-files",
-    "build:web": "NODE_ENV=production webpack"
+    "build:web": "NODE_ENV=production webpack",
+    "lint:staged": "lint-staged"
   },
   "publishConfig": {
     "access": "public"

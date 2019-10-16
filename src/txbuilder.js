@@ -15,12 +15,12 @@ export class TxBuilder {
   static generatePayload(record) {
     // TODO(Ashwin): message type.
     // Registry signature.
-    let { ownerAccount: account } = record;
-    let messageToSign = record.getMessageToSign();
-    let sig = account.signRecord(messageToSign);
-    let signature = new Signature(account.registryPublicKey, sig.toString('base64'));
+    const { ownerAccount: account } = record;
+    const messageToSign = record.getMessageToSign();
+    const sig = account.signRecord(messageToSign);
+    const signature = new Signature(account.registryPublicKey, sig.toString('base64'));
 
-    let payload = new Payload(record, signature);
+    const payload = new Payload(record, signature);
     return payload;
   }
 
@@ -38,7 +38,7 @@ export class TxBuilder {
 
     // TODO(egor): Just take 'signer' param instead of 'account'?
 
-    let message = new Msg(operation, payload, account.formattedCosmosAddress);
+    const message = new Msg(operation, payload, account.formattedCosmosAddress);
 
     // TODO(egorgripasov): class for fees.
     const fee = {
@@ -52,7 +52,7 @@ export class TxBuilder {
     };
 
     // 1. Compose StdSignDoc.
-    let stdSignDoc = {
+    const stdSignDoc = {
       account_number: accountNumber,
       chain_id: chainID,
       fee,
@@ -62,10 +62,10 @@ export class TxBuilder {
     };
 
     // 2. Calculate Signature.
-    let transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
-    let transactionSig = account.sign(transactionDataToSign);
+    const transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
+    const transactionSig = account.sign(transactionDataToSign);
 
-    let transaction = new Transaction(message, account, fee, transactionSig, accountNumber, accountSequence, chainID);
+    const transaction = new Transaction(message, account, fee, transactionSig, accountNumber, accountSequence, chainID);
     return transaction.serialize();
   }
 }

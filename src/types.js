@@ -17,8 +17,8 @@ export class Record {
    * @param {object} ownerAccount
    */
   constructor(record, ownerAccount) {
-    let validator = new Validator();
-    let result = validator.validate(record, RecordSchema);
+    const validator = new Validator();
+    const result = validator.validate(record, RecordSchema);
     if (!result.valid) {
       result.errors.map(console.error);
       throw new Error('Invalid record input.');
@@ -33,7 +33,7 @@ export class Record {
    */
   serialize() {
     return Util.sortJSON({
-      "attributes": btoa(JSON.stringify(this.record))
+      'attributes': btoa(JSON.stringify(this.record))
     });
   }
 
@@ -64,8 +64,8 @@ export class Signature {
    */
   serialize() {
     return Util.sortJSON({
-      "pubKey": this.pubKey,
-      "sig": this.sig
+      'pubKey': this.pubKey,
+      'sig': this.sig
     });
   }
 }
@@ -89,8 +89,8 @@ export class Payload {
    */
   serialize() {
     return Util.sortJSON({
-      "record": this.record.serialize(),
-      "signatures": this.signatures.map(s => s.serialize())
+      'record': this.record.serialize(),
+      'signatures': this.signatures.map(s => s.serialize())
     });
   }
 }
@@ -101,8 +101,8 @@ export class Payload {
 export class Msg {
   // Map operation to cosmos-sdk Message type.
   static OPERATION_TO_MSG_TYPE = {
-    "set": "nameservice/SetRecord",
-    "delete": "nameservice/DeleteRecord"
+    'set': 'nameservice/SetRecord',
+    'delete': 'nameservice/DeleteRecord'
   };
 
   /**
@@ -122,10 +122,10 @@ export class Msg {
    */
   serialize() {
     return Util.sortJSON({
-      "type": Msg.OPERATION_TO_MSG_TYPE[this.operation],
-      "value": {
-        "Payload": this.payload.serialize(),
-        "Signer": this.signer.toString()
+      'type': Msg.OPERATION_TO_MSG_TYPE[this.operation],
+      'value': {
+        'Payload': this.payload.serialize(),
+        'Signer': this.signer.toString()
       }
     });
   }
@@ -146,15 +146,15 @@ export class Transaction {
    * @param {string} chainID
    */
   constructor(message, account, fee, signature, accountNumber, accountSequence, chainID) {
-    fee.gas = parseInt(fee.gas);
+    fee.gas = parseInt(fee.gas, 10);
 
     this.message = message;
     this.account = account;
     this.fee = fee;
     this.signature = signature;
     // TODO(egorgripasov): use BigInt.
-    this.accountNumber = parseInt(accountNumber);
-    this.accountSequence = parseInt(accountSequence);
+    this.accountNumber = parseInt(accountNumber, 10);
+    this.accountSequence = parseInt(accountSequence, 10);
     this.chainID = chainID;
   }
 
@@ -163,18 +163,18 @@ export class Transaction {
    */
   serialize() {
     return Util.sortJSON({
-      "account_number": this.accountNumber.toString(),
-      "chain_id": this.chainID,
-      "sequence": this.accountSequence.toString(),
-      "msg": [this.message.serialize()],
-      "fee": this.fee,
-      "signatures": [
+      'account_number': this.accountNumber.toString(),
+      'chain_id': this.chainID,
+      'sequence': this.accountSequence.toString(),
+      'msg': [this.message.serialize()],
+      'fee': this.fee,
+      'signatures': [
         {
-          "pub_key": this.account.registryPublicKey,
-          "signature": this.signature.toString('base64')
+          'pub_key': this.account.registryPublicKey,
+          'signature': this.signature.toString('base64')
         }
       ],
-      "memo": ""
+      'memo': ''
     });
   }
 }

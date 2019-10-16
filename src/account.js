@@ -3,7 +3,7 @@
 //
 
 import sha256 from 'js-sha256';
-import ripemd160 from 'ripemd160';
+import Ripemd160 from 'ripemd160';
 import secp256k1 from 'secp256k1/elliptic';
 import bip39 from 'bip39';
 import bech32 from 'bech32';
@@ -22,48 +22,72 @@ export class Account {
    * @param {buffer} privateKey
    */
   constructor(privateKey) {
-    this.privateKey = privateKey;
+    this._privateKey = privateKey;
 
     // 1. Generate public key.
-    this.publicKey = secp256k1.publicKeyCreate(privateKey);
+    this._publicKey = secp256k1.publicKeyCreate(this._privateKey);
 
     // 2. Generate cosmos-sdk address.
-    let publicKeySha256 = sha256(this.publicKey);
-    this.cosmosAddress = new ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
+    let publicKeySha256 = sha256(this._publicKey);
+    this._cosmosAddress = new Ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
 
     // 3. Generate cosmos-sdk formatted address.
-    let buffer = Buffer.from(this.cosmosAddress, 'hex');
-    let words = bech32.toWords(buffer);
-    this.formattedCosmosAddress = bech32.encode('cosmos', words);
+    const buffer = Buffer.from(this._cosmosAddress, 'hex');
+    const words = bech32.toWords(buffer);
+    this._formattedCosmosAddress = bech32.encode('cosmos', words);
 
     // 4. Generate registry formatted public key.
-    let publicKeyInHex = AMINO_PREFIX + this.publicKey.toString('hex');
-    this.registryPublicKey = Buffer.from(publicKeyInHex, 'hex').toString('base64');
+    const publicKeyInHex = AMINO_PREFIX + this._publicKey.toString('hex');
+    this._registryPublicKey = Buffer.from(publicKeyInHex, 'hex').toString('base64');
 
     // 5. Generate registry formatted address.
     publicKeySha256 = sha256(Buffer.from(publicKeyInHex, 'hex'));
-    this.registryAddress = new ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
+    this._registryAddress = new Ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
+  }
+
+  get privateKey() {
+    return this._privateKey;
+  }
+
+  get publicKey() {
+    return this._publicKey;
+  }
+
+  get cosmosAddress() {
+    return this._cosmosAddress;
+  }
+
+  get formattedCosmosAddress() {
+    return this._formattedCosmosAddress;
+  }
+
+  get registryPublicKey() {
+    return this._registryPublicKey;
+  }
+
+  get registryAddress() {
+    return this._registryAddress;
   }
 
   /**
    * Get private key.
    */
   getPrivateKey() {
-    return this.privateKey.toString('hex');
+    return this._privateKey.toString('hex');
   }
 
   /**
    * Get public key.
    */
   getPublicKey() {
-    return this.publicKey.toString('hex');
+    return this._publicKey.toString('hex');
   }
 
   /**
    * Get cosmos address.
    */
   getCosmosAddress() {
-    return this.formattedCosmosAddress;
+    return this._formattedCosmosAddress;
   }
 
   /**
@@ -71,9 +95,9 @@ export class Account {
    * @param {object} record
    */
   signRecord(record) {
-    let recordAsJson = canonicalStringify(record);
+    const recordAsJson = canonicalStringify(record);
     // Double sha256.
-    let recordBytesToSign = Buffer.from(sha256(Buffer.from(sha256(Buffer.from(recordAsJson)), 'hex')), 'hex');
+    const recordBytesToSign = Buffer.from(sha256(Buffer.from(sha256(Buffer.from(recordAsJson)), 'hex')), 'hex');
 
     return this.sign(recordBytesToSign);
   }
@@ -83,8 +107,8 @@ export class Account {
    * @param {object} msg
    */
   sign(msg) {
-    let messageToSignSha256 = sha256(msg);
-    let messageToSignSha256InBytes = Buffer.from(messageToSignSha256, 'hex');
+    const messageToSignSha256 = sha256(msg);
+    const messageToSignSha256InBytes = Buffer.from(messageToSignSha256, 'hex');
     const sigObj = secp256k1.sign(messageToSignSha256InBytes, this.privateKey);
 
     return sigObj.signature;
@@ -102,12 +126,12 @@ export class Account {
    * @param {string} mnemonic
    */
   static generateFromMnemonic(mnemonic) {
-    let seed = bip39.mnemonicToSeed(mnemonic);
+    const seed = bip39.mnemonicToSeed(mnemonic);
 
-    let wallet = hdkey.fromMasterSeed(seed);
-    let account = wallet.derivePath(HDPATH);
+    const wallet = hdkey.fromMasterSeed(seed);
+    const account = wallet.derivePath(HDPATH);
 
-    let privateKey = account.getWallet().getPrivateKey();
+    const privateKey = account.getWallet().getPrivateKey();
     return new Account(privateKey);
   }
 }
