@@ -24,11 +24,7 @@ export class Record {
       throw new Error('Invalid record input.');
     }
 
-    let { attributes, extension } = record;
-
-    this.attributes = Util.sortJSON(attributes);
-    this.extension = Util.sortJSON(extension);
-
+    this.record = record;
     this.ownerAccount = ownerAccount;
   }
 
@@ -37,8 +33,7 @@ export class Record {
    */
   serialize() {
     return Util.sortJSON({
-      "attributes": btoa(JSON.stringify(this.attributes)),
-      "extension": btoa(JSON.stringify(this.extension))
+      "attributes": btoa(JSON.stringify(this.record))
     });
   }
 
@@ -46,10 +41,7 @@ export class Record {
    * Get message to calculate record signature.
    */
   getMessageToSign() {
-    return {
-      "attributes": this.attributes,
-      "extension": this.extension
-    }
+    return Util.sortJSON(this.record);
   }
 }
 
