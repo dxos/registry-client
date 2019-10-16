@@ -4,29 +4,24 @@
 
   "definitions": {
 
-    "attributes": {
-      "type": "object",
-      "default": null
-    },
-
-    "extension": {
-      "type": "object",
-      "default": null
-    }
   },
 
   "type": "object",
   "properties": {
-    "attributes": {
-      "$ref": "#/definitions/attributes"
+    "type": {
+      "type": "string"
     },
-    "extension": {
-      "$ref": "#/definitions/extension"
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
     }
   },
 
   "required": [
-    "attributes",
-    "extension"
+    "type",
+    "name",
+    "version"
   ]
 }

@@ -32,7 +32,7 @@ describe('Querying', () => {
   });
 
   test('Query records by reference.', async () => {
-    const { attributes: { protocol } } = bot.record;
+    const { protocol } = bot.record;
     const records = await registry.queryRecords({ protocol });
     expect(records.length).toBeGreaterThanOrEqual(1);
 
@@ -41,7 +41,7 @@ describe('Querying', () => {
   });
 
   test('Query records by attributes.', async () => {
-    const { attributes: { version, name } } = bot.record;
+    const { version, name } = bot.record;
     const records = await registry.queryRecords({ version, name });
     expect(records.length).toBe(1);
 
