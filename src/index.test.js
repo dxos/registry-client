@@ -45,14 +45,14 @@ describe('Querying', () => {
     const records = await registry.queryRecords({ version, name });
     expect(records.length).toBe(1);
 
-    bot = records[0];
+    [ bot ] = records;
     const { version: recordVersion, name: recordName } = bot;
     expect(recordVersion).toBe(version);
     expect(recordName).toBe(name);
   });
 
   test('Query records by id.', async () => {
-    let records = await registry.getRecordsByIds([bot.id]);
+    const records = await registry.getRecordsByIds([bot.id]);
     expect(records.length).toBe(1);
     expect(records[0].id).toBe(bot.id);
   });

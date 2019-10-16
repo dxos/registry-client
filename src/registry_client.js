@@ -4,7 +4,8 @@
 
 // TODO(egorgripasov): replace with appolo client + fragments.
 import graphql from 'graphql.js';
-import { get, set } from 'lodash';
+import { get } from 'lodash.get';
+import { set } from 'lodash.set';
 
 import { Util } from './util';
 
@@ -13,6 +14,37 @@ import { Util } from './util';
  */
 export class RegistryClient {
   static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/query';
+
+  /**
+   * Get query result.
+   * @param {object} query
+   * @param {string} key
+   * @param {function} modifier
+   */
+  static async getResult(query, key, modifier = null) {
+    const result = await query;
+    if (result && result[key] && result[key].length && result[key][0] !== null) {
+      if (modifier) {
+        return modifier(result[key]);
+      }
+      return result[key];
+    }
+    return [];
+  }
+
+  /**
+   * Prepare response attributes.
+   * @param {string} path
+   */
+  static prepareAttributes(path) {
+    return rows => {
+      const result = rows.map(r => {
+        set(r, path, Util.fromGQLAttributes(get(r, path)));
+        return r;
+      });
+      return result;
+    };
+  }
 
   /**
    * New Client.
@@ -26,27 +58,6 @@ export class RegistryClient {
     });
   }
 
-  async _getResult(query, key, modifier = null) {
-    let result = await query;
-    if (result && result[key] && result[key].length && result[key][0] !== null) {
-      if (modifier) {
-        return modifier(result[key]);
-      }
-      return result[key];
-    }
-    return [];
-  }
-
-  _prepareAttributes(path) {
-    return rows => {
-      let result = rows.map(r => {
-        set(r, path, Util.fromGQLAttributes(get(r, path)));
-        return r;
-      });
-      return result;
-    }
-  }
-
   /**
    * Fetch Accounts.
    * @param {array} addresses
@@ -55,7 +66,7 @@ export class RegistryClient {
     console.assert(addresses);
     console.assert(addresses.length);
 
-    let query = `query ($addresses: [String!]) {
+    const query = `query ($addresses: [String!]) {
       getAccounts(addresses: $addresses) {
         address
         pubKey
@@ -68,18 +79,18 @@ export class RegistryClient {
       }
     }`;
 
-    let variables = {
+    const variables = {
       addresses
     };
 
-    return this._getResult(this.graph(query)(variables), 'getAccounts');
+    return RegistryClient.getResult(this.graph(query)(variables), 'getAccounts');
   }
 
   async getRecordsByIds(ids) {
     console.assert(ids);
     console.assert(ids.length);
 
-    let query = `query ($ids: [String!]) {
+    const query = `query ($ids: [String!]) {
       getRecordsByIds(ids: $ids) {
         id
         type
@@ -102,11 +113,11 @@ export class RegistryClient {
       }
     }`;
 
-    let variables = {
+    const variables = {
       ids
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByIds', this._prepareAttributes('attributes'));
+    return RegistryClient.getResult(this.graph(query)(variables), 'getRecordsByIds', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
@@ -118,7 +129,7 @@ export class RegistryClient {
       attributes = {};
     }
 
-    let query = `query ($attributes: [KeyValueInput!]) {
+    const query = `query ($attributes: [KeyValueInput!]) {
       queryRecords(attributes: $attributes) {
         id
         type
@@ -141,11 +152,11 @@ export class RegistryClient {
       }
     }`;
 
-    let variables = {
+    const variables = {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return this._getResult(this.graph(query)(variables), 'queryRecords', this._prepareAttributes('attributes'));
+    return RegistryClient.getResult(this.graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
@@ -155,11 +166,11 @@ export class RegistryClient {
   async submit(tx) {
     console.assert(tx);
 
-    let mutation = `mutation ($tx: String!) {
+    const mutation = `mutation ($tx: String!) {
       submit(tx: $tx)
     }`;
 
-    let variables = {
+    const variables = {
       tx
     };
 
