@@ -8,6 +8,7 @@ import { resolve } from 'url';
 import { RegistryClient } from './registry_client';
 
 import { Account } from './account';
+import { Util } from './util';
 import { TxBuilder } from './txbuilder';
 import { Record } from './types';
 
@@ -113,4 +114,4 @@ export class Registry {
   }
 }
 
-export { Account };
+export { Account, Util };
