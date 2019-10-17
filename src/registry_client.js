@@ -4,8 +4,8 @@
 
 // TODO(egorgripasov): replace with appolo client + fragments.
 import graphql from 'graphql.js';
-import { get } from 'lodash.get';
-import { set } from 'lodash.set';
+import get from 'lodash.get';
+import set from 'lodash.set';
 
 import { Util } from './util';
 

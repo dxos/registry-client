@@ -73,7 +73,7 @@ export class Util {
    */
   static fromGQLAttributes(attributes) {
     const res = {};
-    Object.keys(attributes).forEach(attr => {
+    attributes.forEach(attr => {
       if (attr.value.null) {
         res[attr.key] = null;
       } else {
