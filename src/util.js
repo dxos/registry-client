@@ -2,6 +2,10 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import canonicalStringify from 'canonical-json';
+import multihashing from 'multihashing-async';
+import CID from 'cids';
+
 if (typeof btoa === 'undefined') {
   global.btoa = function (str) {
     return Buffer.from(str, 'binary').toString('base64');
@@ -83,5 +87,16 @@ export class Util {
       }
     });
     return res;
+  }
+
+  /**
+   * Get record content ID.
+   * @param {object} record
+   * @returns {string}
+   */
+  static async getContentId(record) {
+    const content = Buffer.from(canonicalStringify(record));
+    const hash = await multihashing(content, 'sha2-256');
+    return new CID(hash).toString();
   }
 }
