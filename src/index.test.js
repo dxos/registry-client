@@ -2,27 +2,41 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import debug from 'debug';
 import yaml from 'node-yaml';
 
 import { Registry } from './index';
+import { startMockServer } from './mock/server';
 
 const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 
 const YML_PATH = './testing/data/bot.yml';
 
+const MOCK_SERVER = process.env.MOCK_SERVER || false;
+
+const log = debug('test');
+
 jest.setTimeout(10 * 1000);
 
 describe('Querying', () => {
   let bot;
+  let mock;
 
-  const registry = new Registry('http://localhost:9473/query');
+  let registry;
 
   beforeAll(async () => {
+    if (MOCK_SERVER) {
+      mock = await startMockServer();
+      log('Started mock server:', mock.serverInfo.url);
+    }
+
+    registry = new Registry(mock ? mock.serverInfo.url : 'http://localhost:9473/query');
+
     bot = await yaml.read(YML_PATH);
     try {
       await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY);
     } catch (err) {
-      console.log('Record exists.');
+      log('Record exists.');
     }
   });
 
@@ -55,5 +69,11 @@ describe('Querying', () => {
     const records = await registry.getRecordsByIds([bot.id]);
     expect(records.length).toBe(1);
     expect(records[0].id).toBe(bot.id);
+  });
+
+  afterAll(async () => {
+    if (mock) {
+      await mock.mockServer.stop();
+    }
   });
 });

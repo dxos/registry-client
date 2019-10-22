@@ -1,0 +1,12 @@
+[
+  
+  {
+    "type": "wrn:pad",
+    "name": "wireline.io/chess-pad",
+    "version": "2.5.1",
+    "protocol": {
+      "type": "wrn:reference",
+      "id": "QmR7BTTmBiYhfFm5Ft3uA8twnBXqv9dQm7gfbvC4NdtQ7F"
+    }
+  }
+]

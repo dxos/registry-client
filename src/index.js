@@ -62,6 +62,9 @@ export class Registry {
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
   async setRecord(privateKey, record, transactionPrivateKey) {
+    if (process.env.MOCK_SERVER) {
+      return this._client.insertRecord(record);
+    }
     return this._submit(privateKey, record, 'set', transactionPrivateKey);
   }
 

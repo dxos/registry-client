@@ -176,4 +176,38 @@ export class RegistryClient {
 
     return this.graph(mutation)(variables);
   }
+
+  /**
+   * Insert record.
+   * @param {object} attributes
+   */
+  async insertRecord(attributes) {
+    console.assert(Object.keys(attributes).length);
+
+    const query = `mutation insertRecord($attributes: [KeyValueInput]!) {
+      insertRecord(attributes: $attributes) {
+        id
+        type
+        attributes {
+          key
+          value {
+            null
+            int
+            float
+            string
+            boolean
+            reference {
+              id
+            }
+          }
+        }
+      }
+    }`;
+
+    const variables = {
+      attributes: Util.toGQLAttributes(attributes)
+    };
+
+    return RegistryClient.getResult(this.graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
+  }
 }

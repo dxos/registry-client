@@ -74,8 +74,9 @@ export class Util {
   /**
    * Unmarshal attributes array to object.
    * @param {array} attributes
+   * @param {boolean} addRefType
    */
-  static fromGQLAttributes(attributes) {
+  static fromGQLAttributes(attributes, addRefType = false) {
     const res = {};
     attributes.forEach(attr => {
       if (attr.value.null) {
@@ -83,6 +84,9 @@ export class Util {
       } else {
         const { values, null: n, ...types } = attr.value;
         const value = Object.values(types).find(v => v !== null);
+        if (addRefType && typeof (value) === 'object' && types.reference) {
+          value.type = 'wrn:reference';
+        }
         res[attr.key] = value;
       }
     });
@@ -98,5 +102,19 @@ export class Util {
     const content = Buffer.from(canonicalStringify(record));
     const hash = await multihashing(content, 'sha2-256');
     return new CID(hash).toString();
+  }
+
+  /**
+   * Get record references map.
+   * @param record
+   * @return {object}
+   */
+  static getReferencesMap(record) {
+    return record.attributes
+      .filter(attr => attr.value.reference)
+      .reduce((acc, attr) => {
+        acc[attr.key] = attr.value.reference.id;
+        return acc;
+      }, {});
   }
 }
