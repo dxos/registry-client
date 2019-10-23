@@ -73,8 +73,11 @@ export class MemoryStore {
   async insertRecords(records) {
     const result = records.map(async record => {
       const id = await Util.getContentId(record);
-      this._records.set(id, record);
-      return { id, ...record };
+      if (!this._records.has(id)) {
+        this._records.set(id, record);
+        return { id, ...record };
+      }
+      return { id, ...this._records.get(id) };
     });
     return result;
   }

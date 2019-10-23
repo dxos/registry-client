@@ -39,7 +39,7 @@ export class RegistryClient {
   static prepareAttributes(path) {
     return rows => {
       const result = rows.map(r => {
-        set(r, path, Util.fromGQLAttributes(get(r, path)));
+        set(r, path, Util.fromGQLAttributes(get(r, path), false, true));
         return r;
       });
       return result;

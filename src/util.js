@@ -75,21 +75,31 @@ export class Util {
    * Unmarshal attributes array to object.
    * @param {array} attributes
    * @param {boolean} addRefType
+   * @param {boolean} addRefs
    */
-  static fromGQLAttributes(attributes, addRefType = false) {
+  static fromGQLAttributes(attributes, addRefType = false, addRefs = false) {
     const res = {};
+    const refs = {};
     attributes.forEach(attr => {
       if (attr.value.null) {
         res[attr.key] = null;
       } else {
         const { values, null: n, ...types } = attr.value;
         const value = Object.values(types).find(v => v !== null);
-        if (addRefType && typeof (value) === 'object' && types.reference) {
-          value.type = 'wrn:reference';
+        if (typeof (value) === 'object' && types.reference) {
+          if (addRefs) {
+            refs[attr.key] = { ...value };
+          }
+          if (addRefType) {
+            value.type = 'wrn:reference';
+          }
         }
         res[attr.key] = value;
       }
     });
+    if (addRefs) {
+      res._references = refs;
+    }
     return res;
   }
 
@@ -102,19 +112,5 @@ export class Util {
     const content = Buffer.from(canonicalStringify(record));
     const hash = await multihashing(content, 'sha2-256');
     return new CID(hash).toString();
-  }
-
-  /**
-   * Get record references map.
-   * @param record
-   * @return {object}
-   */
-  static getReferencesMap(record) {
-    return record.attributes
-      .filter(attr => attr.value.reference)
-      .reduce((acc, attr) => {
-        acc[attr.key] = attr.value.reference.id;
-        return acc;
-      }, {});
   }
 }
