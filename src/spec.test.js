@@ -90,7 +90,6 @@ describe('Registering', () => {
   });
 
   test('Get bots depending on a particular version of a protocol.', async () => {
-
     const { version, name, type } = protocol.record;
     const records = await registry.queryRecords({ version, name, type });
     expect(records.length).toBe(1);
@@ -103,10 +102,9 @@ describe('Registering', () => {
   });
 
   test('Get bots compatible with a specific pad.', async () => {
-
     const { protocol: { id } } = createdPad.attributes;
-
     const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+
     expect(botRecords.length).toBe(1);
     const [ bot ] = botRecords;
     expect(bot.attributes.protocol.id).toEqual(id);
