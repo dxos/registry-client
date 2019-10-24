@@ -42,17 +42,19 @@ export class Registry {
   /**
    * Get records by ids.
    * @param {array} ids
+   * @param {boolean} refs
    */
-  async getRecordsByIds(ids) {
-    return this._client.getRecordsByIds(ids);
+  async getRecordsByIds(ids, refs = false) {
+    return this._client.getRecordsByIds(ids, refs);
   }
 
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} refs
    */
-  async queryRecords(attributes) {
-    return this._client.queryRecords(attributes);
+  async queryRecords(attributes, refs = false) {
+    return this._client.queryRecords(attributes, refs);
   }
 
   /**
@@ -62,6 +64,9 @@ export class Registry {
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
   async setRecord(privateKey, record, transactionPrivateKey) {
+    if (process.env.MOCK_SERVER) {
+      return this._client.insertRecord(record);
+    }
     return this._submit(privateKey, record, 'set', transactionPrivateKey);
   }
 
