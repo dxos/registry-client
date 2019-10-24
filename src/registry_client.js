@@ -9,6 +9,32 @@ import set from 'lodash.set';
 
 import { Util } from './util';
 
+const attributeField = `
+  attributes {
+    key
+    value {
+      null
+      int
+      float
+      string
+      boolean
+      reference {
+        id
+      }
+    }
+  }
+`;
+
+// TODO(egorgripasov): Reference attributes & recursive fetch.
+const refsField = `
+  references {
+    id
+    type
+    name
+    version
+  }
+`;
+
 /**
  * Registry
  */
@@ -86,7 +112,12 @@ export class RegistryClient {
     return RegistryClient.getResult(this.graph(query)(variables), 'getAccounts');
   }
 
-  async getRecordsByIds(ids) {
+  /**
+   * Get records by ids.
+   * @param {array} ids
+   * @param {boolean} refs
+   */
+  async getRecordsByIds(ids, refs = false) {
     console.assert(ids);
     console.assert(ids.length);
 
@@ -97,19 +128,8 @@ export class RegistryClient {
         name
         version
         owners
-        attributes {
-          key
-          value {
-            null
-            int
-            float
-            string
-            boolean
-            reference {
-              id
-            }
-          }
-        }
+        ${attributeField}
+        ${refs ? refsField : ''}
       }
     }`;
 
@@ -123,8 +143,9 @@ export class RegistryClient {
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} refs
    */
-  async queryRecords(attributes) {
+  async queryRecords(attributes, refs = false) {
     if (!attributes) {
       attributes = {};
     }
@@ -136,19 +157,8 @@ export class RegistryClient {
         name
         version
         owners
-        attributes {
-          key
-          value {
-            null
-            int
-            float
-            string
-            boolean
-            reference {
-              id
-            }
-          }
-        }
+        ${attributeField}
+        ${refs ? refsField : ''}
       }
     }`;
 
@@ -188,19 +198,7 @@ export class RegistryClient {
       insertRecord(attributes: $attributes) {
         id
         type
-        attributes {
-          key
-          value {
-            null
-            int
-            float
-            string
-            boolean
-            reference {
-              id
-            }
-          }
-        }
+        ${attributeField}
       }
     }`;
 
