@@ -40,6 +40,7 @@
     "graphql": "^14.5.4",
     "graphql-request": "^1.8.2",
     "graphql-tools": "^4.0.5",
+    "graphviz": "^0.0.9",
     "jest": "^24.5.0",
     "lint-staged": "^8.1.0",
     "node-yaml": "^4.0.1",
