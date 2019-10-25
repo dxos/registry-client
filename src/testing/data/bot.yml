@@ -1,7 +1,7 @@
 record:
   type: 'wrn:bot'
   name: wireline.io/chess-bot
-  version: 2.0.62
+  version: 2.0.78
   protocol:
     type: 'wrn:reference'
     id: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN

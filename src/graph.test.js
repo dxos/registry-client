@@ -13,7 +13,7 @@ const COLOR_MAP = {
   'wrn:pad': 'green'
 };
 
-test('graph', async () => {
+test.skip('graph', async () => {
   const g = graphviz.digraph('G');
 
   const recordsById = {};

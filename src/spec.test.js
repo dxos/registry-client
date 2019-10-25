@@ -50,6 +50,7 @@ describe('Registering', () => {
   });
 
   test('Register protocol.', async () => {
+    await sleep();
     await registry.setRecord(PRIVATE_KEY, protocol.record, PRIVATE_KEY);
     await sleep();
 

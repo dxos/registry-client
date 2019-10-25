@@ -82,5 +82,9 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "jest": {
+    "testPathIgnorePatterns": ["dist/*"],
+    "maxConcurrency": 1
   }
 }
