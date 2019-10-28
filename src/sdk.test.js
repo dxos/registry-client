@@ -14,6 +14,7 @@ const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a5945
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/query';
 
 const log = debug('test');
 
@@ -31,7 +32,7 @@ describe('Querying', () => {
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    registry = new Registry(mock ? mock.serverInfo.url : 'http://localhost:9473/query');
+    registry = new Registry(mock ? mock.serverInfo.url : WNS_GQL_ENDPOINT);
     bot = await ensureUpdatedConfig(BOT_YML_PATH);
     await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY);
   });
