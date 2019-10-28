@@ -63,10 +63,10 @@ let result = await registry.setRecord(payloadKey, record);
 
 ## Tests
 
-`yarn test` allows to run tests against an external GQL endpoint. By default `http://localhost:9473` endpoint is used, but could be changed by `WNS_GQL_ENDPOINT` ENV var.
+`yarn test` allows to run tests against an external GQL endpoint (of a real WNS server). By default `http://localhost:9473` endpoint is used, but could be changed by `WNS_GQL_ENDPOINT` ENV var.
 
 ```
-$ WNS_GQL_ENDPOINT=http://127.0.0.1:4000/ yarn test
+$ WNS_GQL_ENDPOINT=https://wns-testnet.wireline.ninja/query yarn test
 ```
 
 `yarn test:in-mem-wns` spins up an in-process mock GQL server for the duration of the tests.
