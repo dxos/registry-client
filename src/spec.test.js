@@ -16,6 +16,7 @@ const PAD_YML_PATH = path.join(__dirname, './testing/data/pad.yml');
 const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/query';
 
 const log = debug('test');
 
@@ -42,7 +43,7 @@ describe('Registering', () => {
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    registry = new Registry(mock ? mock.serverInfo.url : 'http://localhost:9473/query');
+    registry = new Registry(mock ? mock.serverInfo.url : WNS_GQL_ENDPOINT);
 
     bot = await ensureUpdatedConfig(BOT_YML_PATH);
     pad = await ensureUpdatedConfig(PAD_YML_PATH);
