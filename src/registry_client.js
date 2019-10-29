@@ -39,7 +39,7 @@ const refsField = `
  * Registry
  */
 export class RegistryClient {
-  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/query';
+  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/graphql';
 
   /**
    * Get query result.
@@ -167,6 +167,33 @@ export class RegistryClient {
     };
 
     return RegistryClient.getResult(this.graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
+  }
+
+  /**
+   * Resolve records by refs.
+   * @param {array} references
+   * @param {boolean} refs
+   */
+  async resolveRecords(references, refs = false) {
+    console.assert(references.length);
+
+    const query = `query ($refs: [String!]) {
+      resolveRecords(refs: $refs) {
+        id
+        type
+        name
+        version
+        owners
+        ${attributeField}
+        ${refs ? refsField : ''}
+      }
+    }`;
+
+    const variables = {
+      refs: references
+    };
+
+    return RegistryClient.getResult(this.graph(query)(variables), 'resolveRecords', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**

@@ -14,7 +14,7 @@ const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a5945
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/query';
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473';
 
 const log = debug('test');
 
@@ -26,6 +26,8 @@ describe('Querying', () => {
   let mock;
   let registry;
 
+  let firstVersion;
+
   beforeAll(async () => {
     if (MOCK_SERVER) {
       mock = await startMockServer();
@@ -33,8 +35,15 @@ describe('Querying', () => {
     }
 
     registry = new Registry(mock ? mock.serverInfo.url : WNS_GQL_ENDPOINT);
-    bot = await ensureUpdatedConfig(BOT_YML_PATH);
-    await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY);
+
+    const publishNewBotVersion = async () => {
+      bot = await ensureUpdatedConfig(BOT_YML_PATH);
+      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY);
+      return bot.record.version;
+    };
+
+    firstVersion = await publishNewBotVersion();
+    await publishNewBotVersion();
   });
 
   test('List records.', async () => {
@@ -66,6 +75,34 @@ describe('Querying', () => {
     const records = await registry.getRecordsByIds([bot.id]);
     expect(records.length).toBe(1);
     expect(records[0].id).toBe(bot.id);
+  });
+
+  test('Resolve records by refs - basic.', async () => {
+    const ref = `${bot.type}:${bot.name}`;
+    const records = await registry.resolveRecords([ref]);
+    expect(records.length).toBe(1);
+    expect(records[0].version).toBe(bot.version);
+  });
+
+  test('Resolve records by refs - specific version.', async () => {
+    const ref = `${bot.type}:${bot.name}#${firstVersion}`;
+    const records = await registry.resolveRecords([ref]);
+    expect(records.length).toBe(1);
+    expect(records[0].version).toBe(firstVersion);
+  });
+
+  test('Resolve records by refs - tilde range.', async () => {
+    const ref = `${bot.type}:${bot.name}#~${firstVersion}`;
+    const records = await registry.resolveRecords([ref]);
+    expect(records.length).toBe(1);
+    expect(records[0].version).toBe(bot.version);
+  });
+
+  test('Resolve records by refs - caret range.', async () => {
+    const ref = `${bot.type}:${bot.name}#^${firstVersion}`;
+    const records = await registry.resolveRecords([ref]);
+    expect(records.length).toBe(1);
+    expect(records[0].version).toBe(bot.version);
   });
 
   afterAll(async () => {

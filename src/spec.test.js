@@ -16,7 +16,7 @@ const PAD_YML_PATH = path.join(__dirname, './testing/data/pad.yml');
 const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/query';
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473';
 
 const log = debug('test');
 

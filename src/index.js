@@ -13,7 +13,7 @@ import { TxBuilder } from './txbuilder';
 import { Record } from './types';
 
 const CHAIN = 'wireline';
-const GQL_PATH = '/query';
+const GQL_PATH = '/graphql';
 
 /**
  * Wireline registry SDK.
@@ -55,6 +55,15 @@ export class Registry {
    */
   async queryRecords(attributes, refs = false) {
     return this._client.queryRecords(attributes, refs);
+  }
+
+  /**
+   * Resolve records by refs.
+   * @param {array} references
+   * @param {boolean} refs
+   */
+  async resolveRecords(references, refs = false) {
+    return this._client.resolveRecords(references, refs);
   }
 
   /**
