@@ -14,7 +14,7 @@ const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a5945
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/query';
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473';
 
 const log = debug('test');
 

@@ -39,7 +39,7 @@ const refsField = `
  * Registry
  */
 export class RegistryClient {
-  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/query';
+  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/graphql';
 
   /**
    * Get query result.

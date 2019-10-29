@@ -13,7 +13,7 @@ import { TxBuilder } from './txbuilder';
 import { Record } from './types';
 
 const CHAIN = 'wireline';
-const GQL_PATH = '/query';
+const GQL_PATH = '/graphql';
 
 /**
  * Wireline registry SDK.

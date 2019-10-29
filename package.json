@@ -80,8 +80,8 @@
     "build:web": "NODE_ENV=production webpack",
     "lint:staged": "lint-staged",
     "start:in-mem-wns": "BABEL_DISABLE_CACHE=1 DEBUG=test babel-node src/mock/main.js",
-    "test": "jest",
-    "test:in-mem-wns": "MOCK_SERVER=1 jest"
+    "test": "jest --runInBand",
+    "test:in-mem-wns": "MOCK_SERVER=1 jest --runInBand"
   },
   "publishConfig": {
     "access": "public"
