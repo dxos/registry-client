@@ -170,6 +170,33 @@ export class RegistryClient {
   }
 
   /**
+   * Resolve records by refs.
+   * @param {array} references
+   * @param {boolean} refs
+   */
+  async resolveRecords(references, refs = false) {
+    console.assert(references.length);
+
+    const query = `query ($refs: [String!]) {
+      resolveRecords(refs: $refs) {
+        id
+        type
+        name
+        version
+        owners
+        ${attributeField}
+        ${refs ? refsField : ''}
+      }
+    }`;
+
+    const variables = {
+      refs: references
+    };
+
+    return RegistryClient.getResult(this.graph(query)(variables), 'resolveRecords', RegistryClient.prepareAttributes('attributes'));
+  }
+
+  /**
    * Submit transaction.
    * @param {string} tx
    */

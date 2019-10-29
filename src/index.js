@@ -58,6 +58,15 @@ export class Registry {
   }
 
   /**
+   * Resolve records by refs.
+   * @param {array} references
+   * @param {boolean} refs
+   */
+  async resolveRecords(references, refs = false) {
+    return this._client.resolveRecords(references, refs);
+  }
+
+  /**
    * Publish record.
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} record
