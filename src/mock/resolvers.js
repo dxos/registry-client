@@ -33,6 +33,8 @@ export class Resolvers {
           return this._memoryStore.queryRecords(filterAttributes);
         },
 
+        resolveRecords: async (_, { refs = [] }) => this._memoryStore.resolveRecords(refs),
+
         getRecordsByIds: async (_, { ids }) => this._memoryStore.getRecordsByIds(ids)
       },
 

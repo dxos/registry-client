@@ -77,6 +77,20 @@ describe('Querying', () => {
     expect(records[0].id).toBe(bot.id);
   });
 
+  test('Query records using semver.', async () => {
+    const { name } = bot;
+    const records = await registry.queryRecords({ version: '^' + firstVersion, name });
+    expect(records.length).toBe(1);
+    expect(records[0].version).toBe(bot.version);
+  });
+
+  test('Query only latest version.', async () => {
+    const { name } = bot;
+    const records = await registry.queryRecords({ version: 'latest', name });
+    expect(records.length).toBe(1);
+    expect(records[0].version).toBe(bot.version);
+  });
+
   test('Resolve records by refs - basic.', async () => {
     const ref = `${bot.type}:${bot.name}`;
     const records = await registry.resolveRecords([ref]);
