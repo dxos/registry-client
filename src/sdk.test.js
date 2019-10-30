@@ -78,15 +78,15 @@ describe('Querying', () => {
   });
 
   test('Query records using semver.', async () => {
-    const { name } = bot;
-    const records = await registry.queryRecords({ version: '^' + firstVersion, name });
+    const { type, name } = bot;
+    const records = await registry.queryRecords({ version: '^' + firstVersion, name, type });
     expect(records.length).toBe(1);
     expect(records[0].version).toBe(bot.version);
   });
 
   test('Query only latest version.', async () => {
-    const { name } = bot;
-    const records = await registry.queryRecords({ version: 'latest', name });
+    const { type, name } = bot;
+    const records = await registry.queryRecords({ version: 'latest', name, type });
     expect(records.length).toBe(1);
     expect(records[0].version).toBe(bot.version);
   });

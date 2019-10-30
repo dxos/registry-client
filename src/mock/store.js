@@ -109,10 +109,11 @@ export class MemoryStore {
   async insertRecords(records) {
     const result = records.map(async record => {
       const id = await Util.getContentId(record);
-      if (!this._records.has(id)) {
-        const { name, type, version } = record;
+      const { name, type, version } = record;
+      const versions = this._getVersions(type, name);
+      if (!this._records.has(id) && !versions.has(version)) {
         this._records.set(id, record);
-        this._getVersions(type, name).set(version, { name, type, version });
+        versions.set(version, { name, type, version });
         return { id, ...record };
       }
       return { id, ...this._records.get(id) };
@@ -120,6 +121,12 @@ export class MemoryStore {
     return result;
   }
 
+  /**
+   * Filter records by type name and version.
+   * @param {string} name
+   * @param {string} type
+   * @param {string} version
+   */
   async _resolveEntities(name, type, version) {
     let res = Array.from(this._records).map(([id, record]) => ({ id, ...record }));
     let entities = Array.from(this._regordGroups).map(([, record]) => record);
