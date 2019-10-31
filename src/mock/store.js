@@ -15,16 +15,16 @@ import records from './data/records';
 export class MemoryStore {
   _records = new Map();
 
-  _regordGroups = new Map();
+  _recordGroups = new Map();
 
   _initialized = false;
 
   _getVersions(type, name) {
     const id = `${type}:${name}`;
-    let map = this._regordGroups.get(id);
+    let map = this._recordGroups.get(id);
     if (!map) {
       map = new Map();
-      this._regordGroups.set(id, map);
+      this._recordGroups.set(id, map);
     }
 
     return map;
@@ -111,12 +111,17 @@ export class MemoryStore {
       const id = await Util.getContentId(record);
       const { name, type, version } = record;
       const versions = this._getVersions(type, name);
-      if (!this._records.has(id) && !versions.has(version)) {
-        this._records.set(id, record);
-        versions.set(version, { name, type, version });
-        return { id, ...record };
+      if (!this._records.has(id)) {
+        if (!versions.has(version)) {
+          this._records.set(id, record);
+          versions.set(version, { name, type, version });
+          return { id, ...record };
+        } else {
+          throw new Error('Record already exists.');
+        }
+      } else {
+        return { id, ...this._records.get(id) };
       }
-      return { id, ...this._records.get(id) };
     });
     return result;
   }
@@ -129,7 +134,7 @@ export class MemoryStore {
    */
   async _resolveEntities(name, type, version) {
     let res = Array.from(this._records).map(([id, record]) => ({ id, ...record }));
-    let entities = Array.from(this._regordGroups).map(([, record]) => record);
+    let entities = Array.from(this._recordGroups).map(([, record]) => record);
 
     if (!version || version === 'latest') {
       // Only latest version of every entity.
@@ -147,7 +152,7 @@ export class MemoryStore {
         }
       });
       entities = newEntities;
-    } else if (version && version.match(/^~|\^/)) {
+    } else if (version && version.match(/^~|\^|<|>|=|!/)) {
       // Latest semver version.
       const newEntities = [];
       entities.forEach(entityMap => {

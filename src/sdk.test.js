@@ -18,7 +18,7 @@ const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473'
 
 const log = debug('test');
 
-jest.setTimeout(10 * 1000);
+jest.setTimeout(40 * 1000);
 
 describe('Querying', () => {
   let bot;
@@ -117,6 +117,21 @@ describe('Querying', () => {
     const records = await registry.resolveRecords([ref]);
     expect(records.length).toBe(1);
     expect(records[0].version).toBe(bot.version);
+  });
+
+  test('Unique index on type, name and version.', async () => {
+    const { name, version, type } = bot;
+    const record = {
+      displayName: 'newName',
+      name,
+      version,
+      type
+    };
+    try {
+      await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY);
+    } catch (err) {
+      expect(JSON.stringify(err).includes('exists')).toBe(true);
+    }
   });
 
   afterAll(async () => {
