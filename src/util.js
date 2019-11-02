@@ -75,11 +75,9 @@ export class Util {
    * Unmarshal attributes array to object.
    * @param {array} attributes
    * @param {boolean} addRefType
-   * @param {boolean} addRefs
    */
-  static fromGQLAttributes(attributes, addRefType = false, addRefs = false) {
+  static fromGQLAttributes(attributes, addRefType = false) {
     const res = {};
-    const refs = {};
     attributes.forEach(attr => {
       if (attr.value.null) {
         res[attr.key] = null;
@@ -87,9 +85,6 @@ export class Util {
         const { values, null: n, ...types } = attr.value;
         const value = Object.values(types).find(v => v !== null);
         if (typeof (value) === 'object' && types.reference) {
-          if (addRefs) {
-            refs[attr.key] = { ...value };
-          }
           if (addRefType) {
             value.type = 'wrn:reference';
           }
@@ -97,9 +92,6 @@ export class Util {
         res[attr.key] = value;
       }
     });
-    if (addRefs) {
-      res._references = refs;
-    }
     return res;
   }
 

@@ -85,12 +85,6 @@ describe('Registering', () => {
     expect(recordType).toBe(type);
   });
 
-  test('Get dependency graph of a module.', async () => {
-    expect(createdPad.attributes._references).toEqual({
-      protocol: { id: pad.record.protocol.id }
-    });
-  });
-
   test('Get dependency graph of a module - graphwalk.', async () => {
     const { version, name, type } = pad.record;
     const records = await registry.queryRecords({ version, name, type }, true);
