@@ -130,7 +130,7 @@ describe('Querying', () => {
     try {
       await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY);
     } catch (err) {
-      expect(JSON.stringify(err).includes('exists')).toBe(true);
+      expect(err.message.includes('exists')).toBe(true);
     }
   });
 

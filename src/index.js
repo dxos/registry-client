@@ -15,10 +15,20 @@ import { Record } from './types';
 const CHAIN = 'wireline';
 const GQL_PATH = '/graphql';
 
+const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
+
 /**
  * Wireline registry SDK.
  */
 export class Registry {
+
+  static processWriteError(error) {
+    let message = (error.message || DEFAULT_WRITE_ERROR).replace(/(\\)+/g, '');
+    const wnsMessage = /"message":"(.*?)"/g.exec(message);
+    message = wnsMessage && wnsMessage[1] ? wnsMessage[1] : message;
+    return message;
+  }
+
   constructor(url) {
     if (!isUrl(url)) {
       throw new Error('Path to a registry GQL endpoint should be provided.');
@@ -73,10 +83,18 @@ export class Registry {
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
   async setRecord(privateKey, record, transactionPrivateKey) {
-    if (process.env.MOCK_SERVER) {
-      return this._client.insertRecord(record);
+    let result;
+    try {
+      if (process.env.MOCK_SERVER) {
+        result = await this._client.insertRecord(record);
+      } else {
+        result = await this._submit(privateKey, record, 'set', transactionPrivateKey);
+      }
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
     }
-    return this._submit(privateKey, record, 'set', transactionPrivateKey);
+    return result;
   }
 
   /**
@@ -104,12 +122,16 @@ export class Registry {
     // 1. Get account details.
     const account = new Account(Buffer.from(privateKey, 'hex'));
     const accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
-    console.assert(accountDetails.length, 'Can not find account to sign the message in registry.');
+    if (!accountDetails.length) {
+      throw new Error('Can not sign the message - account does not exist.');
+    }
 
     const signingAccount = transactionPrivateKey ? new Account(Buffer.from(transactionPrivateKey, 'hex')) : account;
     /* eslint-disable max-len */
     const signingAccountDetails = transactionPrivateKey ? await this.getAccounts([signingAccount.formattedCosmosAddress]) : accountDetails;
-    console.assert(signingAccountDetails.length, 'Can not find account to sign the transaction in registry.');
+    if (!signingAccountDetails.length) {
+      throw new Error('Can not sign the transaction - account does not exist.');
+    }
 
     // 2. Generate message.
     const registryRecord = new Record(record, account);
