@@ -15,3 +15,5 @@ webpack.zip
 .webpack/
 
 .DS_Store
+.idea/
+graph.png

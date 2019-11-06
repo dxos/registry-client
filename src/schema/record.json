@@ -4,43 +4,24 @@
 
   "definitions": {
 
-    "systemAttributes": {
-      "type": "object",
-      "default": null
-    },
-
-    "attributes": {
-      "type": "object",
-      "default": null
-    },
-
-    "links": {
-      "type": "object",
-      "default": null
-    }
   },
 
   "type": "object",
   "properties": {
-    "id": {
-      "type": "string"
-    },
     "type": {
       "type": "string"
     },
-    "systemAttributes": {
-      "$ref": "#/definitions/systemAttributes"
+    "name": {
+      "type": "string"
     },
-    "attributes": {
-      "$ref": "#/definitions/attributes"
-    },
-    "links": {
-      "$ref": "#/definitions/links"
+    "version": {
+      "type": "string"
     }
   },
 
   "required": [
-    "id",
-    "type"
+    "type",
+    "name",
+    "version"
   ]
 }

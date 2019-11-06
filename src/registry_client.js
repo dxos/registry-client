@@ -4,15 +4,73 @@
 
 // TODO(egorgripasov): replace with appolo client + fragments.
 import graphql from 'graphql.js';
-import { get, set } from 'lodash';
+import get from 'lodash.get';
+import set from 'lodash.set';
 
 import { Util } from './util';
+
+const attributeField = `
+  attributes {
+    key
+    value {
+      null
+      int
+      float
+      string
+      boolean
+      reference {
+        id
+      }
+    }
+  }
+`;
+
+// TODO(egorgripasov): Reference attributes & recursive fetch.
+const refsField = `
+  references {
+    id
+    type
+    name
+    version
+  }
+`;
 
 /**
  * Registry
  */
 export class RegistryClient {
-  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/query';
+  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/graphql';
+
+  /**
+   * Get query result.
+   * @param {object} query
+   * @param {string} key
+   * @param {function} modifier
+   */
+  static async getResult(query, key, modifier = null) {
+    const result = await query;
+    if (result && result[key] && result[key].length && result[key][0] !== null) {
+      if (modifier) {
+        return modifier(result[key]);
+      }
+      return result[key];
+    }
+    return [];
+  }
+
+  /**
+   * Prepare response attributes.
+   * @param {string} path
+   */
+  static prepareAttributes(path) {
+    return rows => {
+      const result = rows.map(r => {
+        set(r, path, Util.fromGQLAttributes(get(r, path)));
+        return r;
+      });
+      return result;
+    };
+  }
 
   /**
    * New Client.
@@ -26,27 +84,6 @@ export class RegistryClient {
     });
   }
 
-  async _getResult(query, key, modifier = null) {
-    let result = await query;
-    if (result && result[key] && result[key].length && result[key][0] !== null) {
-      if (modifier) {
-        return modifier(result[key]);
-      }
-      return result[key];
-    }
-    return [];
-  }
-
-  _prepareAttributes(path) {
-    return rows => {
-      let result = rows.map(r => {
-        set(r, path, Util.fromGQLAttributes(get(r, path)));
-        return r;
-      });
-      return result;
-    }
-  }
-
   /**
    * Fetch Accounts.
    * @param {array} addresses
@@ -55,7 +92,7 @@ export class RegistryClient {
     console.assert(addresses);
     console.assert(addresses.length);
 
-    let query = `query ($addresses: [String!]) {
+    const query = `query ($addresses: [String!]) {
       getAccounts(addresses: $addresses) {
         address
         pubKey
@@ -63,117 +100,100 @@ export class RegistryClient {
         sequence
         balance {
           type
-          amount
+          quantity
         }
       }
     }`;
 
-    let variables = {
+    const variables = {
       addresses
     };
 
-    return this._getResult(this.graph(query)(variables), 'getAccounts');
+    return RegistryClient.getResult(this.graph(query)(variables), 'getAccounts');
   }
 
-  async getRecordsByIds(ids) {
+  /**
+   * Get records by ids.
+   * @param {array} ids
+   * @param {boolean} refs
+   */
+  async getRecordsByIds(ids, refs = false) {
     console.assert(ids);
     console.assert(ids.length);
 
-    let query = `query ($ids: [String!]) {
+    const query = `query ($ids: [String!]) {
       getRecordsByIds(ids: $ids) {
         id
         type
-        owner
-        attributes {
-          key
-          value {
-            null
-            int
-            float
-            string
-            boolean
-          }
-        }
+        name
+        version
+        owners
+        ${attributeField}
+        ${refs ? refsField : ''}
       }
     }`;
 
-    let variables = {
+    const variables = {
       ids
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByIds', this._prepareAttributes('attributes'));
+    return RegistryClient.getResult(this.graph(query)(variables), 'getRecordsByIds', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} refs
    */
-  async getRecordsByAttributes(attributes) {
+  async queryRecords(attributes, refs = false) {
     if (!attributes) {
       attributes = {};
     }
 
-    let query = `query ($attributes: [KeyValueInput!]) {
-      getRecordsByAttributes(attributes: $attributes) {
+    const query = `query ($attributes: [KeyValueInput!]) {
+      queryRecords(attributes: $attributes) {
         id
         type
-        owner
-        attributes {
-          key
-          value {
-            null
-            int
-            float
-            string
-            boolean
-          }
-        }
+        name
+        version
+        owners
+        ${attributeField}
+        ${refs ? refsField : ''}
       }
     }`;
 
-    let variables = {
+    const variables = {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return this._getResult(this.graph(query)(variables), 'getRecordsByAttributes', this._prepareAttributes('attributes'));
+    return RegistryClient.getResult(this.graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
-   * Get bots by attributes.
-   * @param {object} attributes
+   * Resolve records by refs.
+   * @param {array} references
+   * @param {boolean} refs
    */
-  async getBotsByAttributes(attributes) {
-    if (!attributes) {
-      attributes = {};
-    }
+  async resolveRecords(references, refs = false) {
+    console.assert(references.length);
 
-    let query = `query ($attributes: [KeyValueInput!]) {
-      getBotsByAttributes(attributes: $attributes) {
+    const query = `query ($refs: [String!]) {
+      resolveRecords(refs: $refs) {
+        id
+        type
         name
-        accessKey
-        record {
-          id
-          type
-          owner
-          attributes {
-            key
-            value {
-              null
-              int
-              float
-              string
-              boolean
-            }
-          }
-        }
+        version
+        owners
+        ${attributeField}
+        ${refs ? refsField : ''}
       }
     }`;
 
-    let variables = {
-      attributes: Util.toGQLAttributes(attributes)
+    const variables = {
+      refs: references
     };
 
-    return this._getResult(this.graph(query)(variables), 'getBotsByAttributes', this._prepareAttributes('record.attributes'));
+    return RegistryClient.getResult(this.graph(query)(variables), 'resolveRecords', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
@@ -183,14 +203,36 @@ export class RegistryClient {
   async submit(tx) {
     console.assert(tx);
 
-    let mutation = `mutation ($tx: String!) {
+    const mutation = `mutation ($tx: String!) {
       submit(tx: $tx)
     }`;
 
-    let variables = {
+    const variables = {
       tx
     };
 
     return this.graph(mutation)(variables);
+  }
+
+  /**
+   * Insert record.
+   * @param {object} attributes
+   */
+  async insertRecord(attributes) {
+    console.assert(Object.keys(attributes).length);
+
+    const query = `mutation insertRecord($attributes: [KeyValueInput]!) {
+      insertRecord(attributes: $attributes) {
+        id
+        type
+        ${attributeField}
+      }
+    }`;
+
+    const variables = {
+      attributes: Util.toGQLAttributes(attributes)
+    };
+
+    return RegistryClient.getResult(this.graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
   }
 }

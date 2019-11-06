@@ -1,0 +1,60 @@
+[
+  {
+    "type": "wrn:protocol",
+    "name": "wireline.io/chess",
+    "version": "1.2.0"
+  },
+  {
+    "type": "wrn:protocol",
+    "name": "wireline.io/chess",
+    "version": "1.2.1"
+  },
+  {
+    "type": "wrn:protocol",
+    "name": "wireline.io/chess",
+    "version": "1.5.1"
+  },
+  {
+    "type": "wrn:protocol",
+    "name": "wireline.io/chess",
+    "version": "1.5.2"
+  },
+  {
+    "type": "wrn:bot",
+    "name": "wireline.io/chess-bot",
+    "version": "1.0.0",
+    "accessKey": "1234567890ABCD",
+    "protocol": {
+      "type": "wrn:reference",
+      "id": "QmV9RReg2AEfQVXma3grfeTRgZy5F2EREuwfXMHcjvBpu3"
+    }
+  },
+  {
+    "type": "wrn:bot",
+    "name": "wireline.io/chess-bot",
+    "version": "1.1.0",
+    "accessKey": "ABCDEF98746323",
+    "protocol": {
+      "type": "wrn:reference",
+      "id": "QmeUbpF3JkztsM46booULxnycfF1ihZHKhdyV2jMxUwW3q"
+    }
+  },
+  {
+    "type": "wrn:pad",
+    "name": "wireline.io/chess-pad",
+    "version": "2.5.0",
+    "protocol": {
+      "type": "wrn:reference",
+      "id": "QmeUbpF3JkztsM46booULxnycfF1ihZHKhdyV2jMxUwW3q"
+    }
+  },
+  {
+    "type": "wrn:pad",
+    "name": "wireline.io/chess-pad",
+    "version": "2.5.1",
+    "protocol": {
+      "type": "wrn:reference",
+      "id": "QmR7BTTmBiYhfFm5Ft3uA8twnBXqv9dQm7gfbvC4NdtQ7F"
+    }
+  }
+]
