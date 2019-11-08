@@ -121,6 +121,28 @@ describe('Registering', () => {
     expect(bot.attributes.protocol.id).toEqual(id);
   });
 
+  test('LP client can show visual graph of dependencies.', async () => {
+    // Get Pad and corresponding Protocol.
+    const { version, name, type } = pad.record;
+    const records = await registry.queryRecords({ version, name, type }, true);
+    expect(records.length).toBe(1);
+
+    const [ padWithRefs ] = records;
+    expect(padWithRefs.references).toBeDefined();
+    expect(padWithRefs.references).toHaveLength(1);
+
+    const [ referencedProto ] = padWithRefs.references;
+    expect(referencedProto.id).toEqual(createdProtocol.id);
+    expect(referencedProto.type).toEqual(createdProtocol.type);
+    expect(referencedProto.version).toEqual(createdProtocol.version);
+
+    // Get Bots that support such protocol.
+    const { id } = referencedProto;
+    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    expect(botRecords.length).toBe(1);
+    expect(botRecords[0].attributes.protocol.id).toEqual(id);
+  });
+
   afterAll(async () => {
     if (mock) {
       await mock.mockServer.stop();
