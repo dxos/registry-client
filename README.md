@@ -3,12 +3,12 @@
 ## Usage
 
 ```
-import { Account, Registry } from 'registry-client';
+import { Account, Registry } from '@wirelineio/registry-client';
 const endpoint = 'https://wns-testnet.wireline.ninja';
 const registry = new Registry(endpoint);
 ```
 
-### Generate private and public key
+### Generate Private & Public Keys
 
 ```
 let mnemonic;
@@ -20,7 +20,7 @@ if (!mnemonic) {
 const key = Account.generateFromMnemonic(mnemonic);
 ```
 
-### Query from registry
+### Query WNS
 
 Get accounts:
 
@@ -36,14 +36,14 @@ let ids = ['650f3ed2-f44e-43f2-9985-473422579fe6'];
 let result = await registry.getRecordsByIds(ids);
 ```
 
-Get records by attributes:
+Query records by attributes:
 
 ```
 let attributes = { type: 'wrn:bot' };
 let result = await registry.queryRecords(attributes);
 ```
 
-### Write to registry
+### Write to WNS
 
 Publish record:
 
