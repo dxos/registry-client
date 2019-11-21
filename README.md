@@ -32,7 +32,7 @@ const result = await registry.getAccounts(addresses);
 Get records by ids:
 
 ```
-let ids = ['650f3ed2-f44e-43f2-9985-473422579fe6'];
+let ids = ['QmfKZkWQdWFtUnsJt4Uakp3jSzXKHcafY5sMnyPodR9Ks2'];
 let result = await registry.getRecordsByIds(ids);
 ```
 
@@ -60,6 +60,14 @@ let record = {
 let result = await registry.setRecord(payloadKey, record);
 ```
 
+Send coins:
+
+```
+let privateKey = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
+let toAddress = 'cosmos1w5q7xy9sk8hqvlklftdfdkc3kgsd90cxlkwvty';
+
+await registry.sendCoins([{ denom: 'wire', amount: '100' }], toAddress, privateKey);
+```
 
 ## Tests
 
