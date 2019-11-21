@@ -10,7 +10,7 @@ import { RegistryClient } from './registry_client';
 import { Account } from './account';
 import { Util } from './util';
 import { TxBuilder } from './txbuilder';
-import { Record } from './types';
+import { Msg, Record } from './types';
 
 const CHAIN = 'wireline';
 const GQL_PATH = '/graphql';
@@ -88,7 +88,7 @@ export class Registry {
       if (process.env.MOCK_SERVER) {
         result = await this._client.insertRecord(record);
       } else {
-        result = await this._submit(privateKey, record, 'set', transactionPrivateKey);
+        result = await this._submit(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey);
       }
     } catch (err) {
       const error = err[0] || err;
@@ -104,7 +104,7 @@ export class Registry {
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    */
   async deleteRecord(privateKey, record, transactionPrivateKey) {
-    return this._submit(privateKey, record, 'delete', transactionPrivateKey);
+    return this._submit(privateKey, record, 'nameservice/DeleteRecord', transactionPrivateKey);
   }
 
   /**
@@ -136,13 +136,14 @@ export class Registry {
     // 2. Generate message.
     const registryRecord = new Record(record, account);
     const payload = TxBuilder.generatePayload(registryRecord);
+    const message = new Msg(operation, {
+      'Payload': payload.serialize(),
+      'Signer': signingAccount.formattedCosmosAddress.toString()
+    });
 
     // 3. Generate transaction.
     const { number, sequence } = signingAccountDetails[0];
-    const transaction = TxBuilder.createTransaction(
-      payload, signingAccount, number.toString(), sequence.toString(), CHAIN, operation
-    );
-
+    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), CHAIN);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // 4. Send transaction.

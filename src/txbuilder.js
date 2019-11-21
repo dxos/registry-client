@@ -2,7 +2,7 @@
 // Copyright 2019 Wireline, Inc.
 //
 
-import { Signature, Payload, Msg, Transaction } from './types';
+import { Signature, Payload, Transaction } from './types';
 
 /**
  * Transaction builder.
@@ -13,7 +13,6 @@ export class TxBuilder {
    * @param {object} record
    */
   static generatePayload(record) {
-    // TODO(Ashwin): message type.
     // Registry signature.
     const { ownerAccount: account } = record;
     const messageToSign = record.getMessageToSign();
@@ -26,20 +25,13 @@ export class TxBuilder {
 
   /**
    * Generates transaction.
-   * @param {object} payload
+   * @param {object} message
    * @param {object} account
    * @param {string} accountNumber
    * @param {string} accountSequence
    * @param {string} chainID
-   * @param {string} operation
    */
-  static createTransaction(payload, account, accountNumber, accountSequence, chainID, operation = 'set') {
-    // 1. Generate message.
-
-    // TODO(egor): Just take 'signer' param instead of 'account'?
-
-    const message = new Msg(operation, payload, account.formattedCosmosAddress);
-
+  static createTransaction(message, account, accountNumber, accountSequence, chainID) {
     // TODO(egorgripasov): class for fees.
     const fee = {
       amount: [

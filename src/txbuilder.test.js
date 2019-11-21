@@ -6,7 +6,7 @@ import path from 'path';
 
 import { Account } from './account';
 import { TxBuilder } from './txbuilder';
-import { Record } from './types';
+import { Msg, Record } from './types';
 import { getBaseConfig } from './testing/helper';
 
 const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928bcd589dd';
@@ -33,8 +33,12 @@ describe('Transactions.', () => {
     const record = new Record(bot.record, acc);
 
     const payload = TxBuilder.generatePayload(record);
+    const message = new Msg('nameservice/SetRecord', {
+      'Payload': payload.serialize(),
+      'Signer': acc.formattedCosmosAddress.toString()
+    });
 
-    const transaction = TxBuilder.createTransaction(payload, acc, ACC_NUM, ACC_SEQ, CHAIN);
-    expect(transaction.signatures[0].signature).toBe(TRANS_SIG);
+    const transaction = TxBuilder.createTransaction(message, acc, ACC_NUM, ACC_SEQ, CHAIN);
+    expect(transaction.value.signatures[0].signature).toBe(TRANS_SIG);
   });
 });
