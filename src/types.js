@@ -99,22 +99,15 @@ export class Payload {
  * Transaction Message.
  */
 export class Msg {
-  // Map operation to cosmos-sdk Message type.
-  static OPERATION_TO_MSG_TYPE = {
-    'set': 'nameservice/SetRecord',
-    'delete': 'nameservice/DeleteRecord'
-  };
 
   /**
    * New Message.
    * @param {string} operation
-   * @param {object} payload
-   * @param {string} signer
+   * @param {object} value
    */
-  constructor(operation, payload, signer) {
-    this.operation = operation;
-    this.payload = payload;
-    this.signer = signer;
+  constructor(operation, value) {
+    this._operation = operation;
+    this._value = value;
   }
 
   /**
@@ -122,11 +115,8 @@ export class Msg {
    */
   serialize() {
     return Util.sortJSON({
-      'type': Msg.OPERATION_TO_MSG_TYPE[this.operation],
-      'value': {
-        'Payload': this.payload.serialize(),
-        'Signer': this.signer.toString()
-      }
+      'type': this._operation,
+      'value': this._value
     });
   }
 }
