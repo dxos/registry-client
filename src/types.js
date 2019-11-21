@@ -146,7 +146,7 @@ export class Transaction {
    * @param {string} chainID
    */
   constructor(message, account, fee, signature, accountNumber, accountSequence, chainID) {
-    fee.gas = parseInt(fee.gas, 10);
+    fee.gas = String(parseInt(fee.gas, 10));
 
     this.message = message;
     this.account = account;
@@ -163,18 +163,24 @@ export class Transaction {
    */
   serialize() {
     return Util.sortJSON({
-      'account_number': this.accountNumber.toString(),
-      'chain_id': this.chainID,
-      'sequence': this.accountSequence.toString(),
-      'msg': [this.message.serialize()],
-      'fee': this.fee,
-      'signatures': [
-        {
-          'pub_key': this.account.registryPublicKey,
-          'signature': this.signature.toString('base64')
-        }
-      ],
-      'memo': ''
+      'type': 'cosmos-sdk/StdTx',
+      'value': {
+        'account_number': this.accountNumber.toString(),
+        'chain_id': this.chainID,
+        'sequence': this.accountSequence.toString(),
+        'msg': [this.message.serialize()],
+        'fee': this.fee,
+        'signatures': [
+          {
+            'pub_key': {
+              'type': 'tendermint/PubKeySecp256k1',
+              'value': this.account.publicKey.toString('base64')
+            },
+            'signature': this.signature.toString('base64')
+          }
+        ],
+        'memo': ''
+      }
     });
   }
 }
