@@ -114,9 +114,16 @@ export class Registry {
    * @param {string} privateKey
    */
   async sendCoins(amount, toAddress, privateKey) {
-    const account = new Account(Buffer.from(privateKey, 'hex'));
-    const fromAddress = account.formattedCosmosAddress;
-    return this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey);
+    let result;
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+    return result;
   }
 
   /**
