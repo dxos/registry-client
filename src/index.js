@@ -128,6 +128,22 @@ export class Registry {
   }
 
   /**
+   * Get bonds by ids.
+   * @param {array} ids
+   */
+  async getBondsByIds(ids) {
+    return this._client.getBondsByIds(ids);
+  }
+
+  /**
+   * Query bonds by attributes.
+   * @param {object} attributes
+   */
+  async queryBonds(attributes) {
+    return this._client.queryBonds(attributes);
+  }
+
+  /**
    * Submit record transaction.
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} record
