@@ -81,14 +81,15 @@ export class Registry {
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} record
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   * @param {string} bondId
    */
-  async setRecord(privateKey, record, transactionPrivateKey) {
+  async setRecord(privateKey, record, transactionPrivateKey, bondId) {
     let result;
     try {
       if (process.env.MOCK_SERVER) {
-        result = await this._client.insertRecord(record);
+        result = await this._client.insertRecord(record, bondId);
       } else {
-        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey);
+        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey, bondId);
       }
     } catch (err) {
       const error = err[0] || err;
@@ -132,10 +133,15 @@ export class Registry {
    * @param {object} record
    * @param {string} operation
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   * @param {string} bondId
    */
-  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey) {
+  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey, bondId) {
     if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
       throw new Error('Registry privateKey should be a hex string.');
+    }
+
+    if (!bondId || !bondId.match(/^[0-9a-fA-F]{64}$/)) {
+      throw new Error(`Invalid bondId: ${bondId}.`);
     }
 
     // 1. Get account details.
@@ -156,6 +162,7 @@ export class Registry {
     const registryRecord = new Record(record, account);
     const payload = TxBuilder.generatePayload(registryRecord);
     const message = new Msg(operation, {
+      'BondID': bondId,
       'Payload': payload.serialize(),
       'Signer': signingAccount.formattedCosmosAddress.toString()
     });
