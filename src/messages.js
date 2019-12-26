@@ -107,3 +107,39 @@ export class MsgRefillBond {
     });
   }
 }
+
+/**
+ * Withdraw bond message.
+ */
+export class MsgWithdrawBond {
+
+  /**
+   * @constructor
+   * @param {string} id
+   * @param {string} owner
+   * @param {object[]} amount
+   */
+  constructor(id, owner, amount) {
+    console.assert(id);
+    console.assert(owner);
+    console.assert(amount);
+
+    this._id = id;
+    this._owner = owner;
+    this._amount = amount;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'bond/WithdrawBond',
+      'value': {
+        'id': this._id,
+        'coins': this._amount,
+        'signer': this._owner
+      }
+    });
+  }
+}
