@@ -197,6 +197,55 @@ export class RegistryClient {
   }
 
   /**
+   * Get bonds by ids.
+   * @param {array} ids
+   */
+  async getBondsByIds(ids) {
+    console.assert(ids);
+    console.assert(ids.length);
+
+    const query = `query ($ids: [String!]) {
+      getBondsByIds(ids: $ids) {
+        id
+        owner
+        balance {
+          type
+          quantity
+        }
+      }
+    }`;
+
+    const variables = {
+      ids
+    };
+
+    return RegistryClient.getResult(this.graph(query)(variables), 'getBondsByIds');
+  }
+
+  /**
+   * Get records by attributes.
+   * @param {object} attributes
+   */
+  async queryBonds(attributes = {}) {
+    const query = `query ($attributes: [KeyValueInput!]) {
+      queryBonds(attributes: $attributes) {
+        id
+        owner
+        balance {
+          type
+          quantity
+        }
+      }
+    }`;
+
+    const variables = {
+      attributes: Util.toGQLAttributes(attributes)
+    };
+
+    return RegistryClient.getResult(this.graph(query)(variables), 'queryBonds');
+  }
+
+  /**
    * Submit transaction.
    * @param {string} tx
    */
