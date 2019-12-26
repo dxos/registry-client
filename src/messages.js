@@ -143,3 +143,35 @@ export class MsgWithdrawBond {
     });
   }
 }
+
+/**
+ * Cancel bond message.
+ */
+export class MsgCancelBond {
+
+  /**
+   * @constructor
+   * @param {string} id
+   * @param {string} owner
+   */
+  constructor(id, owner) {
+    console.assert(id);
+    console.assert(owner);
+
+    this._id = id;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'bond/CancelBond',
+      'value': {
+        'id': this._id,
+        'signer': this._owner
+      }
+    });
+  }
+}
