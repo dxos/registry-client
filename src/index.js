@@ -10,7 +10,8 @@ import { RegistryClient } from './registry_client';
 import { Account } from './account';
 import { Util } from './util';
 import { TxBuilder } from './txbuilder';
-import { Msg, Record, MsgSend } from './types';
+import { Msg, Record } from './types';
+import { MsgSend } from './messages';
 
 const CHAIN = 'wireline';
 const GQL_PATH = '/graphql';
