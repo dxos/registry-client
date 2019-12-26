@@ -11,7 +11,7 @@ import { Account } from './account';
 import { Util } from './util';
 import { TxBuilder } from './txbuilder';
 import { Msg, Record } from './types';
-import { MsgSend } from './messages';
+import { MsgSend, MsgCreateBond } from './messages';
 
 const CHAIN = 'wireline';
 const GQL_PATH = '/graphql';
@@ -145,6 +145,24 @@ export class Registry {
   }
 
   /**
+   * Create bond.
+   * @param {object[]} amount
+   * @param {string} privateKey
+   */
+  async createBond(amount, privateKey) {
+    let result;
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgCreateBond(fromAddress, amount), privateKey);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+    return result;
+  }
+
+  /**
    * Submit record transaction.
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} record
@@ -179,9 +197,9 @@ export class Registry {
     const registryRecord = new Record(record, account);
     const payload = TxBuilder.generatePayload(registryRecord);
     const message = new Msg(operation, {
-      'BondID': bondId,
-      'Payload': payload.serialize(),
-      'Signer': signingAccount.formattedCosmosAddress.toString()
+      'bondId': bondId,
+      'payload': payload.serialize(),
+      'signer': signingAccount.formattedCosmosAddress.toString()
     });
 
     // 3. Generate transaction.
