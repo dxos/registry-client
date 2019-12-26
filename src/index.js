@@ -11,7 +11,7 @@ import { Account } from './account';
 import { Util } from './util';
 import { TxBuilder } from './txbuilder';
 import { Msg, Record } from './types';
-import { MsgSend, MsgCreateBond } from './messages';
+import { MsgSend, MsgCreateBond, MsgRefillBond } from './messages';
 
 const CHAIN = 'wireline';
 const GQL_PATH = '/graphql';
@@ -155,6 +155,25 @@ export class Registry {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgCreateBond(fromAddress, amount), privateKey);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+    return result;
+  }
+
+  /**
+   * Refill bond.
+   * @param {string} id
+   * @param {object[]} amount
+   * @param {string} privateKey
+   */
+  async refillBond(id, amount, privateKey) {
+    let result;
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgRefillBond(id, fromAddress, amount), privateKey);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));

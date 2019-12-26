@@ -71,3 +71,39 @@ export class MsgCreateBond {
     });
   }
 }
+
+/**
+ * Refill bond message.
+ */
+export class MsgRefillBond {
+
+  /**
+   * @constructor
+   * @param {string} id
+   * @param {string} owner
+   * @param {object[]} amount
+   */
+  constructor(id, owner, amount) {
+    console.assert(id);
+    console.assert(owner);
+    console.assert(amount);
+
+    this._id = id;
+    this._owner = owner;
+    this._amount = amount;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'bond/RefillBond',
+      'value': {
+        'id': this._id,
+        'coins': this._amount,
+        'signer': this._owner
+      }
+    });
+  }
+}
