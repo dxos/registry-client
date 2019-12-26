@@ -45,11 +45,29 @@ export class MsgSend {
  */
 export class MsgCreateBond {
 
-  constructor(owner, type, quantity) {
+  /**
+   * @constructor
+   * @param {string} owner
+   * @param {object[]} amount
+   */
+  constructor(owner, amount) {
     console.assert(owner);
-    console.assert(type);
-    console.assert(quantity);
+    console.assert(amount);
 
+    this._owner = owner;
+    this._amount = amount;
+  }
 
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'bond/CreateBond',
+      'value': {
+        'coins': this._amount,
+        'signer': this._owner
+      }
+    });
   }
 }
