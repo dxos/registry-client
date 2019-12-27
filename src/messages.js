@@ -275,3 +275,39 @@ export class MsgDissociateRecords {
     });
   }
 }
+
+/**
+ * Reassociate records (switch bondId) message.
+ */
+export class MsgReassociateRecords {
+
+  /**
+   * @constructor
+   * @param {string} oldBondId
+   * @param {string} newBondId
+   * @param {string} owner
+   */
+  constructor(oldBondId, newBondId, owner) {
+    console.assert(oldBondId);
+    console.assert(newBondId);
+    console.assert(owner);
+
+    this._oldBondId = oldBondId;
+    this._newBondId = newBondId;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/ReassociateRecords',
+      'value': {
+        'oldBondId': this._oldBondId,
+        'newBondId': this._newBondId,
+        'signer': this._owner
+      }
+    });
+  }
+}
