@@ -20,7 +20,8 @@ import {
   MsgCancelBond,
   MsgAssociateBond,
   MsgDissociateBond,
-  MsgDissociateRecords
+  MsgDissociateRecords,
+  MsgReassociateRecords
 } from './messages';
 
 const CHAIN = 'wireline';
@@ -276,6 +277,25 @@ export class Registry {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgDissociateRecords(bondId, fromAddress), privateKey);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+    return result;
+  }
+
+  /**
+   * Reassociate records (switch bond).
+   * @param {string} oldBondId
+   * @param {string} newBondId
+   * @param {string} privateKey
+   */
+  async reassociateRecords(oldBondId, newBondId, privateKey) {
+    let result;
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgReassociateRecords(oldBondId, newBondId, fromAddress), privateKey);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
