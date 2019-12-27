@@ -6,13 +6,10 @@ import debug from 'debug';
 import path from 'path';
 
 import { Registry } from './index';
-import { ensureUpdatedConfig } from './testing/helper';
+import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
 import { startMockServer } from './mock/server';
 
 const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
-
-// TODO(ashwin): Replace with bond creation as part of test setup.
-const BOND_ID = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
 
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
@@ -31,6 +28,8 @@ describe('Querying', () => {
 
   let firstVersion;
 
+  let bondId;
+
   beforeAll(async () => {
     if (MOCK_SERVER) {
       mock = await startMockServer();
@@ -38,10 +37,11 @@ describe('Querying', () => {
     }
 
     registry = new Registry(mock ? mock.serverInfo.url : WNS_GQL_ENDPOINT);
+    bondId = await provisionBondId(registry, PRIVATE_KEY, MOCK_SERVER);
 
     const publishNewBotVersion = async () => {
       bot = await ensureUpdatedConfig(BOT_YML_PATH);
-      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, BOND_ID);
+      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId);
       return bot.record.version;
     };
 
@@ -131,7 +131,7 @@ describe('Querying', () => {
       type
     };
     try {
-      await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY, BOND_ID);
+      await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY, bondId);
     } catch (err) {
       expect(err.message.includes('exists')).toBe(true);
     }
