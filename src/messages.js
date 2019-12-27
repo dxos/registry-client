@@ -243,3 +243,35 @@ export class MsgDissociateBond {
     });
   }
 }
+
+/**
+ * Dissociate all records from bond message.
+ */
+export class MsgDissociateRecords {
+
+  /**
+   * @constructor
+   * @param {string} bondId
+   * @param {string} owner
+   */
+  constructor(bondId, owner) {
+    console.assert(bondId);
+    console.assert(owner);
+
+    this._bondId = bondId;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/DissociateRecords',
+      'value': {
+        'bondId': this._bondId,
+        'signer': this._owner
+      }
+    });
+  }
+}
