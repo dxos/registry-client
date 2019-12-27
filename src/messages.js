@@ -175,3 +175,71 @@ export class MsgCancelBond {
     });
   }
 }
+
+/**
+ * Associate record with bond message.
+ */
+export class MsgAssociateBond {
+
+  /**
+   * @constructor
+   * @param {string} id
+   * @param {string} bondId
+   * @param {string} owner
+   */
+  constructor(id, bondId, owner) {
+    console.assert(id);
+    console.assert(bondId);
+    console.assert(owner);
+
+    this._id = id;
+    this._bondId = bondId;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/AssociateBond',
+      'value': {
+        'id': this._id,
+        'bondId': this._bondId,
+        'signer': this._owner
+      }
+    });
+  }
+}
+
+/**
+ * Dissociate record from bond message.
+ */
+export class MsgDissociateBond {
+
+  /**
+   * @constructor
+   * @param {string} id
+   * @param {string} owner
+   */
+  constructor(id, owner) {
+    console.assert(id);
+    console.assert(owner);
+
+    this._id = id;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/DissociateBond',
+      'value': {
+        'id': this._id,
+        'signer': this._owner
+      }
+    });
+  }
+}
