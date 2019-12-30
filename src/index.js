@@ -4,6 +4,7 @@
 
 import isUrl from 'is-url';
 import { resolve } from 'url';
+import sha256 from 'js-sha256';
 
 import { RegistryClient } from './registry_client';
 
@@ -132,6 +133,29 @@ export class Registry {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+    return result;
+  }
+
+  /**
+   * Computes the next bondId for the given account private key.
+   * @param {string} privateKey
+   */
+  async getNextBondId(privateKey) {
+    let result;
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const accounts = await this.getAccounts([account.formattedCosmosAddress]);
+      if (!accounts.length) {
+        throw new Error('Account does not exist.');
+      }
+
+      const [accountObj] = accounts;
+      const nextSeq = parseInt(accountObj.sequence, 10) + 1;
+      result = sha256(`${accountObj.address}:${accountObj.number}:${nextSeq}`);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
