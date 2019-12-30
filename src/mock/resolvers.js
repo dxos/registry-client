@@ -13,6 +13,10 @@ const WRN_TYPE_TO_GQL_MAP = {
 // TODO(egorgripasov): any better logic?
 const DEFAULT_OWNER = '6ee3328f65c8566cd5451e49e97a767d10a8adf7';
 
+// Dummy bond ID and expiry time for in-mem implementation.
+const BOND_ID = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
+const EXPIRY_TIME = '2050-12-30T06:56:35.084960000';
+
 export class Resolvers {
   /**
    * @constructor
@@ -59,7 +63,11 @@ export class Resolvers {
         references: async (record) => {
           const referenceIds = Object.values(record).filter(value => typeof (value) === 'object').map(value => value.id);
           return this._memoryStore.getRecordsByIds(referenceIds);
-        }
+        },
+
+        bondId: () => BOND_ID,
+
+        expiryTime: () => EXPIRY_TIME
       },
 
       Extension: {
