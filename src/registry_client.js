@@ -128,6 +128,8 @@ export class RegistryClient {
         name
         version
         owners
+        bondId
+        expiryTime
         ${attributeField}
         ${refs ? refsField : ''}
       }
@@ -157,6 +159,8 @@ export class RegistryClient {
         name
         version
         owners
+        bondId
+        expiryTime
         ${attributeField}
         ${refs ? refsField : ''}
       }
@@ -184,6 +188,8 @@ export class RegistryClient {
         name
         version
         owners
+        bondId
+        expiryTime
         ${attributeField}
         ${refs ? refsField : ''}
       }
