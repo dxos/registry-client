@@ -17,6 +17,8 @@ const DEFAULT_OWNER = '6ee3328f65c8566cd5451e49e97a767d10a8adf7';
 const BOND_ID = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
 const EXPIRY_TIME = '2050-12-30T06:56:35.084960000';
 
+const CREATE_TIME = '2020-01-30T06:56:35.084960000';
+
 export class Resolvers {
   /**
    * @constructor
@@ -66,6 +68,8 @@ export class Resolvers {
         },
 
         bondId: () => BOND_ID,
+
+        createTime: () => CREATE_TIME,
 
         expiryTime: () => EXPIRY_TIME
       },

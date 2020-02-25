@@ -68,6 +68,7 @@ type Record {
   version:    String!         # Version (e.g. 0.1.0).
 
   bondId:     String!         # Associated bond ID.
+  createTime: String!         # Record create time.
   expiryTime: String!         # Record expiry time.
 
   owners:     [String]!       # Addresses of record owners.
