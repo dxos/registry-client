@@ -5,9 +5,9 @@
 import sha256 from 'js-sha256';
 import Ripemd160 from 'ripemd160';
 import secp256k1 from 'secp256k1/elliptic';
+import * as bip32 from 'bip32';
 import bip39 from 'bip39';
 import bech32 from 'bech32';
-import hdkey from 'ethereumjs-wallet/hdkey';
 import canonicalStringify from 'canonical-json';
 
 const AMINO_PREFIX = 'EB5AE98721';
@@ -127,11 +127,10 @@ export class Account {
    */
   static generateFromMnemonic(mnemonic) {
     const seed = bip39.mnemonicToSeed(mnemonic);
-
-    const wallet = hdkey.fromMasterSeed(seed);
+    const wallet = bip32.fromSeed(seed);
     const account = wallet.derivePath(HDPATH);
+    const { privateKey } = account;
 
-    const privateKey = account.getWallet().getPrivateKey();
     return new Account(privateKey);
   }
 }
