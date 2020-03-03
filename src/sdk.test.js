@@ -49,6 +49,12 @@ describe('Querying', () => {
     await publishNewBotVersion();
   });
 
+  test('Get status.', async () => {
+    const status = await registry.getStatus();
+    expect(status).toBeDefined();
+    expect(status.version).toBeDefined();
+  });
+
   test('List records.', async () => {
     const records = await registry.queryRecords({});
     expect(records.length).toBeGreaterThanOrEqual(1);

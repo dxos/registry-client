@@ -55,6 +55,13 @@ export class Registry {
   }
 
   /**
+   * Get server status.
+   */
+  async getStatus() {
+    return this._client.getStatus();
+  }
+
+  /**
    * Get accounts by addresses.
    * @param {array} addresses
    */
