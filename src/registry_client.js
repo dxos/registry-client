@@ -85,6 +85,21 @@ export class RegistryClient {
   }
 
   /**
+   * Get server status.
+   */
+  async getStatus() {
+    const query = `query {
+      getStatus {
+        version
+      }
+    }`;
+
+    const { getStatus: status } = await this.graph(query)();
+
+    return status;
+  }
+
+  /**
    * Fetch Accounts.
    * @param {array} addresses
    */

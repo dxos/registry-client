@@ -34,6 +34,8 @@ export class Resolvers {
   getMap() {
     return {
       Query: {
+        getStatus: async () => ({ version: '1.0.0' }),
+
         queryRecords: async (_, { attributes = [] }) => {
           const filterAttributes = Util.fromGQLAttributes(attributes, true);
           return this._memoryStore.queryRecords(filterAttributes);
