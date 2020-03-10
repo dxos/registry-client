@@ -4,6 +4,8 @@
 
 import { Util } from '../util';
 
+import mockStatus from './data/status.json';
+
 const WRN_TYPE_TO_GQL_MAP = {
   'wrn:bot': 'Bot',
   'wrn:pad': 'Pad',
@@ -34,7 +36,7 @@ export class Resolvers {
   getMap() {
     return {
       Query: {
-        getStatus: async () => ({ version: '1.0.0' }),
+        getStatus: async () => (mockStatus),
 
         queryRecords: async (_, { attributes = [] }) => {
           const filterAttributes = Util.fromGQLAttributes(attributes, true);

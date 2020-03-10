@@ -1,0 +1,57 @@
+{
+  "version": "0.3.0",
+  "node": {
+    "id": "57706d1ce3f23d22da8eb958c7cd148544c1b8ae",
+    "network": "wireline",
+    "moniker": "WIRELINE"
+  },
+  "sync": {
+    "latest_block_hash": "FC47172BCEFADF612ACB24CBD2C2EF72AB414C37CDD6F3A353E318FA77559D31",
+    "latest_block_height": "83705",
+    "latest_block_time": "2020-03-10 09:40:26.272231385 +0000 UTC",
+    "catching_up": false
+  },
+  "validator": {
+    "address": "602B0ECE47AE498E785CAE5A1F2402F254EFF505",
+    "voting_power": "10000000"
+  },
+  "validators": [
+    {
+      "address": "3D070985D362DE1521D47F6ACFBA8EC6C6B730C9",
+      "voting_power": "10000000",
+      "proposer_priority": "-10000000"
+    },
+    {
+      "address": "42827D804FBB9DD0E90711EF29E9619E42C2DA57",
+      "voting_power": "10000000",
+      "proposer_priority": "-10000000"
+    },
+    {
+      "address": "602B0ECE47AE498E785CAE5A1F2402F254EFF505",
+      "voting_power": "10000000",
+      "proposer_priority": "20000000"
+    }
+  ],
+  "num_peers": "2",
+  "peers": [
+    {
+      "node": {
+        "id": "9380b3f500ae36d256a8e3f6b5a81ceb62768308",
+        "network": "wireline",
+        "moniker": "WIRELINE"
+      },
+      "is_outbound": true,
+      "remote_ip": "139.178.68.131"
+    },
+    {
+      "node": {
+        "id": "cf258070947018977f8d6f8a16b6f9f0c1cd0fdb",
+        "network": "wireline",
+        "moniker": "WIRELINE"
+      },
+      "is_outbound": true,
+      "remote_ip": "139.178.68.130"
+    }
+  ],
+  "disk_usage": "652M"
+}
