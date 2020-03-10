@@ -62,7 +62,7 @@ interface Extension {
 
 # Record defines the basic properties of an entity in the graph database.
 type Record {
-  id:        String!         # Computed attribute: Multibase encoded content hash (https://github.com/multiformats/multibase).
+  id:         String!         # Computed attribute: Multibase encoded content hash (https://github.com/multiformats/multibase).
   type:       String!         # wrn:<type>, e.g. wrn:bot, wrn:pad.
   name:       String!         # e.g. wireline.io/chess
   version:    String!         # Version (e.g. 0.1.0).
@@ -101,9 +101,44 @@ type Bond {
   balance:    [Coin!]         # Current balance for each coin type.
 }
 
+# Status information about a node (https://docs.tendermint.com/master/rpc/#/Info/status).
+type NodeInfo {
+  id:         String!         # Tendermint Node ID.
+  network:    String!         # Name of the network/blockchain.
+  moniker:    String!         # Name of the node.
+}
+
+type SyncInfo {
+  latest_block_hash:    String!
+  latest_block_height:  String!
+  latest_block_time:    String!
+  catching_up:          Boolean!
+}
+
+# Validator set info (https://docs.tendermint.com/master/rpc/#/Info/validators).
+type ValidatorInfo {
+  address:            String!
+  voting_power:       String!
+  proposer_priority:  String
+}
+
+# Network/peer info (https://docs.tendermint.com/master/rpc/#/Info/net_info).
+type PeerInfo {
+  node:           NodeInfo!
+  is_outbound:    Boolean!
+  remote_ip:      String!
+}
+
 # WNS status.
 type Status {
-  version:  String!
+  version:    String!
+  node:       NodeInfo!
+  sync:       SyncInfo!
+  validator:  ValidatorInfo
+  validators: [ValidatorInfo]!
+  num_peers:  String!
+  peers:      [PeerInfo]
+  disk_usage: String!
 }
 
 type Query {
