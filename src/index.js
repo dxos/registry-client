@@ -51,7 +51,12 @@ export class Registry {
       url = resolve(url, GQL_PATH);
     }
 
+    this._endpoint = url;
     this._client = new RegistryClient(url);
+  }
+
+  get endpoint() {
+    return this._endpoint;
   }
 
   /**
