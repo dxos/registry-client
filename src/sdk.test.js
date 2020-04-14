@@ -4,7 +4,6 @@
 
 import debug from 'debug';
 import path from 'path';
-import url from 'url';
 
 import { Registry } from './index';
 import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
@@ -15,7 +14,7 @@ const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a5945
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/graphql';
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/api';
 
 const log = debug('test');
 
@@ -54,7 +53,7 @@ describe('Querying', () => {
   });
 
   test('Endpoint.', async () => {
-    const expectedEndpoint = MOCK_SERVER ? url.resolve(mock.serverInfo.url, 'graphql') : WNS_GQL_ENDPOINT;
+    const expectedEndpoint = MOCK_SERVER ? mock.serverInfo.url : WNS_GQL_ENDPOINT;
     expect(registry.endpoint).toBe(expectedEndpoint);
   });
 

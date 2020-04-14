@@ -3,7 +3,6 @@
 //
 
 import isUrl from 'is-url';
-import { resolve } from 'url';
 import sha256 from 'js-sha256';
 
 import { RegistryClient } from './registry_client';
@@ -26,7 +25,6 @@ import {
 } from './messages';
 
 const CHAIN = 'wireline';
-const GQL_PATH = '/graphql';
 
 const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
 
@@ -45,10 +43,6 @@ export class Registry {
   constructor(url) {
     if (!isUrl(url)) {
       throw new Error('Path to a registry GQL endpoint should be provided.');
-    }
-
-    if (!url.endsWith(GQL_PATH)) {
-      url = resolve(url, GQL_PATH);
     }
 
     this._endpoint = url;
