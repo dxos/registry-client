@@ -4,7 +4,7 @@
 
 ```JavaScript
 import { Account, Registry } from '@wirelineio/registry-client';
-const endpoint = 'https://wns-testnet.wireline.ninja';
+const endpoint = 'http://localhost:9473/api';
 const registry = new Registry(endpoint);
 ```
 
