@@ -5,7 +5,7 @@
 import { Registry } from './index';
 
 const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
-const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473';
+const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/api';
 
 describe('coins', () => {
   let registry;
