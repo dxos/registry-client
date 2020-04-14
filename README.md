@@ -165,10 +165,10 @@ const result = await registry.reassociateRecords(oldBondId, newBondId, privateKe
 
 ## Tests
 
-`yarn test` allows to run tests against an external GQL endpoint (of a real WNS server). By default `http://localhost:9473` endpoint is used, but could be changed by `WNS_GQL_ENDPOINT` ENV var.
+`yarn test` allows to run tests against an external GQL endpoint (of a real WNS server). By default `http://localhost:9473/api` endpoint is used, but could be changed by `WNS_GQL_ENDPOINT` ENV var.
 
 ```bash
-$ WNS_GQL_ENDPOINT=https://wns-testnet.wireline.ninja yarn test
+$ WNS_GQL_ENDPOINT=http://xbox.local:9473/api yarn test
 ```
 
 `yarn test:in-mem-wns` spins up an in-process mock GQL server for the duration of the tests.
