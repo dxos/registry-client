@@ -4,7 +4,7 @@
 
 import path from 'path';
 
-import { Registry } from './index';
+import { Registry, DEFAULT_CHAIN_ID } from './index';
 import { ensureUpdatedConfig } from './testing/helper';
 
 const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
@@ -14,6 +14,7 @@ const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
 
 const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
+const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
 
 jest.setTimeout(90 * 1000);
 
@@ -37,7 +38,7 @@ const bondTests = () => {
   };
 
   beforeAll(async () => {
-    registry = new Registry(WIRE_WNS_ENDPOINT);
+    registry = new Registry(WIRE_WNS_ENDPOINT, WIRE_WNS_CHAIN_ID);
   });
 
   test('Create bond.', async () => {

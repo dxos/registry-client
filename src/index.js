@@ -24,7 +24,7 @@ import {
   MsgReassociateRecords
 } from './messages';
 
-const DEFAULT_CHAIN_ID = 'wireline';
+export const DEFAULT_CHAIN_ID = 'wireline';
 
 const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
 
@@ -43,20 +43,24 @@ export class Registry {
   /**
    * @constructor
    * @param {string} url
-   * @param {string} chainId
+   * @param {string} chainID
    */
-  constructor(url, chainId = DEFAULT_CHAIN_ID) {
+  constructor(url, chainID = DEFAULT_CHAIN_ID) {
     if (!isUrl(url)) {
       throw new Error('Path to a registry GQL endpoint should be provided.');
     }
 
     this._endpoint = url;
-    this._chainId = chainId;
+    this._chainID = chainID;
     this._client = new RegistryClient(url);
   }
 
   get endpoint() {
     return this._endpoint;
+  }
+
+  get chainID() {
+    return this._chainID;
   }
 
   /**
@@ -381,7 +385,7 @@ export class Registry {
 
     // 3. Generate transaction.
     const { number, sequence } = signingAccountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainId);
+    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // 4. Send transaction.
@@ -408,7 +412,7 @@ export class Registry {
 
     // Generate signed Tx.
     const { number, sequence } = accountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainId);
+    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // Submit Tx to chain.

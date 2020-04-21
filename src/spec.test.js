@@ -5,7 +5,7 @@
 import debug from 'debug';
 import path from 'path';
 
-import { Registry } from './index';
+import { Registry, DEFAULT_CHAIN_ID } from './index';
 import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
 import { startMockServer } from './mock/server';
 
@@ -17,6 +17,7 @@ const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
 const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
+const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
 
 const log = debug('test');
 
@@ -45,7 +46,7 @@ describe('Registering', () => {
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    registry = new Registry(mock ? mock.serverInfo.url : WIRE_WNS_ENDPOINT);
+    registry = new Registry(mock ? mock.serverInfo.url : WIRE_WNS_ENDPOINT, WIRE_WNS_CHAIN_ID);
     bondId = await provisionBondId(registry, PRIVATE_KEY, MOCK_SERVER);
 
     bot = await ensureUpdatedConfig(BOT_YML_PATH);

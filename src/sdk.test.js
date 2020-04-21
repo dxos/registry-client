@@ -5,7 +5,7 @@
 import debug from 'debug';
 import path from 'path';
 
-import { Registry } from './index';
+import { Registry, DEFAULT_CHAIN_ID } from './index';
 import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
 import { startMockServer } from './mock/server';
 
@@ -15,6 +15,7 @@ const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
 const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
+const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
 
 const log = debug('test');
 
@@ -39,7 +40,7 @@ describe('Querying', () => {
     }
 
     endpoint = mock ? mock.serverInfo.url : WIRE_WNS_ENDPOINT;
-    registry = new Registry(endpoint);
+    registry = new Registry(endpoint, WIRE_WNS_CHAIN_ID);
     bondId = await provisionBondId(registry, PRIVATE_KEY, MOCK_SERVER);
 
     const publishNewBotVersion = async () => {
@@ -52,9 +53,10 @@ describe('Querying', () => {
     await publishNewBotVersion();
   });
 
-  test('Endpoint.', async () => {
+  test('Endpoint and chain ID.', async () => {
     const expectedEndpoint = MOCK_SERVER ? mock.serverInfo.url : WIRE_WNS_ENDPOINT;
     expect(registry.endpoint).toBe(expectedEndpoint);
+    expect(registry.chainID).toBe(WIRE_WNS_CHAIN_ID);
   });
 
   test('Get status.', async () => {
