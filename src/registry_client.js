@@ -6,6 +6,7 @@
 import graphql from 'graphql.js';
 import get from 'lodash.get';
 import set from 'lodash.set';
+import assert from 'assert';
 
 import { Util } from './util';
 
@@ -39,7 +40,6 @@ const refsField = `
  * Registry
  */
 export class RegistryClient {
-  static DEFAULT_ENDPOINT = 'https://registry-testnet.wireline.ninja/graphql';
 
   /**
    * Get query result.
@@ -77,8 +77,10 @@ export class RegistryClient {
    * @param {string} endpoint
    */
   constructor(endpoint) {
-    this.endpoint = endpoint || RegistryClient.DEFAULT_ENDPOINT;
-    this.graph = graphql(this.endpoint, {
+    assert(endpoint);
+
+    this._endpoint = endpoint;
+    this._graph = graphql(this._endpoint, {
       method: 'POST',
       asJSON: true
     });
@@ -125,7 +127,7 @@ export class RegistryClient {
       }
     }`;
 
-    const { getStatus: status } = await this.graph(query)();
+    const { getStatus: status } = await this._graph(query)();
 
     return status;
   }
@@ -155,7 +157,7 @@ export class RegistryClient {
       addresses
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'getAccounts');
+    return RegistryClient.getResult(this._graph(query)(variables), 'getAccounts');
   }
 
   /**
@@ -186,7 +188,7 @@ export class RegistryClient {
       ids
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'getRecordsByIds', RegistryClient.prepareAttributes('attributes'));
+    return RegistryClient.getResult(this._graph(query)(variables), 'getRecordsByIds', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
@@ -218,7 +220,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
+    return RegistryClient.getResult(this._graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
@@ -248,7 +250,7 @@ export class RegistryClient {
       refs: references
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'resolveRecords', RegistryClient.prepareAttributes('attributes'));
+    return RegistryClient.getResult(this._graph(query)(variables), 'resolveRecords', RegistryClient.prepareAttributes('attributes'));
   }
 
   /**
@@ -274,7 +276,7 @@ export class RegistryClient {
       ids
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'getBondsByIds');
+    return RegistryClient.getResult(this._graph(query)(variables), 'getBondsByIds');
   }
 
   /**
@@ -297,7 +299,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'queryBonds');
+    return RegistryClient.getResult(this._graph(query)(variables), 'queryBonds');
   }
 
   /**
@@ -315,7 +317,7 @@ export class RegistryClient {
       tx
     };
 
-    return this.graph(mutation)(variables);
+    return this._graph(mutation)(variables);
   }
 
   /**
@@ -337,6 +339,6 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return RegistryClient.getResult(this.graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
+    return RegistryClient.getResult(this._graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
   }
 }
