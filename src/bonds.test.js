@@ -13,7 +13,7 @@ const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
 const MOCK_SERVER = process.env.MOCK_SERVER || false;
 
-const WNS_GQL_ENDPOINT = process.env.WNS_GQL_ENDPOINT || 'http://localhost:9473/api';
+const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
 
 jest.setTimeout(90 * 1000);
 
@@ -37,7 +37,7 @@ const bondTests = () => {
   };
 
   beforeAll(async () => {
-    registry = new Registry(WNS_GQL_ENDPOINT);
+    registry = new Registry(WIRE_WNS_ENDPOINT);
   });
 
   test('Create bond.', async () => {
