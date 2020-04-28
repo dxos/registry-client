@@ -81,6 +81,8 @@ export class Util {
     attributes.forEach(attr => {
       if (attr.value.null) {
         res[attr.key] = null;
+      } else if (attr.value.json) {
+        res[attr.key] = JSON.parse(attr.value.json);
       } else {
         const { values, null: n, ...types } = attr.value;
         const value = Object.values(types).find(v => v !== null);

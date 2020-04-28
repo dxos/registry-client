@@ -19,6 +19,7 @@ const attributeField = `
       float
       string
       boolean
+      json
       reference {
         id
       }
