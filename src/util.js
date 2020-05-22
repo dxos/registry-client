@@ -76,7 +76,7 @@ export class Util {
    * @param {array} attributes
    * @param {boolean} addRefType
    */
-  static fromGQLAttributes(attributes, addRefType = false) {
+  static fromGQLAttributes(attributes, addRefType = true) {
     const res = {};
     attributes.forEach(attr => {
       if (attr.value.null) {
