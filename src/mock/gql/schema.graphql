@@ -23,6 +23,7 @@ type Value {
   float:      Float
   string:     String
   boolean:    Boolean
+  json:       String
 
   reference:  Reference
 
