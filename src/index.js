@@ -71,6 +71,14 @@ export class Registry {
   }
 
   /**
+   * Get logs.
+   * @param {number} count
+   */
+  async getLogs(count) {
+    return this._client.getLogs(count);
+  }
+
+  /**
    * Run arbitrary query.
    * @param {string} query
    * @param {object} variables

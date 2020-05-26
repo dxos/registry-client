@@ -5,9 +5,8 @@
 import getPort from 'get-port';
 import { ApolloServer, makeExecutableSchema } from 'apollo-server';
 
-import schemaDefs from './gql/schema.graphql';
-import extensionDefs from './gql/extensions.graphql';
-
+import schemaDefs from '@wirelineio/wns-schema/schema.graphql';
+import extensionDefs from '@wirelineio/wns-schema/extensions.graphql';
 
 import { MemoryStore } from './store';
 import { Resolvers } from './resolvers';
