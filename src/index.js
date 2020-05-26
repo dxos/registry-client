@@ -71,6 +71,14 @@ export class Registry {
   }
 
   /**
+   * Get logs.
+   * @param {number} count
+   */
+  async getLogs(count) {
+    return this._client.getLogs(count);
+  }
+
+  /**
    * Get accounts by addresses.
    * @param {array} addresses
    */

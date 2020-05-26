@@ -10,6 +10,8 @@ import assert from 'assert';
 
 import { Util } from './util';
 
+const DEFAULT_LOG_NUM_LINES = 50;
+
 const attributeField = `
   attributes {
     key
@@ -131,6 +133,23 @@ export class RegistryClient {
     const { getStatus: status } = await this._graph(query)();
 
     return status;
+  }
+
+  /**
+   * Get logs.
+   */
+  async getLogs(count = DEFAULT_LOG_NUM_LINES) {
+    const query = `query ($count: Int) {
+      getLogs(count: $count)
+    }`;
+
+    const variables = {
+      count
+    };
+
+    const { getLogs: logs } = await this._graph(query)(variables);
+
+    return logs;
   }
 
   /**
