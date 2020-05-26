@@ -79,6 +79,15 @@ export class Registry {
   }
 
   /**
+   * Run arbitrary query.
+   * @param {string} query
+   * @param {object} variables
+   */
+  async query(query, variables) {
+    return this._client.query(query, variables);
+  }
+
+  /**
    * Get accounts by addresses.
    * @param {array} addresses
    */

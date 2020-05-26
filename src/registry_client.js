@@ -90,6 +90,17 @@ export class RegistryClient {
   }
 
   /**
+   * Run arbitrary query.
+   * @param {string} query
+   * @param {object} variables
+   */
+  async query(query, variables) {
+    console.assert(query);
+
+    return this._graph(query)(variables);
+  }
+
+  /**
    * Get server status.
    */
   async getStatus() {
