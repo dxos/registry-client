@@ -30,19 +30,9 @@ export class TxBuilder {
    * @param {string} accountNumber
    * @param {string} accountSequence
    * @param {string} chainID
+   * @param {object} fee
    */
-  static createTransaction(message, account, accountNumber, accountSequence, chainID) {
-    // TODO(egorgripasov): class for fees.
-    const fee = {
-      amount: [
-        // {
-        //   "amount": "201",
-        //   "denom": "wire"
-        // }
-      ],
-      gas: '200000'
-    };
-
+  static createTransaction(message, account, accountNumber, accountSequence, chainID, fee) {
     // 1. Compose StdSignDoc.
     const stdSignDoc = {
       account_number: accountNumber,
