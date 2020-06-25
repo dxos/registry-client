@@ -25,7 +25,7 @@ describe('Transactions.', () => {
     bot = await getBaseConfig(YML_PATH);
   });
 
-  const TRANS_SIG = '9Z+116tfyEN8ZY/iNXAsgEcDJ4FlF4ntX9dHqzmlkvNh5to7804J/GGnSPmu0OD+yLe8imylWQSzsTBdpuaFgA==';
+  const TRANS_SIG = 'L0GkBz7uwU2wmvrwnb1CH+d4U4vdWI1hEZLUA+RugaNVBQVLtcxDV7vsZciMRqumKKq17e5YNrTBF9x2oy+Wsg==';
 
   test('Generate proper transaction signature.', () => {
     const acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
@@ -38,7 +38,17 @@ describe('Transactions.', () => {
       'Signer': acc.formattedCosmosAddress.toString()
     });
 
-    const transaction = TxBuilder.createTransaction(message, acc, ACC_NUM, ACC_SEQ, CHAIN);
+    const fee = {
+      amount: [
+        {
+          amount: '100',
+          denom: 'uwire'
+        }
+      ],
+      gas: '200000'
+    };
+
+    const transaction = TxBuilder.createTransaction(message, acc, ACC_NUM, ACC_SEQ, CHAIN, fee);
     expect(transaction.value.signatures[0].signature).toBe(TRANS_SIG);
   });
 });

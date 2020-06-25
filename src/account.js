@@ -17,6 +17,27 @@ const HDPATH = "m/44'/118'/0'/0/0";
  */
 // TODO(egor): This is a wrapper around the private key and doesn't have any account related stuff (e.g. account number/sequence). Maybe rename to Key?
 export class Account {
+
+  /**
+   * Generate bip39 mnemonic.
+   */
+  static generateMnemonic() {
+    return bip39.generateMnemonic();
+  }
+
+  /**
+   * Generate private key from mnemonic.
+   * @param {string} mnemonic
+   */
+  static generateFromMnemonic(mnemonic) {
+    const seed = bip39.mnemonicToSeed(mnemonic);
+    const wallet = bip32.fromSeed(seed);
+    const account = wallet.derivePath(HDPATH);
+    const { privateKey } = account;
+
+    return new Account(privateKey);
+  }
+
   /**
    * New Account.
    * @param {buffer} privateKey
@@ -112,25 +133,5 @@ export class Account {
     const sigObj = secp256k1.sign(messageToSignSha256InBytes, this.privateKey);
 
     return sigObj.signature;
-  }
-
-  /**
-   * Generate bip39 mnemonic.
-   */
-  static generateMnemonic() {
-    return bip39.generateMnemonic();
-  }
-
-  /**
-   * Generate private key from mnemonic.
-   * @param {string} mnemonic
-   */
-  static generateFromMnemonic(mnemonic) {
-    const seed = bip39.mnemonicToSeed(mnemonic);
-    const wallet = bip32.fromSeed(seed);
-    const account = wallet.derivePath(HDPATH);
-    const { privateKey } = account;
-
-    return new Account(privateKey);
   }
 }

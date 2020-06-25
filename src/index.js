@@ -34,10 +34,7 @@ const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
 export class Registry {
 
   static processWriteError(error) {
-    let message = (error.message || DEFAULT_WRITE_ERROR).replace(/(\\)+/g, '');
-    const wnsMessage = /"message":"(.*?)"/g.exec(message);
-    message = wnsMessage && wnsMessage[1] ? wnsMessage[1] : message;
-    return message;
+    return (error.message || DEFAULT_WRITE_ERROR).replace(/(\\)+/g, '');
   }
 
   /**
@@ -128,30 +125,21 @@ export class Registry {
    * @param {object} record
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    * @param {string} bondId
+   * @param {object} fee
    */
-  async setRecord(privateKey, record, transactionPrivateKey, bondId) {
+  async setRecord(privateKey, record, transactionPrivateKey, bondId, fee) {
     let result;
     try {
       if (process.env.MOCK_SERVER) {
         result = await this._client.insertRecord(record, bondId);
       } else {
-        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey, bondId);
+        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
       }
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
     return result;
-  }
-
-  /**
-   * Delete record.
-   * @param {string} privateKey - private key in HEX to sign message.
-   * @param {object} record
-   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
-   */
-  async deleteRecord(privateKey, record, transactionPrivateKey) {
-    return this._submitRecordTx(privateKey, record, 'nameservice/DeleteRecord', transactionPrivateKey);
   }
 
   /**
@@ -216,13 +204,14 @@ export class Registry {
    * Create bond.
    * @param {object[]} amount
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async createBond(amount, privateKey) {
+  async createBond(amount, privateKey, fee) {
     let result;
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgCreateBond(fromAddress, amount), privateKey);
+      result = await this._submitTx(new MsgCreateBond(fromAddress, amount), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
@@ -367,8 +356,9 @@ export class Registry {
    * @param {string} operation
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    * @param {string} bondId
+   * @param {object} fee
    */
-  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey, bondId) {
+  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey, bondId, fee) {
     if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
       throw new Error('Registry privateKey should be a hex string.');
     }
@@ -402,19 +392,21 @@ export class Registry {
 
     // 3. Generate transaction.
     const { number, sequence } = signingAccountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID);
+    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID, fee);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // 4. Send transaction.
-    return this._client.submit(tx);
+    const { submit: response } = await this._client.submit(tx);
+    return JSON.parse(response);
   }
 
   /**
    * Submit a generic Tx to the chain.
    * @param {object} message
    * @param {string} privateKey - private key in HEX to sign transaction.
+   * @param {object} fee
    */
-  async _submitTx(message, privateKey) {
+  async _submitTx(message, privateKey, fee) {
     // Check private key.
     if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
       throw new Error('Registry privateKey should be a hex string.');
@@ -429,11 +421,12 @@ export class Registry {
 
     // Generate signed Tx.
     const { number, sequence } = accountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID);
+    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID, fee);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // Submit Tx to chain.
-    return this._client.submit(tx);
+    const { submit: response } = await this._client.submit(tx);
+    return JSON.parse(response);
   }
 }
 
