@@ -30,6 +30,21 @@ export const DEFAULT_CHAIN_ID = 'wireline';
 
 const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
 
+// Parse Tx response from cosmos-sdk.
+export const parseTxResponse = result => {
+  const { hash, height, deliver_tx: txResponse = {} } = result;
+  txResponse.data = txResponse.data && Buffer.from(txResponse.data, 'base64').toString('utf8');
+  txResponse.log = JSON.parse(txResponse.log);
+  txResponse.events.forEach(event => {
+    event.attributes = event.attributes.map(({ key, value }) => ({
+      key: Buffer.from(key, 'base64').toString('utf8'),
+      value: Buffer.from(value, 'base64').toString('utf8')
+    }));
+  });
+
+  return { hash, height, ...txResponse };
+};
+
 /**
  * Wireline registry SDK.
  */
@@ -149,7 +164,7 @@ export class Registry {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+    return parseTxResponse(result);
   }
 
   /**
@@ -226,7 +241,7 @@ export class Registry {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+    return parseTxResponse(result);
   }
 
   /**
