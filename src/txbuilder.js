@@ -2,6 +2,8 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import canonicalStringify from 'canonical-json';
+
 import { Signature, Payload, Transaction } from './types';
 
 /**
@@ -44,7 +46,7 @@ export class TxBuilder {
     };
 
     // 2. Calculate Signature.
-    const transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
+    const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
     const transactionSig = account.sign(transactionDataToSign);
 
     const transaction = new Transaction(message, account, fee, transactionSig, accountNumber, accountSequence, chainID);
