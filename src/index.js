@@ -34,7 +34,10 @@ const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
 export class Registry {
 
   static processWriteError(error) {
-    return (error.message || DEFAULT_WRITE_ERROR).replace(/(\\)+/g, '');
+    const message = JSON.parse(error.message);
+    const log = JSON.parse(message.log);
+
+    return log.message || DEFAULT_WRITE_ERROR;
   }
 
   /**
