@@ -136,15 +136,10 @@ export class Transaction {
    * @param {string} chainID
    */
   constructor(message, account, fee, signature, accountNumber, accountSequence, chainID) {
-    fee.gas = String(parseInt(fee.gas, 10));
-
     this.message = message;
     this.account = account;
     this.fee = fee;
     this.signature = signature;
-    // TODO(egorgripasov): use BigInt.
-    this.accountNumber = parseInt(accountNumber, 10);
-    this.accountSequence = parseInt(accountSequence, 10);
     this.chainID = chainID;
   }
 
@@ -155,9 +150,9 @@ export class Transaction {
     return Util.sortJSON({
       'type': 'cosmos-sdk/StdTx',
       'value': {
-        'account_number': this.accountNumber.toString(),
+        'account_number': this.accountNumber,
         'chain_id': this.chainID,
-        'sequence': this.accountSequence.toString(),
+        'sequence': this.accountSequence,
         'msg': [this.message.serialize()],
         'fee': this.fee,
         'signatures': [
