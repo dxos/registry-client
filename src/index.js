@@ -49,8 +49,18 @@ export const parseTxResponse = result => {
 export class Registry {
 
   static processWriteError(error) {
+    /**
+     * Example error object:
+      {
+        message: '{"code":4,"log":"[{\\"msg_index\\":0,\\"success\\":false,\\"log\\":
+          \\"{\\\\\\"codespace\\\\\\":\\\\\\"sdk\\\\\\",\\\\\\"code\\\\\\":4,\\\\\\"message\\\\\\":\\\\\\"Name record already exists.\\\\\\"}\\"}]",
+          "gasWanted":"200000","gasUsed":"30203","events":[{"type":"message","attributes":[{"key":"YWN0aW9u","value":"c2V0"}]}],"codespace":"sdk"}',
+        path: [ 'submit' ]
+      }
+     */
     const message = JSON.parse(error.message);
-    const log = JSON.parse(message.log);
+    let log = JSON.parse(message.log)[0];
+    log = JSON.parse(log.log);
 
     return log.message || DEFAULT_WRITE_ERROR;
   }
@@ -147,6 +157,7 @@ export class Registry {
    */
   async setRecord(privateKey, record, transactionPrivateKey, bondId, fee) {
     let result;
+
     try {
       if (process.env.MOCK_SERVER) {
         result = await this._client.insertRecord(record, bondId);
@@ -157,6 +168,7 @@ export class Registry {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
+
     return parseTxResponse(result);
   }
 
