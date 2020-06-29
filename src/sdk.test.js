@@ -17,6 +17,16 @@ const MOCK_SERVER = process.env.MOCK_SERVER || false;
 const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
 const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
 
+const FEE = {
+  amount: [
+    {
+      amount: '200000',
+      denom: 'uwire'
+    }
+  ],
+  gas: '200000'
+};
+
 const log = debug('test');
 
 jest.setTimeout(40 * 1000);
@@ -45,7 +55,7 @@ describe('Querying', () => {
 
     const publishNewBotVersion = async () => {
       bot = await ensureUpdatedConfig(BOT_YML_PATH);
-      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId);
+      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId, FEE);
       return bot.record.version;
     };
 
@@ -147,7 +157,7 @@ describe('Querying', () => {
       type
     };
     try {
-      await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY, bondId);
+      await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY, bondId, FEE);
     } catch (err) {
       expect(err.message.includes('exists')).toBe(true);
     }

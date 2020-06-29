@@ -8,6 +8,16 @@ const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a5945
 const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
 const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
 
+const FEE = {
+  amount: [
+    {
+      amount: '200000',
+      denom: 'uwire'
+    }
+  ],
+  gas: '200000'
+};
+
 describe('coins', () => {
   let registry;
 
@@ -16,6 +26,6 @@ describe('coins', () => {
   });
 
   test.skip('send', async () => {
-    await registry.sendCoins([{ denom: 'wire', amount: '100' }], 'cosmos1w5q7xy9sk8hqvlklftdfdkc3kgsd90cxlkwvty', PRIVATE_KEY);
+    await registry.sendCoins([{ denom: 'wire', amount: '100' }], 'cosmos1w5q7xy9sk8hqvlklftdfdkc3kgsd90cxlkwvty', PRIVATE_KEY, FEE);
   });
 });
