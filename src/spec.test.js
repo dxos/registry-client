@@ -19,6 +19,16 @@ const MOCK_SERVER = process.env.MOCK_SERVER || false;
 const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
 const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
 
+const FEE = {
+  amount: [
+    {
+      amount: '200000',
+      denom: 'uwire'
+    }
+  ],
+  gas: '200000'
+};
+
 const log = debug('test');
 
 jest.setTimeout(120 * 1000);
@@ -56,7 +66,7 @@ describe('Registering', () => {
 
   test('Register protocol.', async () => {
     await sleep();
-    await registry.setRecord(PRIVATE_KEY, protocol.record, PRIVATE_KEY, bondId);
+    await registry.setRecord(PRIVATE_KEY, protocol.record, PRIVATE_KEY, bondId, FEE);
     await sleep();
 
     const { version, name, type } = protocol.record;
@@ -66,13 +76,13 @@ describe('Registering', () => {
 
   test('Register bot.', async () => {
     bot.record.protocol.id = createdProtocol.id;
-    await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId);
+    await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId, FEE);
     await sleep();
   });
 
   test('Register pad.', async () => {
     pad.record.protocol.id = createdProtocol.id;
-    await registry.setRecord(PRIVATE_KEY, pad.record, PRIVATE_KEY, bondId);
+    await registry.setRecord(PRIVATE_KEY, pad.record, PRIVATE_KEY, bondId, FEE);
     await sleep();
   });
 
