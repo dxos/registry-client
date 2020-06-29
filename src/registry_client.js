@@ -379,6 +379,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return RegistryClient.getResult(this._graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
+    const recordResult = RegistryClient.getResult(this._graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
+    return { ...recordResult, 'deliver_tx': { log: '{}', events: [] } };
   }
 }
