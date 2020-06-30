@@ -50,17 +50,26 @@ export class Registry {
 
   static processWriteError(error) {
     /**
-     * Example error object:
+      Example error objects:
+
       {
         message: '{"code":4,"log":"[{\\"msg_index\\":0,\\"success\\":false,\\"log\\":
           \\"{\\\\\\"codespace\\\\\\":\\\\\\"sdk\\\\\\",\\\\\\"code\\\\\\":4,\\\\\\"message\\\\\\":\\\\\\"Name record already exists.\\\\\\"}\\"}]",
           "gasWanted":"200000","gasUsed":"30203","events":[{"type":"message","attributes":[{"key":"YWN0aW9u","value":"c2V0"}]}],"codespace":"sdk"}',
         path: [ 'submit' ]
       }
-     */
+
+      OR
+
+      {
+        message: '{"code":12,"log":"{\\"codespace\\":\\"sdk\\",\\"code\\":12,\\"message\\":
+          \\"out of gas in location: txSize; gasWanted: 200, gasUsed: 6770\\"}","gasWanted":"200","gasUsed":"6770","events":[]}',
+        path: [ 'submit' ]
+      }
+    */
     const message = JSON.parse(error.message);
-    let log = JSON.parse(message.log)[0];
-    log = JSON.parse(log.log);
+    let log = JSON.parse(message.log);
+    log = (Array.isArray(log)) ? JSON.parse(log[0].log) : log;
 
     return log.message || DEFAULT_WRITE_ERROR;
   }
