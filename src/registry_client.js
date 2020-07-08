@@ -33,9 +33,6 @@ const attributeField = `
 const refsField = `
   references {
     id
-    type
-    name
-    version
   }
 `;
 
@@ -212,9 +209,6 @@ export class RegistryClient {
     const query = `query ($ids: [String!]) {
       getRecordsByIds(ids: $ids) {
         id
-        type
-        name
-        version
         owners
         bondId
         createTime
@@ -244,9 +238,6 @@ export class RegistryClient {
     const query = `query ($attributes: [KeyValueInput!]) {
       queryRecords(attributes: $attributes) {
         id
-        type
-        name
-        version
         owners
         bondId
         createTime
@@ -274,9 +265,6 @@ export class RegistryClient {
     const query = `query ($refs: [String!]) {
       resolveRecords(refs: $refs) {
         id
-        type
-        name
-        version
         owners
         bondId
         createTime
