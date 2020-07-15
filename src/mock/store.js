@@ -7,7 +7,7 @@ import semver from 'semver';
 
 import { Util } from '../util';
 
-import records from './data/records';
+import records from './data/records.json';
 
 /**
  * In-memory store.
@@ -77,7 +77,7 @@ export class MemoryStore {
       })
       .filter(ref => ref.type && ref.name && ref.version)
       .map(async ref => {
-        const records = await this.queryRecords({ ...ref, type: `wrn:${ref.type}` });
+        const records = await this.queryRecords({ ...ref, type: `${ref.type}` });
         return records[0];
       })
       .filter(ref => ref);
@@ -116,9 +116,10 @@ export class MemoryStore {
           this._records.set(id, record);
           versions.set(version, { name, type, version });
           return { id, ...record };
-        } else {
-          throw new Error('Record already exists.');
         }
+
+        throw new Error('Record already exists.');
+
       } else {
         return { id, ...this._records.get(id) };
       }
