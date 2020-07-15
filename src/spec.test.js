@@ -121,14 +121,14 @@ describe('Registering', () => {
 
     const { id } = records[0];
 
-    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } });
     expect(botRecords.length).toBe(1);
     expect(botRecords[0].attributes.protocol.id).toEqual(id);
   });
 
   test('Get bots compatible with a specific pad.', async () => {
     const { protocol: { id } } = createdPad.attributes;
-    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } });
 
     expect(botRecords.length).toBe(1);
     const [ bot ] = botRecords;
@@ -152,7 +152,7 @@ describe('Registering', () => {
 
     // Get Bots that support such protocol.
     const { id } = referencedProto;
-    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } });
     expect(botRecords.length).toBe(1);
     expect(botRecords[0].attributes.protocol.id).toEqual(id);
   });
