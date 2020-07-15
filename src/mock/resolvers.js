@@ -6,12 +6,6 @@ import { Util } from '../util';
 
 import mockStatus from './data/status.json';
 
-const WRN_TYPE_TO_GQL_MAP = {
-  'wrn:bot': 'Bot',
-  'wrn:pad': 'Pad',
-  'wrn:protocol': 'Protocol'
-};
-
 // TODO(egorgripasov): any better logic?
 const DEFAULT_OWNER = '6ee3328f65c8566cd5451e49e97a767d10a8adf7';
 
@@ -43,7 +37,7 @@ export class Resolvers {
           return this._memoryStore.queryRecords(filterAttributes);
         },
 
-        resolveRecords: async (_, { refs = [] }) => this._memoryStore.resolveRecords(refs),
+        // resolveRecords: async (_, { refs = [] }) => this._memoryStore.resolveRecords(refs),
 
         getRecordsByIds: async (_, { ids }) => this._memoryStore.getRecordsByIds(ids)
       },
@@ -64,8 +58,6 @@ export class Resolvers {
           return Util.toGQLAttributes(attributes);
         },
 
-        extension: (record) => record,
-
         references: async (record) => {
           const referenceIds = Object.values(record).filter(value => typeof (value) === 'object').map(value => value.id);
           return this._memoryStore.getRecordsByIds(referenceIds);
@@ -76,13 +68,6 @@ export class Resolvers {
         createTime: () => CREATE_TIME,
 
         expiryTime: () => EXPIRY_TIME
-      },
-
-      Extension: {
-        __resolveType: (obj) => {
-          const resolvedType = WRN_TYPE_TO_GQL_MAP[obj.type];
-          return resolvedType || 'UnknownExtension';
-        }
       }
     };
   }
