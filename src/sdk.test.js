@@ -39,8 +39,6 @@ describe('Querying', () => {
   let endpoint;
   let registry;
 
-  let firstVersion;
-
   let bondId;
 
   beforeAll(async () => {
@@ -59,7 +57,6 @@ describe('Querying', () => {
       return bot.record.version;
     };
 
-    firstVersion = await publishNewBotVersion();
     await publishNewBotVersion();
   });
 
@@ -95,7 +92,7 @@ describe('Querying', () => {
     expect(records.length).toBe(1);
 
     [ bot ] = records;
-    const { version: recordVersion, name: recordName } = bot;
+    const { attributes: { version: recordVersion, name: recordName } } = bot;
     expect(recordVersion).toBe(version);
     expect(recordName).toBe(name);
   });
@@ -106,62 +103,12 @@ describe('Querying', () => {
     expect(records[0].id).toBe(bot.id);
   });
 
-  test('Query records using semver.', async () => {
-    const { type, name } = bot;
-    const records = await registry.queryRecords({ version: '^' + firstVersion, name, type });
-    expect(records.length).toBe(1);
-    expect(records[0].version).toBe(bot.version);
-  });
-
-  test('Query only latest version.', async () => {
-    const { type, name } = bot;
-    const records = await registry.queryRecords({ version: 'latest', name, type });
-    expect(records.length).toBe(1);
-    expect(records[0].version).toBe(bot.version);
-  });
-
-  test('Resolve records by refs - basic.', async () => {
-    const ref = `${bot.type}:${bot.name}`;
-    const records = await registry.resolveRecords([ref]);
-    expect(records.length).toBe(1);
-    expect(records[0].version).toBe(bot.version);
-  });
-
-  test('Resolve records by refs - specific version.', async () => {
-    const ref = `${bot.type}:${bot.name}#${firstVersion}`;
-    const records = await registry.resolveRecords([ref]);
-    expect(records.length).toBe(1);
-    expect(records[0].version).toBe(firstVersion);
-  });
-
-  test('Resolve records by refs - tilde range.', async () => {
-    const ref = `${bot.type}:${bot.name}#~${firstVersion}`;
-    const records = await registry.resolveRecords([ref]);
-    expect(records.length).toBe(1);
-    expect(records[0].version).toBe(bot.version);
-  });
-
-  test('Resolve records by refs - caret range.', async () => {
-    const ref = `${bot.type}:${bot.name}#^${firstVersion}`;
-    const records = await registry.resolveRecords([ref]);
-    expect(records.length).toBe(1);
-    expect(records[0].version).toBe(bot.version);
-  });
-
-  test('Unique index on type, name and version.', async () => {
-    const { name, version, type } = bot;
-    const record = {
-      displayName: 'newName',
-      name,
-      version,
-      type
-    };
-    try {
-      await registry.setRecord(PRIVATE_KEY, record, PRIVATE_KEY, bondId, FEE);
-    } catch (err) {
-      expect(err.message.includes('exists')).toBe(true);
-    }
-  });
+  // test('Resolve records by refs - basic.', async () => {
+  //   const ref = `${bot.type}:${bot.name}`;
+  //   const records = await registry.resolveRecords([ref]);
+  //   expect(records.length).toBe(1);
+  //   expect(records[0].version).toBe(bot.version);
+  // });
 
   afterAll(async () => {
     if (mock) {

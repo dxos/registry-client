@@ -7,15 +7,11 @@ import multihashing from 'multihashing-async';
 import CID from 'cids';
 
 if (typeof btoa === 'undefined') {
-  global.btoa = function (str) {
-    return Buffer.from(str, 'binary').toString('base64');
-  };
+  global.btoa = (str) => Buffer.from(str, 'binary').toString('base64');
 }
 
 if (typeof atob === 'undefined') {
-  global.atob = function (b64Encoded) {
-    return Buffer.from(b64Encoded, 'base64').toString('binary');
-  };
+  global.atob = (b64Encoded) => Buffer.from(b64Encoded, 'base64').toString('binary');
 }
 
 /**
@@ -63,7 +59,7 @@ export class Util {
         vars.push({ key, value: { 'boolean': object[key] } });
       } else if (type === 'object') {
         const nestedObject = object[key];
-        if (nestedObject.type && nestedObject.type === 'wrn:reference') {
+        if (nestedObject.type && nestedObject.type === 'reference') {
           vars.push({ key, value: { 'reference': { id: nestedObject.id } } });
         }
       }
@@ -88,7 +84,7 @@ export class Util {
         const value = Object.values(types).find(v => v !== null);
         if (typeof (value) === 'object' && types.reference) {
           if (addRefType) {
-            value.type = 'wrn:reference';
+            value.type = 'reference';
           }
         }
         res[attr.key] = value;
