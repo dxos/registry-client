@@ -1,5 +1,4 @@
 record:
-  type: 'wrn:protocol'
-  name: wireline.io/chess
+  type: 'protocol'
+  name: 'Chess Protocol'
   version: 1.0.61
-  displayName: Chess
