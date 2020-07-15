@@ -349,7 +349,6 @@ export class RegistryClient {
     const query = `mutation insertRecord($attributes: [KeyValueInput]!) {
       insertRecord(attributes: $attributes) {
         id
-        type
         ${attributeField}
       }
     }`;
