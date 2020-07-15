@@ -1,9 +1,7 @@
 record:
-  type: 'wrn:bot'
-  name: wireline.io/chess-bot
+  type: 'bot'
+  name: 'Chess Bot'
   version: 2.0.78
   protocol:
-    type: 'wrn:reference'
+    type: 'reference'
     id: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN
-  displayName: ChessBot
-  accessKey: 7db6a0c2b8bc79e733612b5cfd45e9f69bec4d05d424076826a0d08a2a62641c
