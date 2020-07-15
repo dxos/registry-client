@@ -93,7 +93,7 @@ describe('Registering', () => {
     expect(records.length).toBe(1);
 
     [ createdPad ] = records;
-    const { version: recordVersion, name: recordName, type: recordType } = createdPad;
+    const { attributes: { version: recordVersion, name: recordName, type: recordType } } = createdPad;
     expect(recordVersion).toBe(version);
     expect(recordName).toBe(name);
     expect(recordType).toBe(type);

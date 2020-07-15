@@ -82,9 +82,9 @@
     "build:node": "NODE_ENV=production babel ./src --out-dir ./dist/es --ignore \"*.test.js\"  --copy-files",
     "build:web": "NODE_ENV=production webpack",
     "lint:staged": "lint-staged",
-    "start:in-mem-wns": "BABEL_DISABLE_CACHE=1 WIRE_WNS_CHAIN_ID=memnet DEBUG=test babel-node src/mock/main.js",
+    "start:memory": "BABEL_DISABLE_CACHE=1 WIRE_WNS_CHAIN_ID=memnet DEBUG=test babel-node src/mock/main.js",
     "test": "jest --runInBand --no-cache",
-    "test:in-mem-wns": "MOCK_SERVER=1 WIRE_WNS_CHAIN_ID=memnet jest --runInBand --no-cache"
+    "test:memory": "MOCK_SERVER=1 WIRE_WNS_CHAIN_ID=memnet jest --runInBand --no-cache"
   },
   "publishConfig": {
     "access": "public"
