@@ -5,55 +5,41 @@
 import debug from 'debug';
 import path from 'path';
 
-import { Registry, DEFAULT_CHAIN_ID } from './index';
-import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
+import { Registry } from './index';
+import { getConfig, ensureUpdatedConfig, provisionBondId } from './testing/helper';
 import { startMockServer } from './mock/server';
 
-const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
-
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
-
-const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
-const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
-
-const FEE = {
-  amount: [
-    {
-      amount: '200000',
-      denom: 'uwire'
-    }
-  ],
-  gas: '200000'
-};
 
 const log = debug('test');
 
 jest.setTimeout(40 * 1000);
+
+const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 describe('Querying', () => {
   let bot;
 
   let mock;
 
-  let endpoint;
+  let wnsEndpoint;
   let registry;
 
   let bondId;
 
   beforeAll(async () => {
-    if (MOCK_SERVER) {
+    if (mockServer) {
       mock = await startMockServer();
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    endpoint = mock ? mock.serverInfo.url : WIRE_WNS_ENDPOINT;
-    registry = new Registry(endpoint, WIRE_WNS_CHAIN_ID);
-    bondId = await provisionBondId(registry, PRIVATE_KEY, MOCK_SERVER);
+    wnsEndpoint = mock ? mock.serverInfo.url : endpoint;
+    registry = new Registry(wnsEndpoint, chainId);
+    bondId = await provisionBondId(registry, privateKey, mockServer);
 
     const publishNewBotVersion = async () => {
       bot = await ensureUpdatedConfig(BOT_YML_PATH);
-      await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId, FEE);
+      await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
       return bot.record.version;
     };
 
@@ -61,9 +47,9 @@ describe('Querying', () => {
   });
 
   test('Endpoint and chain ID.', async () => {
-    const expectedEndpoint = MOCK_SERVER ? mock.serverInfo.url : WIRE_WNS_ENDPOINT;
+    const expectedEndpoint = mockServer ? mock.serverInfo.url : endpoint;
     expect(registry.endpoint).toBe(expectedEndpoint);
-    expect(registry.chainID).toBe(WIRE_WNS_CHAIN_ID);
+    expect(registry.chainID).toBe(chainId);
   });
 
   test('Get status.', async () => {
