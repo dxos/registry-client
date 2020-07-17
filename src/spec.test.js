@@ -5,33 +5,19 @@
 import debug from 'debug';
 import path from 'path';
 
-import { Registry, DEFAULT_CHAIN_ID } from './index';
-import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
+import { Registry } from './index';
+import { getConfig, ensureUpdatedConfig, provisionBondId } from './testing/helper';
 import { startMockServer } from './mock/server';
-
-const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 const PAD_YML_PATH = path.join(__dirname, './testing/data/pad.yml');
 const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 
-const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
-const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
-
-const FEE = {
-  amount: [
-    {
-      amount: '200000',
-      denom: 'uwire'
-    }
-  ],
-  gas: '200000'
-};
-
 const log = debug('test');
 
 jest.setTimeout(120 * 1000);
+
+const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 async function sleep(timeout = 1 * 1000) {
   await new Promise(r => setTimeout(r, timeout));
@@ -51,13 +37,13 @@ describe('Registering', () => {
   let bondId;
 
   beforeAll(async () => {
-    if (MOCK_SERVER) {
+    if (mockServer) {
       mock = await startMockServer();
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    registry = new Registry(mock ? mock.serverInfo.url : WIRE_WNS_ENDPOINT, WIRE_WNS_CHAIN_ID);
-    bondId = await provisionBondId(registry, PRIVATE_KEY, MOCK_SERVER);
+    registry = new Registry(mock ? mock.serverInfo.url : endpoint, chainId);
+    bondId = await provisionBondId(registry, privateKey, mockServer);
 
     bot = await ensureUpdatedConfig(BOT_YML_PATH);
     pad = await ensureUpdatedConfig(PAD_YML_PATH);
@@ -66,7 +52,7 @@ describe('Registering', () => {
 
   test('Register protocol.', async () => {
     await sleep();
-    await registry.setRecord(PRIVATE_KEY, protocol.record, PRIVATE_KEY, bondId, FEE);
+    await registry.setRecord(privateKey, protocol.record, privateKey, bondId, fee);
     await sleep();
 
     const { version, name, type } = protocol.record;
@@ -76,13 +62,13 @@ describe('Registering', () => {
 
   test('Register bot.', async () => {
     bot.record.protocol.id = createdProtocol.id;
-    await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId, FEE);
+    await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
     await sleep();
   });
 
   test('Register pad.', async () => {
     pad.record.protocol.id = createdProtocol.id;
-    await registry.setRecord(PRIVATE_KEY, pad.record, PRIVATE_KEY, bondId, FEE);
+    await registry.setRecord(privateKey, pad.record, privateKey, bondId, fee);
     await sleep();
   });
 
