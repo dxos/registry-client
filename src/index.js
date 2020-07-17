@@ -23,7 +23,10 @@ import {
   MsgAssociateBond,
   MsgDissociateBond,
   MsgDissociateRecords,
-  MsgReassociateRecords
+  MsgReassociateRecords,
+  MsgReserveAuthority,
+  MsgSetName,
+  MsgDeleteName
 } from './messages';
 
 export const DEFAULT_CHAIN_ID = 'wireline';
@@ -155,12 +158,12 @@ export class Registry {
   }
 
   /**
-   * Resolve records by refs.
-   * @param {array} references
+   * Resolve names to records.
+   * @param {array} names
    * @param {boolean} refs
    */
-  async resolveRecords(references, refs = false) {
-    return this._client.resolveRecords(references, refs);
+  async resolveNames(names, refs = false) {
+    return this._client.resolveNames(names, refs);
   }
 
   /**
@@ -413,6 +416,87 @@ export class Registry {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgReassociateRecords(oldBondId, newBondId, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Reserve authority.
+   * @param {string} name
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async reserveAuthority(name, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgReserveAuthority(name, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Lookup authorities by names.
+   * @param {array} names
+   */
+  async lookupAuthorities(names) {
+    return this._client.lookupAuthorities(names);
+  }
+
+  /**
+   * Set name (WRN) to record ID (CID).
+   * @param {string} wrn
+   * @param {string} id
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async setName(wrn, id, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgSetName(wrn, id, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Lookup naming information.
+   * @param {array} names
+   * @param {boolean} history
+   */
+  async lookupNames(names, history = false) {
+    return this._client.lookupNames(names, history);
+  }
+
+  /**
+   * Delete name (WRN) mapping.
+   * @param {string} wrn
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async deleteName(wrn, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgDeleteName(wrn, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));

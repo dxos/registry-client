@@ -89,13 +89,6 @@ describe('Querying', () => {
     expect(records[0].id).toBe(bot.id);
   });
 
-  // test('Resolve records by refs - basic.', async () => {
-  //   const ref = `${bot.type}:${bot.name}`;
-  //   const records = await registry.resolveRecords([ref]);
-  //   expect(records.length).toBe(1);
-  //   expect(records[0].version).toBe(bot.version);
-  // });
-
   afterAll(async () => {
     if (mock) {
       await mock.mockServer.stop();
