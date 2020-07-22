@@ -151,10 +151,11 @@ export class Registry {
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} all
    * @param {boolean} refs
    */
-  async queryRecords(attributes, refs = false) {
-    return this._client.queryRecords(attributes, refs);
+  async queryRecords(attributes, all = false, refs = false) {
+    return this._client.queryRecords(attributes, all, refs);
   }
 
   /**

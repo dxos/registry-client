@@ -56,7 +56,7 @@ describe('Registering', () => {
     await sleep();
 
     const { version, name, type } = protocol.record;
-    const records = await registry.queryRecords({ version, name, type });
+    const records = await registry.queryRecords({ version, name, type }, true);
     [ createdProtocol ] = records;
   });
 
@@ -75,7 +75,7 @@ describe('Registering', () => {
   // Sample queries.
   test('Get version of specific module.', async () => {
     const { version, name, type } = pad.record;
-    const records = await registry.queryRecords({ version, name, type });
+    const records = await registry.queryRecords({ version, name, type }, true);
     expect(records.length).toBe(1);
 
     [ createdPad ] = records;
@@ -87,7 +87,7 @@ describe('Registering', () => {
 
   test('Get dependency graph of a module - graphwalk.', async () => {
     const { version, name, type } = pad.record;
-    const records = await registry.queryRecords({ version, name, type }, true);
+    const records = await registry.queryRecords({ version, name, type }, true, true);
     expect(records.length).toBe(1);
 
     const [ padWithRefs ] = records;
@@ -102,19 +102,19 @@ describe('Registering', () => {
 
   test('Get bots depending on a particular version of a protocol.', async () => {
     const { version, name, type } = protocol.record;
-    const records = await registry.queryRecords({ version, name, type });
+    const records = await registry.queryRecords({ version, name, type }, true);
     expect(records.length).toBe(1);
 
     const { id } = records[0];
 
-    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } }, true);
     expect(botRecords.length).toBe(1);
     expect(botRecords[0].attributes.protocol.id).toEqual(id);
   });
 
   test('Get bots compatible with a specific pad.', async () => {
     const { protocol: { id } } = createdPad.attributes;
-    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } }, true);
 
     expect(botRecords.length).toBe(1);
     const [ bot ] = botRecords;
@@ -124,7 +124,7 @@ describe('Registering', () => {
   test('LP client can show visual graph of dependencies.', async () => {
     // Get Pad and corresponding Protocol.
     const { version, name, type } = pad.record;
-    const records = await registry.queryRecords({ version, name, type }, true);
+    const records = await registry.queryRecords({ version, name, type }, true, true);
     expect(records.length).toBe(1);
 
     const [ padWithRefs ] = records;
@@ -138,7 +138,7 @@ describe('Registering', () => {
 
     // Get Bots that support such protocol.
     const { id } = referencedProto;
-    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } }, true);
     expect(botRecords.length).toBe(1);
     expect(botRecords[0].attributes.protocol.id).toEqual(id);
   });

@@ -236,15 +236,16 @@ export class RegistryClient {
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} all
    * @param {boolean} refs
    */
-  async queryRecords(attributes, refs = false) {
+  async queryRecords(attributes, all = false, refs = false) {
     if (!attributes) {
       attributes = {};
     }
 
-    const query = `query ($attributes: [KeyValueInput!]) {
-      queryRecords(attributes: $attributes) {
+    const query = `query ($attributes: [KeyValueInput!], $all: Boolean) {
+      queryRecords(attributes: $attributes, all: $all) {
         id
         names
         owners
@@ -257,7 +258,8 @@ export class RegistryClient {
     }`;
 
     const variables = {
-      attributes: Util.toGQLAttributes(attributes)
+      attributes: Util.toGQLAttributes(attributes),
+      all
     };
 
     return RegistryClient.getResult(this._graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));

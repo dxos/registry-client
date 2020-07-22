@@ -98,17 +98,17 @@ const bondTests = () => {
 
     // Create a new record.
     version1 = await publishNewBotVersion(bondId1);
-    let [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    let [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(record1.bondId).toBe(bondId1);
 
     // Dissociate record, query and confirm.
     await registry.dissociateBond(record1.id, privateKey, fee);
-    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(record1.bondId).toBe('');
 
     // Associate record with bond, query and confirm.
     await registry.associateBond(record1.id, bondId1, privateKey, fee);
-    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(record1.bondId).toBe(bondId1);
   });
 
@@ -118,9 +118,9 @@ const bondTests = () => {
 
     // Check version1, version2 as associated with bondId1.
     let records;
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(records[0].bondId).toBe(bondId1);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 }, true);
     expect(records[0].bondId).toBe(bondId1);
 
     // Create another bond.
@@ -132,16 +132,16 @@ const bondTests = () => {
 
     // Reassociate records from bondId1 to bondId2, verify change.
     await registry.reassociateRecords(bondId1, bondId2, privateKey, fee);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(records[0].bondId).toBe(bondId2);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 }, true);
     expect(records[0].bondId).toBe(bondId2);
 
     // Dissociate all records from bond, verify change.
     await registry.dissociateRecords(bondId2, privateKey, fee);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(records[0].bondId).toBe('');
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 }, true);
     expect(records[0].bondId).toBe('');
   });
 };
