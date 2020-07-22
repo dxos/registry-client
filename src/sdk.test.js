@@ -59,13 +59,13 @@ describe('Querying', () => {
   });
 
   test('List records.', async () => {
-    const records = await registry.queryRecords({});
+    const records = await registry.queryRecords({}, true);
     expect(records.length).toBeGreaterThanOrEqual(1);
   });
 
   test('Query records by reference.', async () => {
     const { protocol } = bot.record;
-    const records = await registry.queryRecords({ protocol });
+    const records = await registry.queryRecords({ protocol }, true);
     expect(records.length).toBeGreaterThanOrEqual(1);
 
     const { attributes: { protocol: recordProtocol } } = records[0];
@@ -74,7 +74,7 @@ describe('Querying', () => {
 
   test('Query records by attributes.', async () => {
     const { version, name } = bot.record;
-    const records = await registry.queryRecords({ version, name });
+    const records = await registry.queryRecords({ version, name }, true);
     expect(records.length).toBe(1);
 
     [ bot ] = records;
