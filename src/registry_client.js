@@ -207,6 +207,7 @@ export class RegistryClient {
     const query = `query ($ids: [String!]) {
       getRecordsByIds(ids: $ids) {
         id
+        names
         owners
         bondId
         createTime
@@ -236,6 +237,7 @@ export class RegistryClient {
     const query = `query ($attributes: [KeyValueInput!]) {
       queryRecords(attributes: $attributes) {
         id
+        names
         owners
         bondId
         createTime
@@ -328,6 +330,7 @@ export class RegistryClient {
         }
         records {
           id
+          names
           owners
           bondId
           createTime
