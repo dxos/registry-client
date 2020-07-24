@@ -22,6 +22,7 @@ const namingTests = () => {
 
   let authorityName;
   let otherAuthorityName;
+  let otherPrivateKey;
 
   let wrn;
 
@@ -76,6 +77,11 @@ const namingTests = () => {
   test('Set name', async () => {
     wrn = `wrn://${authorityName}/app/test`;
     await registry.setName(wrn, botId, privateKey, fee);
+
+    // Query records should return it (some WRN points to it).
+    const records = await registry.queryRecords({ type: 'bot', version: bot.record.version });
+    expect(records).toBeDefined();
+    expect(records).toHaveLength(1);
   });
 
   test('Lookup name', async () => {
@@ -148,9 +154,8 @@ const namingTests = () => {
 
     // Other account reserves an authority.
     otherAuthorityName = `other-${Date.now()}`;
-    const otherPrivateKey = otherAccount.privateKey.toString('hex');
+    otherPrivateKey = otherAccount.privateKey.toString('hex');
     await registry.reserveAuthority(otherAuthorityName, otherPrivateKey, fee);
-    await registry.setName(`wrn://${otherAuthorityName}/app/test`, botId, otherPrivateKey, fee);
 
     // Try setting name under other authority.
     await expect(registry.setName(`wrn://${otherAuthorityName}/app/test`, botId, privateKey, fee)).rejects.toThrow('Access denied.');
@@ -194,6 +199,16 @@ const namingTests = () => {
     expect(latest.id).toBeDefined();
     expect(latest.id).toBe('');
     expect(latest.height).toBeDefined();
+
+    // Query records should NOT return it (no WRN points to it).
+    let records = await registry.queryRecords({ type: 'bot', version: bot.record.version });
+    expect(records).toBeDefined();
+    expect(records).toHaveLength(0);
+
+    // Query all records should return it (all: true).
+    records = await registry.queryRecords({ type: 'bot', version: bot.record.version }, true);
+    expect(records).toBeDefined();
+    expect(records).toHaveLength(1);
   });
 
   test('Delete already deleted name', async () => {
@@ -215,6 +230,8 @@ const namingTests = () => {
   });
 
   test('Delete name for non-owned authority.', async () => {
+    await registry.setName(`wrn://${otherAuthorityName}/app/test`, botId, otherPrivateKey, fee);
+
     // Try deleting name under other authority.
     await expect(registry.deleteName(`wrn://${otherAuthorityName}/app/test`, privateKey, fee)).rejects.toThrow('Access denied.');
   });
