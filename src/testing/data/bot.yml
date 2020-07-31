@@ -1,7 +1,6 @@
 record:
   type: 'bot'
   name: 'Chess Bot'
-  version: 2.0.78
+  version: '2.0.78'
   protocol:
-    type: 'reference'
-    id: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN
+    /: 'QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN'
