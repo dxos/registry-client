@@ -61,13 +61,13 @@ describe('Registering', () => {
   });
 
   test('Register bot.', async () => {
-    bot.record.protocol.id = createdProtocol.id;
+    bot.record.protocol['/'] = createdProtocol.id;
     await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
     await sleep();
   });
 
   test('Register pad.', async () => {
-    pad.record.protocol.id = createdProtocol.id;
+    pad.record.protocol['/'] = createdProtocol.id;
     await registry.setRecord(privateKey, pad.record, privateKey, bondId, fee);
     await sleep();
   });
@@ -107,18 +107,18 @@ describe('Registering', () => {
 
     const { id } = records[0];
 
-    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } }, true);
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { '/': id } }, true);
     expect(botRecords.length).toBe(1);
-    expect(botRecords[0].attributes.protocol.id).toEqual(id);
+    expect(botRecords[0].attributes.protocol['/']).toEqual(id);
   });
 
   test('Get bots compatible with a specific pad.', async () => {
-    const { protocol: { id } } = createdPad.attributes;
-    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } }, true);
+    const { protocol } = createdPad.attributes;
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol }, true);
 
     expect(botRecords.length).toBe(1);
     const [ bot ] = botRecords;
-    expect(bot.attributes.protocol.id).toEqual(id);
+    expect(bot.attributes.protocol).toEqual(protocol);
   });
 
   test('LP client can show visual graph of dependencies.', async () => {
@@ -138,9 +138,9 @@ describe('Registering', () => {
 
     // Get Bots that support such protocol.
     const { id } = referencedProto;
-    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { type: 'reference', id } }, true);
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { '/': id } }, true);
     expect(botRecords.length).toBe(1);
-    expect(botRecords[0].attributes.protocol.id).toEqual(id);
+    expect(botRecords[0].attributes.protocol['/']).toEqual(id);
   });
 
   afterAll(async () => {

@@ -33,7 +33,7 @@ export class Resolvers {
         getStatus: async () => (mockStatus),
 
         queryRecords: async (_, { attributes = [] }) => {
-          const filterAttributes = Util.fromGQLAttributes(attributes, true);
+          const filterAttributes = Util.fromGQLAttributes(attributes);
           return this._memoryStore.queryRecords(filterAttributes);
         },
 
@@ -42,7 +42,7 @@ export class Resolvers {
 
       Mutation: {
         insertRecord: async (_, { attributes }) => {
-          const inputRecord = Util.fromGQLAttributes(attributes, true);
+          const inputRecord = Util.fromGQLAttributes(attributes);
           const [record] = await this._memoryStore.insertRecords([inputRecord]);
           return record;
         }
@@ -57,7 +57,7 @@ export class Resolvers {
         },
 
         references: async (record) => {
-          const referenceIds = Object.values(record).filter(value => typeof (value) === 'object').map(value => value.id);
+          const referenceIds = Object.values(record).filter(value => typeof (value) === 'object').map(value => value['/']);
           return this._memoryStore.getRecordsByIds(referenceIds);
         },
 

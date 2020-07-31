@@ -69,7 +69,7 @@ describe('Querying', () => {
     expect(records.length).toBeGreaterThanOrEqual(1);
 
     const { attributes: { protocol: recordProtocol } } = records[0];
-    expect(protocol.id).toBe(recordProtocol.id);
+    expect(protocol['/']).toBe(recordProtocol['/']);
   });
 
   test('Query records by attributes.', async () => {
