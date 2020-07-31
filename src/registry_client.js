@@ -262,7 +262,10 @@ export class RegistryClient {
       all
     };
 
-    return RegistryClient.getResult(this._graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
+    let result = (await this._graph(query)(variables))['queryRecords'];
+    result = RegistryClient.prepareAttributes('attributes')(result);
+
+    return result;
   }
 
   /**
