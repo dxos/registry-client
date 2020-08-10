@@ -7,7 +7,7 @@ import semver from 'semver';
 
 import { Util } from '../util';
 
-import records from './data/records';
+import records from './data/records.json';
 
 /**
  * In-memory store.
@@ -32,12 +32,13 @@ export class MemoryStore {
 
   /**
    * Initialize store.
+   * @param {array} data Records to init server with.
    * @return {Promise<void>}
    * @private
    */
-  async init() {
+  async init(data) {
     if (!this._initialized) {
-      await this.insertRecords(records);
+      await this.insertRecords(data || records);
       this._initialized = true;
     }
   }

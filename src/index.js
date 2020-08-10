@@ -12,6 +12,8 @@ import { Util } from './util';
 import { TxBuilder } from './txbuilder';
 import { Msg, Record } from './types';
 
+import { createSchema } from './mock/schema';
+
 import {
   MsgSend,
   MsgCreateBond,
@@ -44,15 +46,20 @@ export class Registry {
    * @constructor
    * @param {string} url
    * @param {string} chainID
+   * @param {object} options
    */
-  constructor(url, chainID = DEFAULT_CHAIN_ID) {
-    if (!isUrl(url)) {
+  constructor(url, chainID = DEFAULT_CHAIN_ID, options = {}) {
+    const { schema } = options;
+
+    if (!schema && !isUrl(url)) {
       throw new Error('Path to a registry GQL endpoint should be provided.');
     }
 
     this._endpoint = url;
     this._chainID = chainID;
-    this._client = new RegistryClient(url);
+    this._options = options;
+
+    this._client = new RegistryClient(url, options);
   }
 
   get endpoint() {
@@ -437,4 +444,4 @@ export class Registry {
   }
 }
 
-export { Account, Util };
+export { Account, Util, createSchema };
