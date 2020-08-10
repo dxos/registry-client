@@ -2,8 +2,8 @@
 // Copyright 2019 Wireline, Inc.
 //
 
-// TODO(egorgripasov): replace with appolo client + fragments.
-import graphql from 'graphql.js';
+import { graphql } from 'graphql';
+import graphqlClient from 'graphql.js';
 import get from 'lodash.get';
 import set from 'lodash.set';
 import assert from 'assert';
@@ -78,15 +78,24 @@ export class RegistryClient {
   /**
    * New Client.
    * @param {string} endpoint
+   * @param {object} options
    */
-  constructor(endpoint) {
-    assert(endpoint);
+  constructor(endpoint, options) {
+    const { schema } = options;
+    assert(endpoint || schema);
 
     this._endpoint = endpoint;
-    this._graph = graphql(this._endpoint, {
-      method: 'POST',
-      asJSON: true
-    });
+    if (schema) {
+      this._graph = source => async variableValues => {
+        const { data } = await graphql({ schema, source, variableValues });
+        return data;
+      };
+    } else {
+      this._graph = graphqlClient(this._endpoint, {
+        method: 'POST',
+        asJSON: true
+      });
+    }
   }
 
   /**

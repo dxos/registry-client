@@ -3,27 +3,16 @@
 //
 
 import getPort from 'get-port';
-import { ApolloServer, makeExecutableSchema } from 'apollo-server';
+import { ApolloServer } from 'apollo-server';
 
-import schemaDefs from '@wirelineio/wns-schema/gql/schema.graphql';
-import extensionDefs from '@wirelineio/wns-schema/gql/extensions.graphql';
-
-import { MemoryStore } from './store';
-import { Resolvers } from './resolvers';
+import { createSchema } from './schema';
 
 /**
  * Create a mock GQL server.
  * @return {ApolloServer}
  */
 export const createMockServer = async () => {
-  const memoryStore = new MemoryStore();
-  await memoryStore.init();
-
-  const schema = makeExecutableSchema({
-    typeDefs: [schemaDefs, extensionDefs],
-    resolvers: new Resolvers(memoryStore).getMap(),
-    inheritResolversFromInterfaces: true
-  });
+  const schema = await createSchema();
   return new ApolloServer({ schema });
 };
 
