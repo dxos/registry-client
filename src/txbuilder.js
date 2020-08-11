@@ -49,7 +49,7 @@ export class TxBuilder {
     const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
     const transactionSig = account.sign(transactionDataToSign);
 
-    const transaction = new Transaction(message, account, fee, transactionSig, accountNumber, accountSequence, chainID);
+    const transaction = new Transaction(message, account, fee, transactionSig, chainID);
     return transaction.serialize();
   }
 }
