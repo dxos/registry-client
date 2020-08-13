@@ -322,13 +322,15 @@ export class MsgReserveAuthority {
   /**
    * @constructor
    * @param {string} name
+   * @param {string} signer
    * @param {string} owner
    */
-  constructor(name, owner) {
+  constructor(name, signer, owner = '') {
     assert(name);
-    assert(owner);
+    assert(signer);
 
     this._name = name;
+    this._signer = signer;
     this._owner = owner;
   }
 
@@ -340,7 +342,8 @@ export class MsgReserveAuthority {
       'type': 'nameservice/ReserveAuthority',
       'value': {
         'name': this._name,
-        'signer': this._owner
+        'signer': this._signer,
+        'owner': this._owner
       }
     });
   }
