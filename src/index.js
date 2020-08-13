@@ -423,14 +423,15 @@ export class Registry {
    * @param {string} name
    * @param {string} privateKey
    * @param {object} fee
+   * @param {string} owner
    */
-  async reserveAuthority(name, privateKey, fee) {
+  async reserveAuthority(name, privateKey, fee, owner = '') {
     let result;
 
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgReserveAuthority(name, fromAddress), privateKey, fee);
+      result = await this._submitTx(new MsgReserveAuthority(name, fromAddress, owner), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
