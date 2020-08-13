@@ -74,6 +74,50 @@ const namingTests = () => {
     await expect(registry.reserveAuthority(authorityName, privateKey, fee)).rejects.toThrow('Name already exists.');
   });
 
+  test('Reserve sub-authority.', async () => {
+    const subAuthority = `echo.${authorityName}`;
+    await registry.reserveAuthority(subAuthority, privateKey, fee);
+
+    const result = await registry.lookupAuthorities([subAuthority]);
+    expect(result).toBeDefined();
+    expect(result.meta).toBeDefined();
+    expect(result.meta.height).toBeDefined();
+    expect(result.records).toBeDefined();
+    expect(result.records).toHaveLength(1);
+
+    const [record] = result.records;
+    expect(record.ownerAddress).toBeDefined();
+    expect(record.ownerPublicKey).toBeDefined();
+    expect(record.height).toBeDefined();
+  });
+
+  test('Reserve sub-authority with different owner.', async () => {
+    // Create another account, send tx to set public key on the account.
+    const mnenonic1 = Account.generateMnemonic();
+    const otherAccount1 = Account.generateFromMnemonic(mnenonic1);
+    await registry.sendCoins([{ denom: 'uwire', amount: '1000000000' }], otherAccount1.formattedCosmosAddress, privateKey, fee);
+
+    const mnenonic2 = Account.generateMnemonic();
+    const otherAccount2 = Account.generateFromMnemonic(mnenonic2);
+    await registry.sendCoins([{ denom: 'uwire', amount: '10' }], otherAccount2.formattedCosmosAddress, otherAccount1.getPrivateKey(), fee);
+
+    const subAuthority = `halo.${authorityName}`;
+    await registry.reserveAuthority(subAuthority, privateKey, fee, otherAccount1.formattedCosmosAddress);
+
+    const result = await registry.lookupAuthorities([subAuthority]);
+    expect(result).toBeDefined();
+    expect(result.meta).toBeDefined();
+    expect(result.meta.height).toBeDefined();
+    expect(result.records).toBeDefined();
+    expect(result.records).toHaveLength(1);
+
+    const [record] = result.records;
+    expect(record.ownerAddress).toBeDefined();
+    expect(record.ownerAddress).toBe(otherAccount1.getCosmosAddress());
+    expect(record.ownerPublicKey).toBeDefined();
+    expect(record.height).toBeDefined();
+  });
+
   test('Set name', async () => {
     wrn = `wrn://${authorityName}/app/test`;
     await registry.setName(wrn, botId, privateKey, fee);
