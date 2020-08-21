@@ -1,6 +1,6 @@
 {
   "name": "@wirelineio/registry-client",
-  "version": "1.0.0-moon.0",
+  "version": "1.0.0-moon.1",
   "description": "Wireline Registry JavaScript Client.",
   "repository": "https://github.com/wirelineio/registry-client",
   "author": "",
