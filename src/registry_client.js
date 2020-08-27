@@ -33,9 +33,13 @@ const attributeField = `
 const refsField = `
   references {
     id
-    type
-    name
-    version
+  }
+`;
+
+const historyFields = `
+  history {
+    id
+    height
   }
 `;
 
@@ -104,7 +108,7 @@ export class RegistryClient {
    * @param {object} variables
    */
   async query(query, variables) {
-    console.assert(query);
+    assert(query);
 
     return this._graph(query)(variables);
   }
@@ -177,8 +181,8 @@ export class RegistryClient {
    * @param {array} addresses
    */
   async getAccounts(addresses) {
-    console.assert(addresses);
-    console.assert(addresses.length);
+    assert(addresses);
+    assert(addresses.length);
 
     const query = `query ($addresses: [String!]) {
       getAccounts(addresses: $addresses) {
@@ -206,15 +210,13 @@ export class RegistryClient {
    * @param {boolean} refs
    */
   async getRecordsByIds(ids, refs = false) {
-    console.assert(ids);
-    console.assert(ids.length);
+    assert(ids);
+    assert(ids.length);
 
     const query = `query ($ids: [String!]) {
       getRecordsByIds(ids: $ids) {
         id
-        type
-        name
-        version
+        names
         owners
         bondId
         createTime
@@ -234,19 +236,18 @@ export class RegistryClient {
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} all
    * @param {boolean} refs
    */
-  async queryRecords(attributes, refs = false) {
+  async queryRecords(attributes, all = false, refs = false) {
     if (!attributes) {
       attributes = {};
     }
 
-    const query = `query ($attributes: [KeyValueInput!]) {
-      queryRecords(attributes: $attributes) {
+    const query = `query ($attributes: [KeyValueInput!], $all: Boolean) {
+      queryRecords(attributes: $attributes, all: $all) {
         id
-        type
-        name
-        version
+        names
         owners
         bondId
         createTime
@@ -257,40 +258,111 @@ export class RegistryClient {
     }`;
 
     const variables = {
-      attributes: Util.toGQLAttributes(attributes)
+      attributes: Util.toGQLAttributes(attributes),
+      all
     };
 
-    return RegistryClient.getResult(this._graph(query)(variables), 'queryRecords', RegistryClient.prepareAttributes('attributes'));
+    let result = (await this._graph(query)(variables))['queryRecords'];
+    result = RegistryClient.prepareAttributes('attributes')(result);
+
+    return result;
   }
 
   /**
-   * Resolve records by refs.
-   * @param {array} references
-   * @param {boolean} refs
+   * Lookup authorities by names.
+   * @param {array} names
    */
-  async resolveRecords(references, refs = false) {
-    console.assert(references.length);
+  async lookupAuthorities(names) {
+    assert(names.length);
 
-    const query = `query ($refs: [String!]) {
-      resolveRecords(refs: $refs) {
-        id
-        type
-        name
-        version
-        owners
-        bondId
-        createTime
-        expiryTime
-        ${attributeField}
-        ${refs ? refsField : ''}
+    const query = `query ($names: [String!]) {
+      lookupAuthorities(names: $names) {
+        meta {
+          height
+        }
+        records {
+          ownerAddress
+          ownerPublicKey
+          height
+        }
       }
     }`;
 
     const variables = {
-      refs: references
+      names
     };
 
-    return RegistryClient.getResult(this._graph(query)(variables), 'resolveRecords', RegistryClient.prepareAttributes('attributes'));
+    const result = await this._graph(query)(variables);
+
+    return result['lookupAuthorities'];
+  }
+
+  /**
+   * Lookup names.
+   * @param {array} names
+   * @param {boolean} history
+   */
+  async lookupNames(names, history = false) {
+    assert(names.length);
+
+    const query = `query ($names: [String!]) {
+      lookupNames(names: $names) {
+        meta {
+          height
+        }
+        records {
+          latest {
+            id
+            height
+          }
+          ${history ? historyFields : ''}
+        }
+      }
+    }`;
+
+    const variables = {
+      names
+    };
+
+    const result = await this._graph(query)(variables);
+
+    return result['lookupNames'];
+  }
+
+  /**
+   * Resolve names to records.
+   * @param {array} names
+   * @param {boolean} refs
+   */
+  async resolveNames(names, refs = false) {
+    assert(names.length);
+
+    const query = `query ($names: [String!]) {
+      resolveNames(names: $names) {
+        meta {
+          height
+        }
+        records {
+          id
+          names
+          owners
+          bondId
+          createTime
+          expiryTime
+          ${attributeField}
+          ${refs ? refsField : ''}
+        }
+      }
+    }`;
+
+    const variables = {
+      names
+    };
+
+    const result = (await this._graph(query)(variables))['resolveNames'];
+    result.records = RegistryClient.prepareAttributes('attributes')(result.records);
+
+    return result;
   }
 
   /**
@@ -298,8 +370,8 @@ export class RegistryClient {
    * @param {array} ids
    */
   async getBondsByIds(ids) {
-    console.assert(ids);
-    console.assert(ids.length);
+    assert(ids);
+    assert(ids.length);
 
     const query = `query ($ids: [String!]) {
       getBondsByIds(ids: $ids) {
@@ -347,7 +419,7 @@ export class RegistryClient {
    * @param {string} tx
    */
   async submit(tx) {
-    console.assert(tx);
+    assert(tx);
 
     const mutation = `mutation ($tx: String!) {
       submit(tx: $tx)
@@ -365,12 +437,11 @@ export class RegistryClient {
    * @param {object} attributes
    */
   async insertRecord(attributes) {
-    console.assert(Object.keys(attributes).length);
+    assert(Object.keys(attributes).length);
 
     const query = `mutation insertRecord($attributes: [KeyValueInput]!) {
       insertRecord(attributes: $attributes) {
         id
-        type
         ${attributeField}
       }
     }`;
@@ -379,6 +450,7 @@ export class RegistryClient {
       attributes: Util.toGQLAttributes(attributes)
     };
 
-    return RegistryClient.getResult(this._graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
+    const recordResult = RegistryClient.getResult(this._graph(query)(variables), 'insertRecord', RegistryClient.prepareAttributes('attributes'));
+    return { ...recordResult, 'deliver_tx': { log: '{}', events: [] } };
   }
 }

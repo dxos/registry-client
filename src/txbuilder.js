@@ -2,6 +2,8 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import canonicalStringify from 'canonical-json';
+
 import { Signature, Payload, Transaction } from './types';
 
 /**
@@ -30,19 +32,9 @@ export class TxBuilder {
    * @param {string} accountNumber
    * @param {string} accountSequence
    * @param {string} chainID
+   * @param {object} fee
    */
-  static createTransaction(message, account, accountNumber, accountSequence, chainID) {
-    // TODO(egorgripasov): class for fees.
-    const fee = {
-      amount: [
-        // {
-        //   "amount": "201",
-        //   "denom": "wire"
-        // }
-      ],
-      gas: '200000'
-    };
-
+  static createTransaction(message, account, accountNumber, accountSequence, chainID, fee) {
     // 1. Compose StdSignDoc.
     const stdSignDoc = {
       account_number: accountNumber,
@@ -54,10 +46,10 @@ export class TxBuilder {
     };
 
     // 2. Calculate Signature.
-    const transactionDataToSign = Buffer.from(JSON.stringify(stdSignDoc));
+    const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
     const transactionSig = account.sign(transactionDataToSign);
 
-    const transaction = new Transaction(message, account, fee, transactionSig, accountNumber, accountSequence, chainID);
+    const transaction = new Transaction(message, account, fee, transactionSig, chainID);
     return transaction.serialize();
   }
 }

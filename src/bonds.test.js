@@ -4,17 +4,12 @@
 
 import path from 'path';
 
-import { Registry, DEFAULT_CHAIN_ID } from './index';
-import { ensureUpdatedConfig } from './testing/helper';
-
-const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
+import { Registry } from './index';
+import { getConfig, ensureUpdatedConfig } from './testing/helper';
 
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
-const MOCK_SERVER = process.env.MOCK_SERVER || false;
-
-const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
-const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
+const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 jest.setTimeout(90 * 1000);
 
@@ -33,18 +28,18 @@ const bondTests = () => {
 
   const publishNewBotVersion = async (bondId) => {
     bot = await ensureUpdatedConfig(BOT_YML_PATH);
-    await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId);
+    await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
     return bot.record.version;
   };
 
   beforeAll(async () => {
-    registry = new Registry(WIRE_WNS_ENDPOINT, WIRE_WNS_CHAIN_ID);
+    registry = new Registry(endpoint, chainId);
   });
 
   test('Create bond.', async () => {
-    bondId1 = await registry.getNextBondId(PRIVATE_KEY);
+    bondId1 = await registry.getNextBondId(privateKey);
     expect(bondId1).toBeDefined();
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], PRIVATE_KEY);
+    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey, fee);
   });
 
   test('Get bond by ID.', async () => {
@@ -71,7 +66,7 @@ const bondTests = () => {
   });
 
   test('Refill bond.', async () => {
-    await registry.refillBond(bondId1, [{ denom: 'uwire', amount: '500' }], PRIVATE_KEY);
+    await registry.refillBond(bondId1, [{ denom: 'uwire', amount: '500' }], privateKey, fee);
 
     const [bond] = await registry.getBondsByIds([bondId1]);
     expect(bond).toBeDefined();
@@ -81,7 +76,7 @@ const bondTests = () => {
   });
 
   test('Withdraw bond.', async () => {
-    await registry.withdrawBond(bondId1, [{ denom: 'uwire', amount: '500' }], PRIVATE_KEY);
+    await registry.withdrawBond(bondId1, [{ denom: 'uwire', amount: '500' }], privateKey, fee);
 
     const [bond] = await registry.getBondsByIds([bondId1]);
     expect(bond).toBeDefined();
@@ -91,29 +86,29 @@ const bondTests = () => {
   });
 
   test('Cancel bond.', async () => {
-    await registry.cancelBond(bondId1, PRIVATE_KEY);
+    await registry.cancelBond(bondId1, privateKey, fee);
     const bonds = await registry.getBondsByIds([bondId1]);
     expect(bonds).toHaveLength(0);
   });
 
   test('Associate/Dissociate bond.', async () => {
-    bondId1 = await registry.getNextBondId(PRIVATE_KEY);
+    bondId1 = await registry.getNextBondId(privateKey);
     expect(bondId1).toBeDefined();
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], PRIVATE_KEY);
+    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey, fee);
 
     // Create a new record.
     version1 = await publishNewBotVersion(bondId1);
-    let [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    let [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(record1.bondId).toBe(bondId1);
 
     // Dissociate record, query and confirm.
-    await registry.dissociateBond(record1.id, PRIVATE_KEY);
-    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    await registry.dissociateBond(record1.id, privateKey, fee);
+    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(record1.bondId).toBe('');
 
     // Associate record with bond, query and confirm.
-    await registry.associateBond(record1.id, bondId1, PRIVATE_KEY);
-    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    await registry.associateBond(record1.id, bondId1, privateKey, fee);
+    [record1] = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(record1.bondId).toBe(bondId1);
   });
 
@@ -123,35 +118,35 @@ const bondTests = () => {
 
     // Check version1, version2 as associated with bondId1.
     let records;
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(records[0].bondId).toBe(bondId1);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 }, true);
     expect(records[0].bondId).toBe(bondId1);
 
     // Create another bond.
-    bondId2 = await registry.getNextBondId(PRIVATE_KEY);
+    bondId2 = await registry.getNextBondId(privateKey);
     expect(bondId2).toBeDefined();
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], PRIVATE_KEY);
+    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey, fee);
     const [bond] = await registry.getBondsByIds([bondId2]);
     expect(bond.id).toBe(bondId2);
 
     // Reassociate records from bondId1 to bondId2, verify change.
-    await registry.reassociateRecords(bondId1, bondId2, PRIVATE_KEY);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    await registry.reassociateRecords(bondId1, bondId2, privateKey, fee);
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(records[0].bondId).toBe(bondId2);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 }, true);
     expect(records[0].bondId).toBe(bondId2);
 
     // Dissociate all records from bond, verify change.
-    await registry.dissociateRecords(bondId2, PRIVATE_KEY);
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 });
+    await registry.dissociateRecords(bondId2, privateKey, fee);
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version1 }, true);
     expect(records[0].bondId).toBe('');
-    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 });
+    records = await registry.queryRecords({ type: bot.type, name: bot.name, version: version2 }, true);
     expect(records[0].bondId).toBe('');
   });
 };
 
-if (MOCK_SERVER) {
+if (mockServer) {
   // Required as jest complains if file has no tests.
   test('skipping bond tests', () => {});
 } else {

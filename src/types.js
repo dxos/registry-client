@@ -131,21 +131,14 @@ export class Transaction {
    * @param {object} account
    * @param {object} fee
    * @param {string} signature
-   * @param {string} accountNumber
-   * @param {string} accountSequence
    * @param {string} chainID
    */
-  constructor(message, account, fee, signature, accountNumber, accountSequence, chainID) {
-    fee.gas = String(parseInt(fee.gas, 10));
-
-    this.message = message;
-    this.account = account;
-    this.fee = fee;
-    this.signature = signature;
-    // TODO(egorgripasov): use BigInt.
-    this.accountNumber = parseInt(accountNumber, 10);
-    this.accountSequence = parseInt(accountSequence, 10);
-    this.chainID = chainID;
+  constructor(message, account, fee, signature, chainID) {
+    this._message = message;
+    this._account = account;
+    this._fee = fee;
+    this._signature = signature;
+    this._chainID = chainID;
   }
 
   /**
@@ -155,18 +148,16 @@ export class Transaction {
     return Util.sortJSON({
       'type': 'cosmos-sdk/StdTx',
       'value': {
-        'account_number': this.accountNumber.toString(),
-        'chain_id': this.chainID,
-        'sequence': this.accountSequence.toString(),
-        'msg': [this.message.serialize()],
-        'fee': this.fee,
+        'chain_id': this._chainID,
+        'msg': [this._message.serialize()],
+        'fee': this._fee,
         'signatures': [
           {
             'pub_key': {
               'type': 'tendermint/PubKeySecp256k1',
-              'value': this.account.publicKey.toString('base64')
+              'value': this._account.publicKey.toString('base64')
             },
-            'signature': this.signature.toString('base64')
+            'signature': this._signature.toString('base64')
           }
         ],
         'memo': ''

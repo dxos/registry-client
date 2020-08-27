@@ -7,15 +7,11 @@ import multihashing from 'multihashing-async';
 import CID from 'cids';
 
 if (typeof btoa === 'undefined') {
-  global.btoa = function (str) {
-    return Buffer.from(str, 'binary').toString('base64');
-  };
+  global.btoa = (str) => Buffer.from(str, 'binary').toString('base64');
 }
 
 if (typeof atob === 'undefined') {
-  global.atob = function (b64Encoded) {
-    return Buffer.from(b64Encoded, 'base64').toString('binary');
-  };
+  global.atob = (b64Encoded) => Buffer.from(b64Encoded, 'base64').toString('binary');
 }
 
 /**
@@ -63,8 +59,8 @@ export class Util {
         vars.push({ key, value: { 'boolean': object[key] } });
       } else if (type === 'object') {
         const nestedObject = object[key];
-        if (nestedObject.type && nestedObject.type === 'wrn:reference') {
-          vars.push({ key, value: { 'reference': { id: nestedObject.id } } });
+        if (nestedObject['/'] !== undefined) {
+          vars.push({ key, value: { 'reference': { id: nestedObject['/'] } } });
         }
       }
     });
@@ -74,26 +70,25 @@ export class Util {
   /**
    * Unmarshal attributes array to object.
    * @param {array} attributes
-   * @param {boolean} addRefType
    */
-  static fromGQLAttributes(attributes, addRefType = true) {
+  static fromGQLAttributes(attributes = []) {
     const res = {};
     attributes.forEach(attr => {
       if (attr.value.null) {
         res[attr.key] = null;
       } else if (attr.value.json) {
         res[attr.key] = JSON.parse(attr.value.json);
+      } else if (attr.value.reference) {
+        // Convert GQL reference to IPLD style link.
+        const ref = attr.value.reference;
+        res[attr.key] = { '/': ref.id };
       } else {
         const { values, null: n, ...types } = attr.value;
         const value = Object.values(types).find(v => v !== null);
-        if (typeof (value) === 'object' && types.reference) {
-          if (addRefType) {
-            value.type = 'wrn:reference';
-          }
-        }
         res[attr.key] = value;
       }
     });
+
     return res;
   }
 

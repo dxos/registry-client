@@ -5,23 +5,19 @@
 import debug from 'debug';
 import path from 'path';
 
-import { Registry, DEFAULT_CHAIN_ID } from './index';
-import { ensureUpdatedConfig, provisionBondId } from './testing/helper';
+import { Registry } from './index';
+import { getConfig, ensureUpdatedConfig, provisionBondId } from './testing/helper';
 import { startMockServer } from './mock/server';
-
-const PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 const PAD_YML_PATH = path.join(__dirname, './testing/data/pad.yml');
 const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 
-const MOCK_SERVER = process.env.MOCK_SERVER || false;
-const WIRE_WNS_ENDPOINT = process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api';
-const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
-
 const log = debug('test');
 
 jest.setTimeout(120 * 1000);
+
+const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 async function sleep(timeout = 1 * 1000) {
   await new Promise(r => setTimeout(r, timeout));
@@ -41,13 +37,13 @@ describe('Registering', () => {
   let bondId;
 
   beforeAll(async () => {
-    if (MOCK_SERVER) {
+    if (mockServer) {
       mock = await startMockServer();
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    registry = new Registry(mock ? mock.serverInfo.url : WIRE_WNS_ENDPOINT, WIRE_WNS_CHAIN_ID);
-    bondId = await provisionBondId(registry, PRIVATE_KEY, MOCK_SERVER);
+    registry = new Registry(mock ? mock.serverInfo.url : endpoint, chainId);
+    bondId = await provisionBondId(registry, privateKey, mockServer);
 
     bot = await ensureUpdatedConfig(BOT_YML_PATH);
     pad = await ensureUpdatedConfig(PAD_YML_PATH);
@@ -56,34 +52,34 @@ describe('Registering', () => {
 
   test('Register protocol.', async () => {
     await sleep();
-    await registry.setRecord(PRIVATE_KEY, protocol.record, PRIVATE_KEY, bondId);
+    await registry.setRecord(privateKey, protocol.record, privateKey, bondId, fee);
     await sleep();
 
     const { version, name, type } = protocol.record;
-    const records = await registry.queryRecords({ version, name, type });
+    const records = await registry.queryRecords({ version, name, type }, true);
     [ createdProtocol ] = records;
   });
 
   test('Register bot.', async () => {
-    bot.record.protocol.id = createdProtocol.id;
-    await registry.setRecord(PRIVATE_KEY, bot.record, PRIVATE_KEY, bondId);
+    bot.record.protocol['/'] = createdProtocol.id;
+    await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
     await sleep();
   });
 
   test('Register pad.', async () => {
-    pad.record.protocol.id = createdProtocol.id;
-    await registry.setRecord(PRIVATE_KEY, pad.record, PRIVATE_KEY, bondId);
+    pad.record.protocol['/'] = createdProtocol.id;
+    await registry.setRecord(privateKey, pad.record, privateKey, bondId, fee);
     await sleep();
   });
 
   // Sample queries.
   test('Get version of specific module.', async () => {
     const { version, name, type } = pad.record;
-    const records = await registry.queryRecords({ version, name, type });
+    const records = await registry.queryRecords({ version, name, type }, true);
     expect(records.length).toBe(1);
 
     [ createdPad ] = records;
-    const { version: recordVersion, name: recordName, type: recordType } = createdPad;
+    const { attributes: { version: recordVersion, name: recordName, type: recordType } } = createdPad;
     expect(recordVersion).toBe(version);
     expect(recordName).toBe(name);
     expect(recordType).toBe(type);
@@ -91,7 +87,7 @@ describe('Registering', () => {
 
   test('Get dependency graph of a module - graphwalk.', async () => {
     const { version, name, type } = pad.record;
-    const records = await registry.queryRecords({ version, name, type }, true);
+    const records = await registry.queryRecords({ version, name, type }, true, true);
     expect(records.length).toBe(1);
 
     const [ padWithRefs ] = records;
@@ -106,29 +102,29 @@ describe('Registering', () => {
 
   test('Get bots depending on a particular version of a protocol.', async () => {
     const { version, name, type } = protocol.record;
-    const records = await registry.queryRecords({ version, name, type });
+    const records = await registry.queryRecords({ version, name, type }, true);
     expect(records.length).toBe(1);
 
     const { id } = records[0];
 
-    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { '/': id } }, true);
     expect(botRecords.length).toBe(1);
-    expect(botRecords[0].attributes.protocol.id).toEqual(id);
+    expect(botRecords[0].attributes.protocol['/']).toEqual(id);
   });
 
   test('Get bots compatible with a specific pad.', async () => {
-    const { protocol: { id } } = createdPad.attributes;
-    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    const { protocol } = createdPad.attributes;
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol }, true);
 
     expect(botRecords.length).toBe(1);
     const [ bot ] = botRecords;
-    expect(bot.attributes.protocol.id).toEqual(id);
+    expect(bot.attributes.protocol).toEqual(protocol);
   });
 
   test('LP client can show visual graph of dependencies.', async () => {
     // Get Pad and corresponding Protocol.
     const { version, name, type } = pad.record;
-    const records = await registry.queryRecords({ version, name, type }, true);
+    const records = await registry.queryRecords({ version, name, type }, true, true);
     expect(records.length).toBe(1);
 
     const [ padWithRefs ] = records;
@@ -142,9 +138,9 @@ describe('Registering', () => {
 
     // Get Bots that support such protocol.
     const { id } = referencedProto;
-    const botRecords = await registry.queryRecords({ type: 'wrn:bot', protocol: { type: 'wrn:reference', id } });
+    const botRecords = await registry.queryRecords({ type: 'bot', protocol: { '/': id } }, true);
     expect(botRecords.length).toBe(1);
-    expect(botRecords[0].attributes.protocol.id).toEqual(id);
+    expect(botRecords[0].attributes.protocol['/']).toEqual(id);
   });
 
   afterAll(async () => {

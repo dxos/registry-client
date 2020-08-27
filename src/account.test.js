@@ -16,7 +16,7 @@ const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928b
 const REGISTRY_PUBLIC_KEY = '61rphyECRYVJ4HX4HwQy8pG4WuXWZn2oArJyicXUU8xA6X4Ycy8=';
 const REGISTRY_ADDRESS = 'eec4c68e77c6726ca41f261441d4b4870d2748d4';
 
-const RECORD_SIGNATURE = 'olMVoUsUroEyVsDsmTuZuuBtPMp6Ipk4PlgFRmMGCIUyrm9LwquSfbkdI7T6wne2TDA0g9Lh87RqiE7dDqXkxw==';
+const RECORD_SIGNATURE = 'H05pwBvXjnvy/xFnBRG804fuqBl7d5n7CiXyYzy03CsRf3mrZ0mkDAUCMYKc5Md0ROUgtq1V/ZDhZ44Jyfttnw==';
 
 const YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 

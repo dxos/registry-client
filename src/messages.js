@@ -2,6 +2,8 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import assert from 'assert';
+
 import { Util } from './util';
 
 /**
@@ -16,9 +18,9 @@ export class MsgSend {
    * @param {object[]} amount
    */
   constructor(fromAddress, toAddress, amount) {
-    console.assert(fromAddress);
-    console.assert(toAddress);
-    console.assert(amount && amount.length);
+    assert(fromAddress);
+    assert(toAddress);
+    assert(amount && amount.length);
 
     this._fromAddress = fromAddress;
     this._toAddress = toAddress;
@@ -51,8 +53,8 @@ export class MsgCreateBond {
    * @param {object[]} amount
    */
   constructor(owner, amount) {
-    console.assert(owner);
-    console.assert(amount);
+    assert(owner);
+    assert(amount);
 
     this._owner = owner;
     this._amount = amount;
@@ -84,9 +86,9 @@ export class MsgRefillBond {
    * @param {object[]} amount
    */
   constructor(id, owner, amount) {
-    console.assert(id);
-    console.assert(owner);
-    console.assert(amount);
+    assert(id);
+    assert(owner);
+    assert(amount);
 
     this._id = id;
     this._owner = owner;
@@ -120,9 +122,9 @@ export class MsgWithdrawBond {
    * @param {object[]} amount
    */
   constructor(id, owner, amount) {
-    console.assert(id);
-    console.assert(owner);
-    console.assert(amount);
+    assert(id);
+    assert(owner);
+    assert(amount);
 
     this._id = id;
     this._owner = owner;
@@ -155,8 +157,8 @@ export class MsgCancelBond {
    * @param {string} owner
    */
   constructor(id, owner) {
-    console.assert(id);
-    console.assert(owner);
+    assert(id);
+    assert(owner);
 
     this._id = id;
     this._owner = owner;
@@ -188,9 +190,9 @@ export class MsgAssociateBond {
    * @param {string} owner
    */
   constructor(id, bondId, owner) {
-    console.assert(id);
-    console.assert(bondId);
-    console.assert(owner);
+    assert(id);
+    assert(bondId);
+    assert(owner);
 
     this._id = id;
     this._bondId = bondId;
@@ -223,8 +225,8 @@ export class MsgDissociateBond {
    * @param {string} owner
    */
   constructor(id, owner) {
-    console.assert(id);
-    console.assert(owner);
+    assert(id);
+    assert(owner);
 
     this._id = id;
     this._owner = owner;
@@ -255,8 +257,8 @@ export class MsgDissociateRecords {
    * @param {string} owner
    */
   constructor(bondId, owner) {
-    console.assert(bondId);
-    console.assert(owner);
+    assert(bondId);
+    assert(owner);
 
     this._bondId = bondId;
     this._owner = owner;
@@ -288,9 +290,9 @@ export class MsgReassociateRecords {
    * @param {string} owner
    */
   constructor(oldBondId, newBondId, owner) {
-    console.assert(oldBondId);
-    console.assert(newBondId);
-    console.assert(owner);
+    assert(oldBondId);
+    assert(newBondId);
+    assert(owner);
 
     this._oldBondId = oldBondId;
     this._newBondId = newBondId;
@@ -306,6 +308,109 @@ export class MsgReassociateRecords {
       'value': {
         'oldBondId': this._oldBondId,
         'newBondId': this._newBondId,
+        'signer': this._owner
+      }
+    });
+  }
+}
+
+/**
+ * Reserve authority message.
+ */
+export class MsgReserveAuthority {
+
+  /**
+   * @constructor
+   * @param {string} name
+   * @param {string} signer
+   * @param {string} owner
+   */
+  constructor(name, signer, owner = '') {
+    assert(name);
+    assert(signer);
+
+    this._name = name;
+    this._signer = signer;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/ReserveAuthority',
+      'value': {
+        'name': this._name,
+        'signer': this._signer,
+        'owner': this._owner
+      }
+    });
+  }
+}
+
+/**
+ * Set name message.
+ */
+export class MsgSetName {
+
+  /**
+   * @constructor
+   * @param {string} wrn
+   * @param {string} id
+   * @param {string} owner
+   */
+  constructor(wrn, id, owner) {
+    assert(wrn);
+    assert(id);
+    assert(owner);
+
+    this._wrn = wrn;
+    this._id = id;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/SetName',
+      'value': {
+        'wrn': this._wrn,
+        'id': this._id,
+        'signer': this._owner
+      }
+    });
+  }
+}
+
+/**
+ * Delete name message.
+ */
+export class MsgDeleteName {
+
+  /**
+   * @constructor
+   * @param {string} wrn
+   * @param {string} owner
+   */
+  constructor(wrn, owner) {
+    assert(wrn);
+    assert(owner);
+
+    this._wrn = wrn;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/DeleteName',
+      'value': {
+        'wrn': this._wrn,
         'signer': this._owner
       }
     });

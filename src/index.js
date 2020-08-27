@@ -23,12 +23,30 @@ import {
   MsgAssociateBond,
   MsgDissociateBond,
   MsgDissociateRecords,
-  MsgReassociateRecords
+  MsgReassociateRecords,
+  MsgReserveAuthority,
+  MsgSetName,
+  MsgDeleteName
 } from './messages';
 
 export const DEFAULT_CHAIN_ID = 'wireline';
 
 const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
+
+// Parse Tx response from cosmos-sdk.
+export const parseTxResponse = result => {
+  const { hash, height, deliver_tx: txResponse = {} } = result;
+  txResponse.data = txResponse.data && Buffer.from(txResponse.data, 'base64').toString('utf8');
+  txResponse.log = JSON.parse(txResponse.log);
+  txResponse.events.forEach(event => {
+    event.attributes = event.attributes.map(({ key, value }) => ({
+      key: Buffer.from(key, 'base64').toString('utf8'),
+      value: Buffer.from(value, 'base64').toString('utf8')
+    }));
+  });
+
+  return { hash, height, ...txResponse };
+};
 
 /**
  * Wireline registry SDK.
@@ -36,10 +54,29 @@ const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
 export class Registry {
 
   static processWriteError(error) {
-    let message = (error.message || DEFAULT_WRITE_ERROR).replace(/(\\)+/g, '');
-    const wnsMessage = /"message":"(.*?)"/g.exec(message);
-    message = wnsMessage && wnsMessage[1] ? wnsMessage[1] : message;
-    return message;
+    /**
+      Example error objects:
+
+      {
+        message: '{"code":4,"log":"[{\\"msg_index\\":0,\\"success\\":false,\\"log\\":
+          \\"{\\\\\\"codespace\\\\\\":\\\\\\"sdk\\\\\\",\\\\\\"code\\\\\\":4,\\\\\\"message\\\\\\":\\\\\\"Name record already exists.\\\\\\"}\\"}]",
+          "gasWanted":"200000","gasUsed":"30203","events":[{"type":"message","attributes":[{"key":"YWN0aW9u","value":"c2V0"}]}],"codespace":"sdk"}',
+        path: [ 'submit' ]
+      }
+
+      OR
+
+      {
+        message: '{"code":12,"log":"{\\"codespace\\":\\"sdk\\",\\"code\\":12,\\"message\\":
+          \\"out of gas in location: txSize; gasWanted: 200, gasUsed: 6770\\"}","gasWanted":"200","gasUsed":"6770","events":[]}',
+        path: [ 'submit' ]
+      }
+    */
+    const message = JSON.parse(error.message);
+    let log = JSON.parse(message.log);
+    log = (Array.isArray(log)) ? JSON.parse(log[0].log) : log;
+
+    return log.message || DEFAULT_WRITE_ERROR;
   }
 
   /**
@@ -114,19 +151,20 @@ export class Registry {
   /**
    * Get records by attributes.
    * @param {object} attributes
+   * @param {boolean} all
    * @param {boolean} refs
    */
-  async queryRecords(attributes, refs = false) {
-    return this._client.queryRecords(attributes, refs);
+  async queryRecords(attributes, all = false, refs = false) {
+    return this._client.queryRecords(attributes, all, refs);
   }
 
   /**
-   * Resolve records by refs.
-   * @param {array} references
+   * Resolve names to records.
+   * @param {array} names
    * @param {boolean} refs
    */
-  async resolveRecords(references, refs = false) {
-    return this._client.resolveRecords(references, refs);
+  async resolveNames(names, refs = false) {
+    return this._client.resolveNames(names, refs);
   }
 
   /**
@@ -135,30 +173,23 @@ export class Registry {
    * @param {object} record
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    * @param {string} bondId
+   * @param {object} fee
    */
-  async setRecord(privateKey, record, transactionPrivateKey, bondId) {
+  async setRecord(privateKey, record, transactionPrivateKey, bondId, fee) {
     let result;
+
     try {
       if (process.env.MOCK_SERVER) {
         result = await this._client.insertRecord(record, bondId);
       } else {
-        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey, bondId);
+        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
       }
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
-  }
 
-  /**
-   * Delete record.
-   * @param {string} privateKey - private key in HEX to sign message.
-   * @param {object} record
-   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
-   */
-  async deleteRecord(privateKey, record, transactionPrivateKey) {
-    return this._submitRecordTx(privateKey, record, 'nameservice/DeleteRecord', transactionPrivateKey);
+    return parseTxResponse(result);
   }
 
   /**
@@ -166,18 +197,21 @@ export class Registry {
    * @param {object[]} amount
    * @param {string} toAddress
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async sendCoins(amount, toAddress, privateKey) {
+  async sendCoins(amount, toAddress, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey);
+      result = await this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
@@ -223,18 +257,21 @@ export class Registry {
    * Create bond.
    * @param {object[]} amount
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async createBond(amount, privateKey) {
+  async createBond(amount, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgCreateBond(fromAddress, amount), privateKey);
+      result = await this._submitTx(new MsgCreateBond(fromAddress, amount), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
@@ -242,18 +279,21 @@ export class Registry {
    * @param {string} id
    * @param {object[]} amount
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async refillBond(id, amount, privateKey) {
+  async refillBond(id, amount, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgRefillBond(id, fromAddress, amount), privateKey);
+      result = await this._submitTx(new MsgRefillBond(id, fromAddress, amount), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
@@ -261,36 +301,42 @@ export class Registry {
    * @param {string} id
    * @param {object[]} amount
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async withdrawBond(id, amount, privateKey) {
+  async withdrawBond(id, amount, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgWithdrawBond(id, fromAddress, amount), privateKey);
+      result = await this._submitTx(new MsgWithdrawBond(id, fromAddress, amount), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
    * Cancel bond.
    * @param {string} id
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async cancelBond(id, privateKey) {
+  async cancelBond(id, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgCancelBond(id, fromAddress), privateKey);
+      result = await this._submitTx(new MsgCancelBond(id, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
@@ -298,54 +344,63 @@ export class Registry {
    * @param {string} id
    * @param {string} bondId
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async associateBond(id, bondId, privateKey) {
+  async associateBond(id, bondId, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgAssociateBond(id, bondId, fromAddress), privateKey);
+      result = await this._submitTx(new MsgAssociateBond(id, bondId, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
    * Dissociate record from bond.
    * @param {string} id
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async dissociateBond(id, privateKey) {
+  async dissociateBond(id, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgDissociateBond(id, fromAddress), privateKey);
+      result = await this._submitTx(new MsgDissociateBond(id, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
    * Dissociate all records from bond.
    * @param {string} bondId
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async dissociateRecords(bondId, privateKey) {
+  async dissociateRecords(bondId, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgDissociateRecords(bondId, fromAddress), privateKey);
+      result = await this._submitTx(new MsgDissociateRecords(bondId, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
   }
 
   /**
@@ -353,18 +408,103 @@ export class Registry {
    * @param {string} oldBondId
    * @param {string} newBondId
    * @param {string} privateKey
+   * @param {object} fee
    */
-  async reassociateRecords(oldBondId, newBondId, privateKey) {
+  async reassociateRecords(oldBondId, newBondId, privateKey, fee) {
     let result;
+
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgReassociateRecords(oldBondId, newBondId, fromAddress), privateKey);
+      result = await this._submitTx(new MsgReassociateRecords(oldBondId, newBondId, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
-    return result;
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Reserve authority.
+   * @param {string} name
+   * @param {string} privateKey
+   * @param {object} fee
+   * @param {string} owner
+   */
+  async reserveAuthority(name, privateKey, fee, owner = '') {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgReserveAuthority(name, fromAddress, owner), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Lookup authorities by names.
+   * @param {array} names
+   */
+  async lookupAuthorities(names) {
+    return this._client.lookupAuthorities(names);
+  }
+
+  /**
+   * Set name (WRN) to record ID (CID).
+   * @param {string} wrn
+   * @param {string} id
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async setName(wrn, id, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgSetName(wrn, id, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Lookup naming information.
+   * @param {array} names
+   * @param {boolean} history
+   */
+  async lookupNames(names, history = false) {
+    return this._client.lookupNames(names, history);
+  }
+
+  /**
+   * Delete name (WRN) mapping.
+   * @param {string} wrn
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async deleteName(wrn, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgDeleteName(wrn, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
   }
 
   /**
@@ -374,8 +514,9 @@ export class Registry {
    * @param {string} operation
    * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
    * @param {string} bondId
+   * @param {object} fee
    */
-  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey, bondId) {
+  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey, bondId, fee) {
     if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
       throw new Error('Registry privateKey should be a hex string.');
     }
@@ -409,19 +550,21 @@ export class Registry {
 
     // 3. Generate transaction.
     const { number, sequence } = signingAccountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID);
+    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID, fee);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // 4. Send transaction.
-    return this._client.submit(tx);
+    const { submit: response } = await this._client.submit(tx);
+    return JSON.parse(response);
   }
 
   /**
    * Submit a generic Tx to the chain.
    * @param {object} message
    * @param {string} privateKey - private key in HEX to sign transaction.
+   * @param {object} fee
    */
-  async _submitTx(message, privateKey) {
+  async _submitTx(message, privateKey, fee) {
     // Check private key.
     if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
       throw new Error('Registry privateKey should be a hex string.');
@@ -436,11 +579,12 @@ export class Registry {
 
     // Generate signed Tx.
     const { number, sequence } = accountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID);
+    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID, fee);
     const tx = btoa(JSON.stringify(transaction, null, 2));
 
     // Submit Tx to chain.
-    return this._client.submit(tx);
+    const { submit: response } = await this._client.submit(tx);
+    return JSON.parse(response);
   }
 }
 
