@@ -1945,10 +1945,10 @@
     "@webassemblyjs/wast-parser" "1.8.5"
     "@xtuc/long" "4.2.2"
 
-"@wirelineio/wns-schema@^1.0.0-moon.0":
-  version "1.0.0-moon.0"
-  resolved "https://registry.yarnpkg.com/@wirelineio/wns-schema/-/wns-schema-1.0.0-moon.0.tgz#fd311128a74abae2efb26dc8b28816999a6d1ed3"
-  integrity sha512-DwAkLvjWCXWyD4OsCrpzUP1ogX86b0C8v5Ikldm5Enovirqdx/oLhnCS01acPelH2HaKW0uDilcMKYMXyx/Rnw==
+"@wirelineio/wns-schema@^0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@wirelineio/wns-schema/-/wns-schema-0.3.1.tgz#9cc2beedeb231a876ce49b74a51a49b05f975fa8"
+  integrity sha512-L9nHCuJaobVttWXBuom9OMl4umkyWJM4vC/mJvb7vs8xSruhjQqM6yig03E87jUuJnLsSxfGG6LEoDlaU2mWUw==
   dependencies:
     jest "^26.0.1"
 
