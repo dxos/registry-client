@@ -39,7 +39,8 @@ describe('Querying', () => {
 
     const publishNewBotVersion = async () => {
       bot = await ensureUpdatedConfig(BOT_YML_PATH);
-      await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
+      const result = await registry.setRecord(privateKey, bot.record, privateKey, bondId, fee);
+      bot.id = result.data;
       return bot.record.version;
     };
 
