@@ -448,11 +448,20 @@ export class Registry {
   }
 
   /**
+   * Get records by ids.
+   * @param {array} ids
+   */
+  async getAuctionsByIds(ids) {
+    return this._client.getAuctionsByIds(ids);
+  }
+
+  /**
    * Lookup authorities by names.
    * @param {array} names
+   * @param {boolean} auction - fetch auction information
    */
-  async lookupAuthorities(names) {
-    return this._client.lookupAuthorities(names);
+  async lookupAuthorities(names, auction) {
+    return this._client.lookupAuthorities(names, auction);
   }
 
   /**
