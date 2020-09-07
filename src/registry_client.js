@@ -43,6 +43,55 @@ const historyFields = `
   }
 `;
 
+const auctionFields = `
+  id
+  status
+  ownerAddress
+  createTime
+  commitsEndTime
+  revealsEndTime
+  commitFee {
+    type
+    quantity
+  }
+  revealFee {
+    type
+    quantity
+  }
+  minimumBid {
+    type
+    quantity
+  }
+  winnerAddress
+  winnerBid {
+    type
+    quantity
+  }
+  winnerPrice {
+    type
+    quantity
+  }
+  bids {
+    bidderAddress
+    status
+    commitHash
+    commitTime
+    revealTime
+    commitFee {
+      type
+      quantity
+    }
+    revealFee {
+      type
+      quantity
+    }
+    bidAmount {
+      type
+      quantity
+    }
+  }
+`;
+
 /**
  * Registry
  */
@@ -271,8 +320,9 @@ export class RegistryClient {
   /**
    * Lookup authorities by names.
    * @param {array} names
+   * @param {boolean} auction
    */
-  async lookupAuthorities(names) {
+  async lookupAuthorities(names, auction = false) {
     assert(names.length);
 
     const query = `query ($names: [String!]) {
@@ -284,6 +334,10 @@ export class RegistryClient {
           ownerAddress
           ownerPublicKey
           height
+          status
+          bondId
+          expiryTime
+          ${auction ? ('auction { ' + auctionFields + ' }') : ''}
         }
       }
     }`;
@@ -295,6 +349,27 @@ export class RegistryClient {
     const result = await this._graph(query)(variables);
 
     return result['lookupAuthorities'];
+  }
+
+  /**
+   * Get auctions by ids.
+   * @param {array} ids
+   */
+  async getAuctionsByIds(ids) {
+    assert(ids);
+    assert(ids.length);
+
+    const query = `query ($ids: [String!]) {
+      getAuctionsByIds(ids: $ids) {
+        ${auctionFields}
+      }
+    }`;
+
+    const variables = {
+      ids
+    };
+
+    return RegistryClient.getResult(this._graph(query)(variables), 'getAuctionsByIds');
   }
 
   /**
