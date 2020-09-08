@@ -416,3 +416,39 @@ export class MsgDeleteName {
     });
   }
 }
+
+/**
+ * Set authority bond.
+ */
+export class MsgSetAuthorityBond {
+
+  /**
+   * @constructor
+   * @param {string} name
+   * @param {string} bondId
+   * @param {string} owner
+   */
+  constructor(name, bondId, owner) {
+    assert(name);
+    assert(bondId);
+    assert(owner);
+
+    this._name = name;
+    this._bondId = bondId;
+    this._owner = owner;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'nameservice/SetAuthorityBond',
+      'value': {
+        'name': this._name,
+        'bondId': this._bondId,
+        'signer': this._owner
+      }
+    });
+  }
+}

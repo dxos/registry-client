@@ -26,7 +26,8 @@ import {
   MsgReassociateRecords,
   MsgReserveAuthority,
   MsgSetName,
-  MsgDeleteName
+  MsgDeleteName,
+  MsgSetAuthorityBond
 } from './messages';
 
 export const DEFAULT_CHAIN_ID = 'wireline';
@@ -439,6 +440,28 @@ export class Registry {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgReserveAuthority(name, fromAddress, owner), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Set authority bond.
+   * @param {string} name
+   * @param {string} bondId
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async setAuthorityBond(name, bondId, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgSetAuthorityBond(name, bondId, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
