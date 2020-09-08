@@ -27,7 +27,9 @@ import {
   MsgReserveAuthority,
   MsgSetName,
   MsgDeleteName,
-  MsgSetAuthorityBond
+  MsgSetAuthorityBond,
+  MsgCommitBid,
+  MsgRevealBid
 } from './messages';
 
 export const DEFAULT_CHAIN_ID = 'wireline';
@@ -462,6 +464,50 @@ export class Registry {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgSetAuthorityBond(name, bondId, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Commit auction bid.
+   * @param {string} auctionId
+   * @param {string} commitHash
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async commitBid(auctionId, commitHash, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgCommitBid(auctionId, commitHash, fromAddress), privateKey, fee);
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Reveal auction bid.
+   * @param {string} auctionId
+   * @param {string} reveal
+   * @param {string} privateKey
+   * @param {object} fee
+   */
+  async revealBid(auctionId, reveal, privateKey, fee) {
+    let result;
+
+    try {
+      const account = new Account(Buffer.from(privateKey, 'hex'));
+      const fromAddress = account.formattedCosmosAddress;
+      result = await this._submitTx(new MsgRevealBid(auctionId, reveal, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
