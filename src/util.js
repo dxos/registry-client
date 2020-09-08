@@ -2,9 +2,7 @@
 // Copyright 2019 Wireline, Inc.
 //
 
-import canonicalStringify from 'canonical-json';
-import multihashing from 'multihashing-async';
-import CID from 'cids';
+import dagCBOR from 'ipld-dag-cbor';
 
 if (typeof btoa === 'undefined') {
   global.btoa = (str) => Buffer.from(str, 'binary').toString('base64');
@@ -98,8 +96,9 @@ export class Util {
    * @returns {string}
    */
   static async getContentId(record) {
-    const content = Buffer.from(canonicalStringify(record));
-    const hash = await multihashing(content, 'sha2-256');
-    return new CID(hash).toString();
+    const content = dagCBOR.util.serialize(record);
+    const cid = await dagCBOR.util.cid(content);
+
+    return cid.toString();
   }
 }

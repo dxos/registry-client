@@ -452,3 +452,75 @@ export class MsgSetAuthorityBond {
     });
   }
 }
+
+/**
+ * Commit auction bid.
+ */
+export class MsgCommitBid {
+
+  /**
+   * @constructor
+   * @param {string} auctionId
+   * @param {string} commitHash
+   * @param {string} bidder
+   */
+  constructor(auctionId, commitHash, bidder) {
+    assert(auctionId);
+    assert(commitHash);
+    assert(bidder);
+
+    this._auctionId = auctionId;
+    this._commitHash = commitHash;
+    this._bidder = bidder;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'auction/CommitBid',
+      'value': {
+        'auctionId': this._auctionId,
+        'commit': this._commitHash,
+        'signer': this._bidder
+      }
+    });
+  }
+}
+
+/**
+ * Reveal auction bid.
+ */
+export class MsgRevealBid {
+
+  /**
+   * @constructor
+   * @param {string} auctionId
+   * @param {string} reveal
+   * @param {string} bidder
+   */
+  constructor(auctionId, reveal, bidder) {
+    assert(auctionId);
+    assert(reveal);
+    assert(bidder);
+
+    this._auctionId = auctionId;
+    this._reveal = reveal;
+    this._bidder = bidder;
+  }
+
+  /**
+   * Serialize Message.
+   */
+  serialize() {
+    return Util.sortJSON({
+      'type': 'auction/RevealBid',
+      'value': {
+        'auctionId': this._auctionId,
+        'reveal': this._reveal,
+        'signer': this._bidder
+      }
+    });
+  }
+}
