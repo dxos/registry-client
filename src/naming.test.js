@@ -71,7 +71,7 @@ const namingTests = () => {
   });
 
   test('Reserve already reserved authority', async () => {
-    await expect(registry.reserveAuthority(authorityName, privateKey, fee)).rejects.toThrow('Name already exists.');
+    await expect(registry.reserveAuthority(authorityName, privateKey, fee)).rejects.toThrow('Name already reserved.');
   });
 
   test('Reserve sub-authority.', async () => {
@@ -116,6 +116,15 @@ const namingTests = () => {
     expect(record.ownerAddress).toBe(otherAccount1.getCosmosAddress());
     expect(record.ownerPublicKey).toBeDefined();
     expect(record.height).toBeDefined();
+  });
+
+  test('Set name for unbonded authority', async () => {
+    wrn = `wrn://${authorityName}/app/test`;
+    await expect(registry.setName(wrn, botId, privateKey, fee)).rejects.toThrow('Authority bond not found.');
+  });
+
+  test('Set authority bond', async () => {
+    await registry.setAuthorityBond(authorityName, bondId, privateKey, fee);
   });
 
   test('Set name', async () => {
@@ -274,6 +283,9 @@ const namingTests = () => {
   });
 
   test('Delete name for non-owned authority.', async () => {
+    const otherBondId = await registry.getNextBondId(otherPrivateKey);
+    await registry.createBond([{ denom: 'uwire', amount: '10000' }], otherPrivateKey, fee);
+    await registry.setAuthorityBond(otherAuthorityName, otherBondId, otherPrivateKey, fee);
     await registry.setName(`wrn://${otherAuthorityName}/app/test`, botId, otherPrivateKey, fee);
 
     // Try deleting name under other authority.
