@@ -52,6 +52,37 @@ export const parseTxResponse = result => {
 };
 
 /**
+ * Create an auction bid.
+ * @param {string} chainId
+ * @param {string} auctionId
+ * @param {string} bidderAddress
+ * @param {string} bidAmount
+ * @param {string} noise
+ */
+export const createBid = async (chainId, auctionId, bidderAddress, bidAmount, noise = null) => {
+  if (!noise) {
+    noise = Account.generateMnemonic();
+  }
+
+  const reveal = {
+    chainId,
+    auctionId,
+    bidderAddress,
+    bidAmount,
+    noise
+  };
+
+  const commitHash = await Util.getContentId(reveal);
+  const revealString = Buffer.from(JSON.stringify(reveal)).toString('hex');
+
+  return {
+    commitHash,
+    reveal,
+    revealString
+  };
+};
+
+/**
  * Wireline registry SDK.
  */
 export class Registry {

@@ -293,7 +293,7 @@ const namingTests = () => {
   });
 };
 
-if (mockServer) {
+if (mockServer || process.env.WIRE_AUCTIONS_ENABLED) {
   // Required as jest complains if file has no tests.
   test('skipping naming tests', () => {});
 } else {
