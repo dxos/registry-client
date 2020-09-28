@@ -193,6 +193,28 @@ export class Registry {
   }
 
   /**
+   * Publish record.
+   * @param {function} walletSigner - async callback to sign message.
+   * @param {object} record
+   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   * @param {string} bondId
+   * @param {object} fee
+   */
+  async setRecordWallet(walletSigner, record, transactionPrivateKey, bondId, fee) {
+    let result;
+
+    try {     
+        result = await this._submitRecordTxWallet(walletSigner, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
+    } catch (err) {
+      console.log(`Error: ${JSON.stringify(err)}`);
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
    * Send coins.
    * @param {object[]} amount
    * @param {string} toAddress
@@ -555,6 +577,57 @@ export class Registry {
 
     // 4. Send transaction.
     const { submit: response } = await this._client.submit(tx);
+    return JSON.parse(response);
+  }
+
+/**
+   * Submit record transaction.
+   * @param {function} walletSigner - async callback to sign message
+   * @param {object} record
+   * @param {string} operation
+   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   * @param {string} bondId
+   * @param {object} fee
+   */
+  async _submitRecordTxWallet(walletSigner, record, operation, transactionPrivateKey, bondId, fee) {
+
+    if (!bondId || !bondId.match(/^[0-9a-fA-F]{64}$/)) {
+      throw new Error(`Invalid bondId: ${bondId}.`);
+    }
+
+    const accountAddress = walletSigner.getAddress();
+    console.log(`accountAddress: ${accountAddress}`);
+
+    /* eslint-disable max-len */
+    const signingAccountDetails = await this.getAccounts([accountAddress]);
+    if (!signingAccountDetails.length) {
+      throw new Error('Can not sign the transaction - account does not exist.');
+    }
+
+    console.log(`signingAccountDetails: ${JSON.stringify(signingAccountDetails)}`);
+
+    // 2. Generate message.
+    const registryRecord = new Record(record, undefined); // The account parameter doesn't seem to be used
+    const payload = await TxBuilder.generatePayloadWallet(registryRecord, walletSigner);
+    const message = new Msg(operation, {
+      'bondId': bondId,
+      'payload': payload.serialize(),
+      'signer': accountAddress
+    });
+
+    console.log('This far 1');
+
+    // 3. Generate transaction.
+    const { number, sequence } = signingAccountDetails[0];
+    const transaction = await TxBuilder.createTransactionWallet(message, walletSigner, number.toString(), sequence.toString(), this._chainID, fee);
+    console.log(`Transaction for submit: ${JSON.stringify(transaction)}`);
+    const tx = btoa(JSON.stringify(transaction, null, 2));
+
+    console.log('This far 3');
+    // 4. Send transaction.
+    console.log(`Submitting: ${JSON.stringify(tx)}`);
+    const { submit: response } = await this._client.submit(tx);
+    console.log(`Response: ${response}`);
     return JSON.parse(response);
   }
 

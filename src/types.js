@@ -133,9 +133,9 @@ export class Transaction {
    * @param {string} signature
    * @param {string} chainID
    */
-  constructor(message, account, fee, signature, chainID) {
+  constructor(message, publicKey, fee, signature, chainID) {
     this._message = message;
-    this._account = account;
+    this._publicKey = publicKey;
     this._fee = fee;
     this._signature = signature;
     this._chainID = chainID;
@@ -155,7 +155,7 @@ export class Transaction {
           {
             'pub_key': {
               'type': 'tendermint/PubKeySecp256k1',
-              'value': this._account.publicKey.toString('base64')
+              'value': this._publicKey
             },
             'signature': this._signature.toString('base64')
           }
