@@ -203,8 +203,8 @@ export class Registry {
   async setRecordWallet(walletSigner, record, transactionPrivateKey, bondId, fee) {
     let result;
 
-    try {     
-        result = await this._submitRecordTxWallet(walletSigner, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
+    try {
+      result = await this._submitRecordTxWallet(walletSigner, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
     } catch (err) {
       console.log(`Error: ${JSON.stringify(err)}`);
       const error = err[0] || err;
@@ -227,8 +227,35 @@ export class Registry {
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
+      console.log('sendCoins submits fromAddress', fromAddress)
       result = await this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey, fee);
     } catch (err) {
+      console.error('error in sendcoins,', err);
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Send coins.
+   * @param {object[]} amount
+   * @param {string} toAddress
+   * @param {object} walletSigner
+   * @param {object} fee
+   */
+  async sendCoinsWallet(amount, toAddress, walletSigner, fee) {
+    let result;
+
+    try {
+      // const account = new Account(Buffer.from(privateKey, 'hex'));
+      // const fromAddress = account.formattedCosmosAddress;
+      const fromAddress = walletSigner.getAddress();
+      console.log('sendCoinsWallet submits fromAddress', fromAddress);
+      result = await this._submitTxWallet(new MsgSend(fromAddress, toAddress, amount), walletSigner, fee);
+    } catch (err) {
+      console.error('error in sendCoinsWallet,', err);
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
@@ -580,7 +607,7 @@ export class Registry {
     return JSON.parse(response);
   }
 
-/**
+  /**
    * Submit record transaction.
    * @param {function} walletSigner - async callback to sign message
    * @param {object} record
@@ -652,10 +679,51 @@ export class Registry {
 
     // Generate signed Tx.
     const { number, sequence } = accountDetails[0];
+    console.log('number', number)
+    console.log('sequence', sequence)
+    console.log('this._chainID', this._chainID)
     const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID, fee);
     const tx = btoa(JSON.stringify(transaction, null, 2));
+    console.log('transaction', transaction)
+    console.log('tx', tx)
 
     // Submit Tx to chain.
+    const { submit: response } = await this._client.submit(tx);
+    return JSON.parse(response);
+  }
+
+  /**
+   * Submit a generic Tx to the chain.
+   * @param {object} message
+   * @param {object} walletSigner
+   * @param {object} fee
+   */
+  async _submitTxWallet(message, walletSigner, fee) {
+    console.log('message', message)
+
+    const accountAddress = walletSigner.getAddress();
+    console.log(`accountAddress: ${accountAddress}`);
+
+    /* eslint-disable max-len */
+    const signingAccountDetails = await this.getAccounts([accountAddress]);
+    if (!signingAccountDetails.length) {
+      throw new Error('Can not sign the transaction - account does not exist.');
+    }
+
+    // Generate signed Tx.
+    console.log('signingAccountDetails', signingAccountDetails)
+    const { number, sequence } = signingAccountDetails[0];
+    console.log('number', number)
+    console.log('sequence', sequence)
+    console.log('this._chainID', this._chainID)
+    const transaction = await TxBuilder.createTransactionWallet(message, walletSigner, number.toString(), sequence.toString(), this._chainID, fee);
+    console.log('attempting btoa..')
+    console.log('transaction', transaction)
+    const tx = btoa(JSON.stringify(transaction, null, 2));
+    console.log('tx', tx)
+
+    // Submit Tx to chain.
+    console.log('submitting to client...')
     const { submit: response } = await this._client.submit(tx);
     return JSON.parse(response);
   }
