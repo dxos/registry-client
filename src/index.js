@@ -203,8 +203,8 @@ export class Registry {
   async setRecordWallet(walletSigner, record, transactionPrivateKey, bondId, fee) {
     let result;
 
-    try {     
-        result = await this._submitRecordTxWallet(walletSigner, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
+    try {
+      result = await this._submitRecordTxWallet(walletSigner, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
     } catch (err) {
       console.log(`Error: ${JSON.stringify(err)}`);
       const error = err[0] || err;
@@ -580,7 +580,7 @@ export class Registry {
     return JSON.parse(response);
   }
 
-/**
+  /**
    * Submit record transaction.
    * @param {function} walletSigner - async callback to sign message
    * @param {object} record
