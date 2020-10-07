@@ -33,12 +33,18 @@ export class TxBuilder {
   static async generatePayloadWallet(record, walletSigner) {
     // Registry signature.
     const { ownerAccount: account } = record;
+    console.log('generatePayloadWallet1');
     const messageToSign = record.getMessageToSign();
+    console.log('generatePayloadWallet2');
     const walletSignature = await walletSigner.sign(messageToSign);
+    console.log('generatePayloadWallet3');
     const sig = walletSignature.signature;
-    const signature = new Signature(walletSignature.publicKey.toString('base64'), sig.toString('base64'));
+    console.log('generatePayloadWallet4');
+    const signature = new Signature(walletSignature.registryPublicKey, sig.toString('base64'));
+    console.log('generatePayloadWallet5');
 
     const payload = new Payload(record, signature);
+    console.log('generatePayloadWallet6');
     return payload;
   }
 

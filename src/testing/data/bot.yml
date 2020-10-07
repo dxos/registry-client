@@ -1,6 +1,6 @@
 record:
   type: bot
   name: Chess Bot
-  version: 1.0.0
+  version: 1.0.2
   protocol:
     /: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN
