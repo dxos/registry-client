@@ -229,6 +229,28 @@ export class Registry {
       const fromAddress = account.formattedCosmosAddress;
       result = await this._submitTx(new MsgSend(fromAddress, toAddress, amount), privateKey, fee);
     } catch (err) {
+      console.error('error in sendcoins,', err);
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  /**
+   * Send coins.
+   * @param {object[]} amount
+   * @param {string} toAddress
+   * @param {object} walletSigner - async callback to sign message.
+   * @param {object} fee
+   */
+  async sendCoinsWithSigner(amount, toAddress, walletSigner, fee) {
+    let result;
+
+    try {
+      throw new Error('Not yet implemented')
+    } catch (err) {
+      console.error('error in sendCoinsWithSigner,', err);
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
     }
