@@ -47,7 +47,7 @@ export class Account {
     this._privateKey = privateKey;
 
     // 1. Generate public key.
-    this._publicKey = secp256k1.publicKeyCreate(this._privateKey);
+    this._publicKey = Buffer.from(secp256k1.publicKeyCreate(this._privateKey));
 
     // 2. Generate cosmos-sdk address.
     let publicKeySha256 = sha256(this._publicKey);

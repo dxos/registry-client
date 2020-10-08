@@ -18,8 +18,7 @@ export class TxBuilder {
     // Registry signature.
     const messageToSign = record.getMessageToSign();
     const sig = account.signRecord(messageToSign);
-    const pk = Buffer.from(account.publicKey.buffer);
-    const signature = new Signature(pk.toString('base64'), sig.toString('base64'));
+    const signature = new Signature(account.publicKey.toString('base64'), sig.toString('base64'));
 
     const payload = new Payload(record, signature);
     return payload;
