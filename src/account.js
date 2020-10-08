@@ -10,6 +10,7 @@ import bech32 from 'bech32';
 import canonicalStringify from 'canonical-json';
 import { Mnemonic, HDKey } from 'wallet.ts';
 import EthCrypto from 'eth-crypto';
+import keccak256 from 'keccak256';
 
 const AMINO_PREFIX = 'EB5AE98721';
 
@@ -53,7 +54,7 @@ export class Account {
     this._cosmosAddress = new Ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
 
     // 3. Generate cosmos-sdk formatted address.
-    const ethAddress = EthCrypto.publicKey.toAddress(this._publicKey.toString('hex'));
+    const ethAddress = EthCrypto.publicKey.toAddress(this._publicKey);
     const buffer = Buffer.from(ethAddress.substring(2), 'hex');
     const words = bech32.toWords(buffer);
     this._formattedCosmosAddress = bech32.encode('cosmos', words);
@@ -129,10 +130,11 @@ export class Account {
    * @param {object} msg
    */
   sign(msg) {
-    const messageToSignSha256 = sha256(msg);
-    const messageToSignSha256InBytes = Buffer.from(messageToSignSha256, 'hex');
-    const sigObj = secp256k1.sign(messageToSignSha256InBytes, this.privateKey);
+    const hashedData = keccak256(msg);
+    const sig = secp256k1.ecdsaSign(hashedData, this.privateKey);
+    let signature = Buffer.from(sig.signature.buffer);
+    signature = Buffer.concat([signature, Buffer.from(Uint8Array.from('1').buffer)]);
 
-    return sigObj.signature;
+    return signature;
   }
 }

@@ -145,6 +145,7 @@ export class Transaction {
    * Serialize Transaction.
    */
   serialize() {
+    const pk = Buffer.from(this._account.publicKey.buffer);
     return Util.sortJSON({
       'type': 'cosmos-sdk/StdTx',
       'value': {
@@ -154,8 +155,8 @@ export class Transaction {
         'signatures': [
           {
             'pub_key': {
-              'type': 'tendermint/PubKeySecp256k1',
-              'value': this._account.publicKey.toString('base64')
+              'type': 'ethermint/PubKeySecp256k1',
+              'value': pk.toString('base64')
             },
             'signature': this._signature.toString('base64')
           }

@@ -14,12 +14,12 @@ export class TxBuilder {
    * Generates registry message.
    * @param {object} record
    */
-  static generatePayload(record) {
+  static generatePayload(record, account) {
     // Registry signature.
-    const { ownerAccount: account } = record;
     const messageToSign = record.getMessageToSign();
     const sig = account.signRecord(messageToSign);
-    const signature = new Signature(account.registryPublicKey, sig.toString('base64'));
+    const pk = Buffer.from(account.publicKey.buffer);
+    const signature = new Signature(pk.toString('base64'), sig.toString('base64'));
 
     const payload = new Payload(record, signature);
     return payload;

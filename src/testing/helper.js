@@ -8,7 +8,7 @@ import semver from 'semver';
 // Fake bond ID used for in-mem tests.
 const FAKE_BOND_ID = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
 
-const DEFAULT_PRIVATE_KEY = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
+const DEFAULT_PRIVATE_KEY = 'af9f4edfdb17577f8d3d535ed42f682ee2def76e7cc1950f49de7c77c06310e8';
 
 export const ensureUpdatedConfig = async path => {
   const conf = await yaml.read(path);
@@ -48,7 +48,7 @@ export const provisionBondId = async (registry, privateKey, mock) => {
 export const getConfig = () => ({
   mockServer: process.env.MOCK_SERVER || false,
   wns: {
-    chainId: process.env.WIRE_WNS_CHAIN_ID || 'wireline',
+    chainId: process.env.WIRE_WNS_CHAIN_ID || 'wireline-1',
     privateKey: DEFAULT_PRIVATE_KEY,
     endpoint: process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api',
     fee: {

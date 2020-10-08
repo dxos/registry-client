@@ -92,25 +92,20 @@ export class Registry {
       Example error objects:
 
       {
-        message: '{"code":4,"log":"[{\\"msg_index\\":0,\\"success\\":false,\\"log\\":
-          \\"{\\\\\\"codespace\\\\\\":\\\\\\"sdk\\\\\\",\\\\\\"code\\\\\\":4,\\\\\\"message\\\\\\":\\\\\\"Name record already exists.\\\\\\"}\\"}]",
-          "gasWanted":"200000","gasUsed":"30203","events":[{"type":"message","attributes":[{"key":"YWN0aW9u","value":"c2V0"}]}],"codespace":"sdk"}',
+        message: '{"code":18,"data":null,"log":"invalid request: Name already reserved.: failed to execute message; message index: 0","info":"","gasWanted":"200000","gasUsed":"86717","events":[],"codespace":"sdk"}',
         path: [ 'submit' ]
       }
 
       OR
 
       {
-        message: '{"code":12,"log":"{\\"codespace\\":\\"sdk\\",\\"code\\":12,\\"message\\":
-          \\"out of gas in location: txSize; gasWanted: 200, gasUsed: 6770\\"}","gasWanted":"200","gasUsed":"6770","events":[]}',
+        message: '{"code":4,"data":null,"log":"unauthorized: Authority bond not found.: failed to execute message; message index: 0","info":"","gasWanted":"200000","gasUsed":"74988","events":[],"codespace":"sdk"}',
         path: [ 'submit' ]
       }
+
     */
     const message = JSON.parse(error.message);
-    let log = JSON.parse(message.log);
-    log = (Array.isArray(log)) ? JSON.parse(log[0].log) : log;
-
-    return log.message || DEFAULT_WRITE_ERROR;
+    return message.log || DEFAULT_WRITE_ERROR;
   }
 
   /**
@@ -650,7 +645,7 @@ export class Registry {
 
     // 2. Generate message.
     const registryRecord = new Record(record, account);
-    const payload = TxBuilder.generatePayload(registryRecord);
+    const payload = TxBuilder.generatePayload(registryRecord, account);
     const message = new Msg(operation, {
       'bondId': bondId,
       'payload': payload.serialize(),
