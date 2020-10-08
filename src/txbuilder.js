@@ -26,13 +26,13 @@ export class TxBuilder {
     return payload;
   }
 
-/**
+  /**
    * Generates registry message.
    * @param {object} record
    */
   static async generatePayloadWallet(record, walletSigner) {
     // Registry signature.
-    const { ownerAccount: account } = record;
+    const { ownerAccount: account } = record; // eslint-disable-line no-unused-vars
     console.log('generatePayloadWallet1');
     const messageToSign = record.getMessageToSign();
     console.log('generatePayloadWallet2');
@@ -58,6 +58,7 @@ export class TxBuilder {
    * @param {object} fee
    */
   static createTransaction(message, account, accountNumber, accountSequence, chainID, fee) {
+    console.log('createTransaction, chainId', chainID);
     // 1. Compose StdSignDoc.
     const stdSignDoc = {
       account_number: accountNumber,
@@ -71,6 +72,10 @@ export class TxBuilder {
     // 2. Calculate Signature.
     const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
     const transactionSig = account.sign(transactionDataToSign);
+    console.log('regular transactionSig', transactionSig);
+    console.log('regular publicKey', account.publicKey.toString('base64'));
+    console.log('regular transactionSig to string', transactionSig.toString());
+    console.log('regular transactionSig to string', transactionSig.toString('base64'));
 
     const transaction = new Transaction(message, account.publicKey.toString('base64'), fee, transactionSig, chainID);
     return transaction.serialize();
@@ -87,6 +92,7 @@ export class TxBuilder {
    */
   static async createTransactionWallet(message, walletSigner, accountNumber, accountSequence, chainID, fee) {
     // 1. Compose StdSignDoc.
+    console.log('createTransactionWallet, message', message, 'serialized message', message.serialize(), 'chainId:', chainID);
     const stdSignDoc = {
       account_number: accountNumber,
       chain_id: chainID,
@@ -101,8 +107,13 @@ export class TxBuilder {
     const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
     const transactionSig = await walletSigner.sign(transactionDataToSign);
     console.log(`transactionSig: ${JSON.stringify(transactionSig)}`);
+    console.log('wallet transactionSig', transactionSig);
+    console.log('wallet publicKey', transactionSig.publicKey);
 
-    const transaction = new Transaction(message, transactionSig.publicKey, fee, transactionSig.signature, chainID);
+    const signature = Buffer.from(transactionSig.signature, 'base64');
+    console.log('signature', signature);
+
+    const transaction = new Transaction(message, transactionSig.publicKey, fee, signature, chainID);
     console.log(`transaction: ${JSON.stringify(transaction)}`);
     return transaction.serialize();
   }
