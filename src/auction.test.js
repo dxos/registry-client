@@ -138,11 +138,11 @@ if (mockServer || !process.env.WIRE_AUCTIONS_ENABLED) {
 
     make install
     ./scripts/setup.sh --reset
-    wire wns migrate patch --to-file ~/.wire/wnsd/config/genesis.json --key 'app_state.nameservice.params.authority_auctions' --value true --type bool
-    wire wns migrate patch --to-file ~/.wire/wnsd/config/genesis.json --key 'app_state.nameservice.params.authority_rent_duration' --value '60000000000'
-    wire wns migrate patch --to-file ~/.wire/wnsd/config/genesis.json --key 'app_state.nameservice.params.authority_grace_period' --value '300000000000'
-    wire wns migrate patch --to-file ~/.wire/wnsd/config/genesis.json --key 'app_state.nameservice.params.authority_auction_commits_duration' --value '60000000000'
-    wire wns migrate patch --to-file ~/.wire/wnsd/config/genesis.json --key 'app_state.nameservice.params.authority_auction_reveals_duration' --value '60000000000'
+    wire wns migrate patch --to-file ~/.wire/dxnsd/config/genesis.json --key 'app_state.nameservice.params.authority_auction_enabled' --value true --type bool
+    wire wns migrate patch --to-file ~/.wire/dxnsd/config/genesis.json --key 'app_state.nameservice.params.authority_rent_duration' --value '60000000000'
+    wire wns migrate patch --to-file ~/.wire/dxnsd/config/genesis.json --key 'app_state.nameservice.params.authority_grace_period' --value '300000000000'
+    wire wns migrate patch --to-file ~/.wire/dxnsd/config/genesis.json --key 'app_state.nameservice.params.authority_auction_commits_duration' --value '60000000000'
+    wire wns migrate patch --to-file ~/.wire/dxnsd/config/genesis.json --key 'app_state.nameservice.params.authority_auction_reveals_duration' --value '60000000000'
     ./scripts/server.sh start --tail
 
     WIRE_AUCTIONS_ENABLED=1 yarn jest --runInBand --no-cache src/auction.test.js

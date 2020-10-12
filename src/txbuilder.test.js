@@ -25,14 +25,14 @@ describe('Transactions.', () => {
     bot = await getBaseConfig(YML_PATH);
   });
 
-  const TRANS_SIG = 'P+Jj43teIZkhCyYuOczdtBy8jZWzjGaKLiWdaxFq3mVmDS3AMJnECzt1C2czhNu8ethcw0rkPdPlLryL1z1XQQ==';
+  const TRANS_SIG = 'EgTkDRngdSjtzWvyRI40iL4ivaCtQ/9Q2gQSWrNOqa8XK9+X1Ls2Ja+7FfVh2Ja03Usmh4GAW4oB0mldGoQIdwE=';
 
   test('Generate proper transaction signature.', () => {
     const acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
 
     const record = new Record(bot.record, acc);
 
-    const payload = TxBuilder.generatePayload(record);
+    const payload = TxBuilder.generatePayload(record, acc);
     const message = new Msg('nameservice/SetRecord', {
       'Payload': payload.serialize(),
       'Signer': acc.formattedCosmosAddress.toString()

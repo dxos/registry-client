@@ -154,7 +154,7 @@ export class Transaction {
         'signatures': [
           {
             'pub_key': {
-              'type': 'tendermint/PubKeySecp256k1',
+              'type': 'ethermint/PubKeySecp256k1',
               'value': this._account.publicKey.toString('base64')
             },
             'signature': this._signature.toString('base64')

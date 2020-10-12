@@ -5,13 +5,15 @@
 import sha256 from 'js-sha256';
 import Ripemd160 from 'ripemd160';
 import secp256k1 from 'secp256k1/elliptic';
-import * as bip32 from 'bip32';
-import bip39 from 'bip39';
+import * as bip39 from 'bip39';
 import bech32 from 'bech32';
 import canonicalStringify from 'canonical-json';
+import { Mnemonic, HDKey } from 'wallet.ts';
+import EthCrypto from 'eth-crypto';
+import keccak256 from 'keccak256';
 
 const AMINO_PREFIX = 'EB5AE98721';
-const HDPATH = "m/44'/118'/0'/0/0";
+
 /**
  * Registry account.
  */
@@ -27,15 +29,14 @@ export class Account {
 
   /**
    * Generate private key from mnemonic.
-   * @param {string} mnemonic
+   * @param {string} phrase
    */
-  static generateFromMnemonic(mnemonic) {
-    const seed = bip39.mnemonicToSeed(mnemonic);
-    const wallet = bip32.fromSeed(seed);
-    const account = wallet.derivePath(HDPATH);
-    const { privateKey } = account;
+  static generateFromMnemonic(phrase) {
+    const mnemonic = Mnemonic.parse(phrase);
+    const seed = mnemonic.toSeed();
+    const masterKey = HDKey.parseMasterSeed(seed);
 
-    return new Account(privateKey);
+    return new Account(masterKey.privateKey);
   }
 
   /**
@@ -46,14 +47,15 @@ export class Account {
     this._privateKey = privateKey;
 
     // 1. Generate public key.
-    this._publicKey = secp256k1.publicKeyCreate(this._privateKey);
+    this._publicKey = Buffer.from(secp256k1.publicKeyCreate(this._privateKey));
 
     // 2. Generate cosmos-sdk address.
     let publicKeySha256 = sha256(this._publicKey);
     this._cosmosAddress = new Ripemd160().update(Buffer.from(publicKeySha256, 'hex')).digest().toString('hex');
 
     // 3. Generate cosmos-sdk formatted address.
-    const buffer = Buffer.from(this._cosmosAddress, 'hex');
+    const ethAddress = EthCrypto.publicKey.toAddress(this._publicKey);
+    const buffer = Buffer.from(ethAddress.substring(2), 'hex');
     const words = bech32.toWords(buffer);
     this._formattedCosmosAddress = bech32.encode('cosmos', words);
 
@@ -128,10 +130,11 @@ export class Account {
    * @param {object} msg
    */
   sign(msg) {
-    const messageToSignSha256 = sha256(msg);
-    const messageToSignSha256InBytes = Buffer.from(messageToSignSha256, 'hex');
-    const sigObj = secp256k1.sign(messageToSignSha256InBytes, this.privateKey);
+    const hashedData = keccak256(msg);
+    const sig = secp256k1.ecdsaSign(hashedData, this.privateKey);
+    let signature = Buffer.from(sig.signature.buffer);
+    signature = Buffer.concat([signature, Buffer.from(Uint8Array.from('1').buffer)]);
 
-    return sigObj.signature;
+    return signature;
   }
 }
