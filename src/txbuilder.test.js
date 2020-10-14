@@ -25,7 +25,7 @@ describe('Transactions.', () => {
     bot = await getBaseConfig(YML_PATH);
   });
 
-  const TRANS_SIG = 'EgTkDRngdSjtzWvyRI40iL4ivaCtQ/9Q2gQSWrNOqa8XK9+X1Ls2Ja+7FfVh2Ja03Usmh4GAW4oB0mldGoQIdwE=';
+  const TRANS_SIG = 'PGx+zlgTxzr/4s/OkoKIlIeWzkKELnSFWU+LONMirds5ffik7qkoDIolAL0bu/R6RsfW+qDG6abY9uxHRsc0hA==';
 
   test('Generate proper transaction signature.', () => {
     const acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));

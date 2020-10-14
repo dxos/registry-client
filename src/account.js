@@ -47,7 +47,7 @@ export class Account {
     this._privateKey = privateKey;
 
     // 1. Generate public key.
-    this._publicKey = Buffer.from(secp256k1.publicKeyCreate(this._privateKey));
+    this._publicKey = Buffer.from(secp256k1.publicKeyCreate(this._privateKey, false));
 
     // 2. Generate cosmos-sdk address.
     let publicKeySha256 = sha256(this._publicKey);
@@ -132,8 +132,7 @@ export class Account {
   sign(msg) {
     const hashedData = keccak256(msg);
     const sig = secp256k1.ecdsaSign(hashedData, this.privateKey);
-    let signature = Buffer.from(sig.signature.buffer);
-    signature = Buffer.concat([signature, Buffer.from(Uint8Array.from('1').buffer)]);
+    const signature = Buffer.from(sig.signature.buffer);
 
     return signature;
   }
