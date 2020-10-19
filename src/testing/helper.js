@@ -48,7 +48,7 @@ export const provisionBondId = async (registry, privateKey, mock) => {
 export const getConfig = () => ({
   mockServer: process.env.MOCK_SERVER || false,
   wns: {
-    chainId: process.env.WIRE_WNS_CHAIN_ID || 'wireline',
+    chainId: process.env.WIRE_WNS_CHAIN_ID || 'wireline-1',
     privateKey: DEFAULT_PRIVATE_KEY,
     endpoint: process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api',
     fee: {
