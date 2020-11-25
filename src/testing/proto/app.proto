@@ -1,0 +1,16 @@
+//
+// Copyright 2020 Wireline, Inc.
+//
+
+syntax = "proto3";
+
+package test;
+
+import "common.proto";
+
+message ChessApp {
+  Meta meta = 1;
+
+  // Chess variant supported by the app.
+  string variant = 2;
+}

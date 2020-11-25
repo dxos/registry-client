@@ -1,0 +1,12 @@
+//
+// Copyright 2020 Wireline, Inc.
+//
+
+syntax = "proto3";
+
+package test;
+
+message ChessMove {
+  string from = 1;
+  string to = 2;
+}

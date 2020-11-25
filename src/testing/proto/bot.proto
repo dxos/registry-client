@@ -1,0 +1,16 @@
+//
+// Copyright 2020 Wireline, Inc.
+//
+
+syntax = "proto3";
+
+package test;
+
+import "common.proto";
+
+message ChessBot {
+  Meta meta = 1;
+
+  // Name of the chess engine the bot runs.
+  string engine = 2;
+}
