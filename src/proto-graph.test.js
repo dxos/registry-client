@@ -4,6 +4,8 @@
 
 import debug from 'debug';
 import path from 'path';
+import graphviz from 'graphviz';
+import fs from 'fs';
 
 import { Registry } from './index';
 import { getConfig, ensureUpdatedConfig, provisionBondId } from './testing/helper';
@@ -13,6 +15,13 @@ import { schema } from './testing/proto/gen/index.ts';
 const PROTOCOL_YML_PATH = path.join(__dirname, './testing/data/protocol.yml');
 const APP_YML_PATH = path.join(__dirname, './testing/data/app.yml');
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
+
+const COLOR_MAP = {
+  'proto': 'red',
+  'protocol': 'orange',
+  'bot': 'blue',
+  'app': 'green'
+};
 
 const log = debug('test');
 
@@ -31,7 +40,21 @@ const encodeProtoToBase64 = (typeName, obj) => {
   return encoded.toString('base64');
 };
 
+const getGraphNodeId = (attributes) => {
+  const { type, name, version } = attributes;
+  return `${type}:${name}#${version}`;
+};
+
 describe('Protobuf support / type graph', () => {
+  const protocolPayloadType = 'wrn://dxos/type/chess-protocol';
+  const appPayloadType = 'wrn://dxos/type/chess-app';
+  const botPayloadType = 'wrn://dxos/type/chess-bot';
+
+  const appProto = { type: 'proto', name: 'ChessApp Protobuf', version: '1.0.0', ipfs: { '/': 'CID(app.proto)' } };
+  const botProto = { type: 'proto', name: 'ChessBot Protobuf', version: '1.0.0', ipfs: { '/': 'CID(bot.proto)' } };
+
+  const names = { [protocolPayloadType]: 'ipfs' };
+
   let bot;
   let app;
   let protocol;
@@ -56,11 +79,19 @@ describe('Protobuf support / type graph', () => {
     bot = await ensureUpdatedConfig(BOT_YML_PATH);
     app = await ensureUpdatedConfig(APP_YML_PATH);
     protocol = await ensureUpdatedConfig(PROTOCOL_YML_PATH);
+
+    const outDir = path.join(process.cwd(), 'out');
+    if (!fs.existsSync(outDir)) {
+      fs.mkdirSync(outDir);
+    }
   });
 
   test('Register proto files', async () => {
-    await registry.setRecord(privateKey, { type: 'proto', ipfs: { '/': 'CID(app.proto)' } }, privateKey, bondId, fee);
-    await registry.setRecord(privateKey, { type: 'proto', ipfs: { '/': 'CID(bot.proto)' } }, privateKey, bondId, fee);
+    await registry.setRecord(privateKey, appProto, privateKey, bondId, fee);
+    names[appPayloadType] = getGraphNodeId(appProto);
+
+    await registry.setRecord(privateKey, botProto, privateKey, bondId, fee);
+    names[botPayloadType] = getGraphNodeId(botProto);
   });
 
   test('Register protocol.', async () => {
@@ -68,6 +99,7 @@ describe('Protobuf support / type graph', () => {
 
     const record = {
       ...protocol.record,
+      payloadType: protocolPayloadType,
       ipfs: {
         '/': 'CID(protocol.proto)'
       }
@@ -95,7 +127,7 @@ describe('Protobuf support / type graph', () => {
     const record = {
       ...bot.record,
 
-      payloadType: 'wrn://dxos/type/chess-bot',
+      payloadType: botPayloadType,
       payload
     };
 
@@ -117,7 +149,7 @@ describe('Protobuf support / type graph', () => {
     const record = {
       ...app.record,
 
-      payloadType: 'wrn://dxos/type/chess-app',
+      payloadType: appPayloadType,
       payload
     };
 
@@ -140,10 +172,51 @@ describe('Protobuf support / type graph', () => {
     expect(bot.attributes.protocol).toEqual(protocol);
   });
 
-  afterAll(async () => {
+  test('Graph records.', async () => {
     const records = await registry.queryRecords({}, true);
+    log(JSON.stringify(names, null, 2));
     log(JSON.stringify(records, null, 2));
 
+    const recordsById = {};
+    records.forEach(record => {
+      recordsById[record.id] = record;
+    });
+
+    const g = graphviz.digraph('G');
+    g.addNode('ipfs');
+
+    /* eslint-disable no-restricted-syntax */
+    const ids = Object.keys(recordsById);
+    ids.forEach(id => {
+      const record = recordsById[id];
+      log(JSON.stringify(record));
+
+      const { type } = record.attributes;
+      const wrn = getGraphNodeId(record.attributes);
+      g.addNode(wrn, { color: COLOR_MAP[type] });
+      for (const [propName, propValue] of Object.entries(record.attributes)) {
+        if (propName !== 'ipfs' && propValue && typeof (propValue) === 'object' && propValue['/']) {
+          log(propValue);
+          const refRecord = recordsById[propValue['/']];
+          const refWrn = getGraphNodeId(refRecord.attributes);
+          g.addEdge(wrn, refWrn, { label: propName });
+        }
+
+        if (propName === 'payloadType') {
+          g.addEdge(wrn, names[propValue], { label: `payloadType => resolve(${propValue})` });
+        }
+
+        if (propName === 'ipfs') {
+          g.addEdge(wrn, 'ipfs', { label: `ipfs ${propValue['/']}` });
+        }
+      }
+    });
+
+    // `brew install graphviz` if this errors.
+    g.output('png', 'out/graph.png');
+  });
+
+  afterAll(async () => {
     if (mock) {
       await mock.mockServer.stop();
     }
