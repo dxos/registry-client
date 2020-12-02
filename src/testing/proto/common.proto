@@ -1,0 +1,12 @@
+//
+// Copyright 2020 Wireline, Inc.
+//
+
+syntax = "proto3";
+
+package test;
+
+message Meta {
+  string repository = 1;
+  string author = 2;
+}

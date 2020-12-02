@@ -1,0 +1,6 @@
+record:
+  type: app
+  name: Chess App
+  version: 1.0.0
+  protocol:
+    /: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN
