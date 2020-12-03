@@ -2,6 +2,7 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import debug from 'debug';
 import isUrl from 'is-url';
 import sha256 from 'js-sha256';
 
@@ -31,6 +32,8 @@ import {
   MsgCommitBid,
   MsgRevealBid
 } from './messages';
+
+const log = debug('registry-client');
 
 export const DEFAULT_CHAIN_ID = 'wireline';
 
@@ -647,9 +650,11 @@ export class Registry {
     // 3. Generate transaction.
     const { number, sequence } = signingAccountDetails[0];
     const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID, fee);
-    const tx = btoa(JSON.stringify(transaction, null, 2));
+    const requestJSON = JSON.stringify(transaction);
+    log(`Request: ${requestJSON}`);
 
     // 4. Send transaction.
+    const tx = btoa(requestJSON);
     const { submit: response } = await this._client.submit(tx);
     return JSON.parse(response);
   }
