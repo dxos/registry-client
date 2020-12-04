@@ -5,8 +5,8 @@
 import path from 'path';
 
 import { Account } from './account';
-import { TxBuilder } from './txbuilder';
-import { Msg, Record } from './types';
+import { createTransaction } from './txbuilder';
+import { Msg, Payload, Record } from './types';
 import { getBaseConfig } from './testing/helper';
 
 const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928bcd589dd';
@@ -32,7 +32,7 @@ describe('Transactions.', () => {
 
     const record = new Record(bot.record, acc);
 
-    const payload = TxBuilder.generatePayload(record);
+    const payload = acc.signPayload(new Payload(record));
     const message = new Msg('nameservice/SetRecord', {
       'Payload': payload.serialize(),
       'Signer': acc.formattedCosmosAddress.toString()
@@ -48,7 +48,7 @@ describe('Transactions.', () => {
       gas: '200000'
     };
 
-    const transaction = TxBuilder.createTransaction(message, acc, ACC_NUM, ACC_SEQ, CHAIN, fee);
+    const transaction = createTransaction(message, acc, ACC_NUM, ACC_SEQ, CHAIN, fee);
     expect(transaction.value.signatures[0].signature).toBe(TRANS_SIG);
   });
 });

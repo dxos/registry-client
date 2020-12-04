@@ -2,6 +2,7 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import assert from 'assert';
 import { Validator } from 'jsonschema';
 
 import RecordSchema from './schema/record.json';
@@ -14,9 +15,10 @@ export class Record {
   /**
    * New Record.
    * @param {object} record
-   * @param {object} ownerAccount
    */
-  constructor(record, ownerAccount) {
+  constructor(record) {
+    assert(record);
+
     const validator = new Validator();
     const result = validator.validate(record, RecordSchema);
     if (!result.valid) {
@@ -24,8 +26,7 @@ export class Record {
       throw new Error('Invalid record input.');
     }
 
-    this.record = record;
-    this.ownerAccount = ownerAccount;
+    this._record = record;
   }
 
   /**
@@ -33,7 +34,7 @@ export class Record {
    */
   serialize() {
     return Util.sortJSON({
-      'attributes': btoa(JSON.stringify(this.record))
+      'attributes': btoa(JSON.stringify(this._record))
     });
   }
 
@@ -41,7 +42,7 @@ export class Record {
    * Get message to calculate record signature.
    */
   getMessageToSign() {
-    return Util.sortJSON(this.record);
+    return Util.sortJSON(this._record);
   }
 }
 
@@ -49,14 +50,18 @@ export class Record {
  * Record Signature.
  */
 export class Signature {
+
   /**
    * New Signature.
    * @param {string} pubKey
    * @param {string} sig
    */
   constructor(pubKey, sig) {
-    this.pubKey = pubKey;
-    this.sig = sig;
+    assert(pubKey);
+    assert(sig);
+
+    this._pubKey = pubKey;
+    this._sig = sig;
   }
 
   /**
@@ -64,8 +69,8 @@ export class Signature {
    */
   serialize() {
     return Util.sortJSON({
-      'pubKey': this.pubKey,
-      'sig': this.sig
+      'pubKey': this._pubKey,
+      'sig': this._sig
     });
   }
 }
@@ -74,14 +79,31 @@ export class Signature {
  * Message Payload.
  */
 export class Payload {
+
   /**
    * New Payload.
    * @param {object} record
    * @param  {...any} signatures
    */
   constructor(record, ...signatures) {
-    this.record = record;
-    this.signatures = signatures;
+    assert(record);
+
+    this._record = record;
+    this._signatures = signatures;
+  }
+
+  get record() {
+    return this._record;
+  }
+
+  /**
+   * Add message signature to payload.
+   * @param {object} signature
+   */
+  addSignature(signature) {
+    assert(signature);
+
+    this._signatures.push(signature);
   }
 
   /**
@@ -89,8 +111,8 @@ export class Payload {
    */
   serialize() {
     return Util.sortJSON({
-      'record': this.record.serialize(),
-      'signatures': this.signatures.map(s => s.serialize())
+      'record': this._record.serialize(),
+      'signatures': this._signatures.map(s => s.serialize())
     });
   }
 }
@@ -106,6 +128,9 @@ export class Msg {
    * @param {object} value
    */
   constructor(operation, value) {
+    assert(operation);
+    assert(value);
+
     this._operation = operation;
     this._value = value;
   }
@@ -125,6 +150,7 @@ export class Msg {
  * Transaction.
  */
 export class Transaction {
+
   /**
    * New Transaction.
    * @param {object} message
@@ -134,6 +160,12 @@ export class Transaction {
    * @param {string} chainID
    */
   constructor(message, account, fee, signature, chainID) {
+    assert(message);
+    assert(account);
+    assert(fee);
+    assert(signature);
+    assert(chainID);
+
     this._message = message;
     this._account = account;
     this._fee = fee;

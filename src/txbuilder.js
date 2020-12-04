@@ -2,54 +2,42 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import assert from 'assert';
 import canonicalStringify from 'canonical-json';
 
-import { Signature, Payload, Transaction } from './types';
+import { Transaction } from './types';
 
 /**
- * Transaction builder.
+ * Generate a cosmos-sdk transaction.
+ * @param {object} message
+ * @param {object} account
+ * @param {string} accountNumber
+ * @param {string} accountSequence
+ * @param {string} chainID
+ * @param {object} fee
  */
-export class TxBuilder {
-  /**
-   * Generates registry message.
-   * @param {object} record
-   */
-  static generatePayload(record) {
-    // Registry signature.
-    const { ownerAccount: account } = record;
-    const messageToSign = record.getMessageToSign();
-    const sig = account.signRecord(messageToSign);
-    const signature = new Signature(account.registryPublicKey, sig.toString('base64'));
+export const createTransaction = (message, account, accountNumber, accountSequence, chainID, fee) => {
+  assert(message);
+  assert(account);
+  assert(accountNumber);
+  assert(accountSequence);
+  assert(chainID);
+  assert(fee);
 
-    const payload = new Payload(record, signature);
-    return payload;
-  }
+  // 1. Compose StdSignDoc.
+  const stdSignDoc = {
+    account_number: accountNumber,
+    chain_id: chainID,
+    fee,
+    memo: '',
+    msgs: [message.serialize()],
+    sequence: accountSequence
+  };
 
-  /**
-   * Generates transaction.
-   * @param {object} message
-   * @param {object} account
-   * @param {string} accountNumber
-   * @param {string} accountSequence
-   * @param {string} chainID
-   * @param {object} fee
-   */
-  static createTransaction(message, account, accountNumber, accountSequence, chainID, fee) {
-    // 1. Compose StdSignDoc.
-    const stdSignDoc = {
-      account_number: accountNumber,
-      chain_id: chainID,
-      fee,
-      memo: '',
-      msgs: [message.serialize()],
-      sequence: accountSequence
-    };
+  // 2. Calculate signature.
+  const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
+  const transactionSig = account.sign(transactionDataToSign);
 
-    // 2. Calculate Signature.
-    const transactionDataToSign = Buffer.from(canonicalStringify(stdSignDoc));
-    const transactionSig = account.sign(transactionDataToSign);
-
-    const transaction = new Transaction(message, account, fee, transactionSig, chainID);
-    return transaction.serialize();
-  }
-}
+  const transaction = new Transaction(message, account, fee, transactionSig, chainID);
+  return transaction.serialize();
+};

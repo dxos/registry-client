@@ -10,8 +10,8 @@ import { RegistryClient } from './registry_client';
 
 import { Account } from './account';
 import { Util } from './util';
-import { TxBuilder } from './txbuilder';
-import { Msg, Record } from './types';
+import { createTransaction } from './txbuilder';
+import { Msg, Record, Payload } from './types';
 
 import { createSchema } from './mock/schema';
 
@@ -611,11 +611,11 @@ export class Registry {
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} record
    * @param {string} operation
-   * @param {string} transactionPrivateKey - private key in HEX to sign transaction.
+   * @param {string} txPrivateKey - private key in HEX to sign transaction.
    * @param {string} bondId
    * @param {object} fee
    */
-  async _submitRecordTx(privateKey, record, operation, transactionPrivateKey, bondId, fee) {
+  async _submitRecordTx(privateKey, record, operation, txPrivateKey, bondId, fee) {
     if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
       throw new Error('Registry privateKey should be a hex string.');
     }
@@ -624,39 +624,21 @@ export class Registry {
       throw new Error(`Invalid bondId: ${bondId}.`);
     }
 
-    // 1. Get account details.
-    const account = new Account(Buffer.from(privateKey, 'hex'));
-    const accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
-    if (!accountDetails.length) {
-      throw new Error('Can not sign the message - account does not exist.');
-    }
+    // Generate signed record.
+    const recordSignerAccount = new Account(Buffer.from(privateKey, 'hex'));
+    const registryRecord = new Record(record);
+    const payload = recordSignerAccount.signPayload(new Payload(registryRecord));
 
-    const signingAccount = transactionPrivateKey ? new Account(Buffer.from(transactionPrivateKey, 'hex')) : account;
-    /* eslint-disable max-len */
-    const signingAccountDetails = transactionPrivateKey ? await this.getAccounts([signingAccount.formattedCosmosAddress]) : accountDetails;
-    if (!signingAccountDetails.length) {
-      throw new Error('Can not sign the transaction - account does not exist.');
-    }
-
-    // 2. Generate message.
-    const registryRecord = new Record(record, account);
-    const payload = TxBuilder.generatePayload(registryRecord);
+    // Generate cosmos message.
+    const txSignerAccount = txPrivateKey ? new Account(Buffer.from(txPrivateKey, 'hex')) : recordSignerAccount;
     const message = new Msg(operation, {
       'bondId': bondId,
       'payload': payload.serialize(),
-      'signer': signingAccount.formattedCosmosAddress.toString()
+      'signer': txSignerAccount.formattedCosmosAddress.toString()
     });
 
     // 3. Generate transaction.
-    const { number, sequence } = signingAccountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, signingAccount, number.toString(), sequence.toString(), this._chainID, fee);
-    const requestJSON = JSON.stringify(transaction);
-    log(`Request: ${requestJSON}`);
-
-    // 4. Send transaction.
-    const tx = btoa(requestJSON);
-    const { submit: response } = await this._client.submit(tx);
-    return JSON.parse(response);
+    return this._submitTx(message, txSignerAccount.getPrivateKey(), fee);
   }
 
   /**
@@ -673,17 +655,19 @@ export class Registry {
 
     // Check that the account exists on-chain.
     const account = new Account(Buffer.from(privateKey, 'hex'));
-    const accountDetails = await this.getAccounts([account.formattedCosmosAddress]);
-    if (!accountDetails.length) {
+    const accountInfo = await this.getAccounts([account.formattedCosmosAddress]);
+    if (!accountInfo.length) {
       throw new Error('Can not sign the transaction - account does not exist.');
     }
 
     // Generate signed Tx.
-    const { number, sequence } = accountDetails[0];
-    const transaction = TxBuilder.createTransaction(message, account, number.toString(), sequence.toString(), this._chainID, fee);
-    const tx = btoa(JSON.stringify(transaction, null, 2));
+    const [{ number, sequence }] = accountInfo;
+    const transaction = createTransaction(message, account, number.toString(), sequence.toString(), this._chainID, fee);
+    const requestJSON = JSON.stringify(transaction);
+    log(`Tx: ${requestJSON}`);
 
     // Submit Tx to chain.
+    const tx = btoa(requestJSON);
     const { submit: response } = await this._client.submit(tx);
     return JSON.parse(response);
   }

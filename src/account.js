@@ -2,6 +2,7 @@
 // Copyright 2019 Wireline, Inc.
 //
 
+import assert from 'assert';
 import sha256 from 'js-sha256';
 import Ripemd160 from 'ripemd160';
 import secp256k1 from 'secp256k1/elliptic';
@@ -10,8 +11,11 @@ import bip39 from 'bip39';
 import bech32 from 'bech32';
 import canonicalStringify from 'canonical-json';
 
+import { Signature } from './types';
+
 const AMINO_PREFIX = 'EB5AE98721';
 const HDPATH = "m/44'/118'/0'/0/0";
+
 /**
  * Registry account.
  */
@@ -30,6 +34,8 @@ export class Account {
    * @param {string} mnemonic
    */
   static generateFromMnemonic(mnemonic) {
+    assert(mnemonic);
+
     const seed = bip39.mnemonicToSeed(mnemonic);
     const wallet = bip32.fromSeed(seed);
     const account = wallet.derivePath(HDPATH);
@@ -43,6 +49,8 @@ export class Account {
    * @param {buffer} privateKey
    */
   constructor(privateKey) {
+    assert(privateKey);
+
     this._privateKey = privateKey;
 
     // 1. Generate public key.
@@ -116,6 +124,8 @@ export class Account {
    * @param {object} record
    */
   signRecord(record) {
+    assert(record);
+
     const recordAsJson = canonicalStringify(record);
     // Double sha256.
     const recordBytesToSign = Buffer.from(sha256(Buffer.from(sha256(Buffer.from(recordAsJson)), 'hex')), 'hex');
@@ -123,12 +133,27 @@ export class Account {
     return this.sign(recordBytesToSign);
   }
 
+  signPayload(payload) {
+    assert(payload);
+
+    const { record } = payload;
+    const messageToSign = record.getMessageToSign();
+
+    const sig = this.signRecord(messageToSign);
+    const signature = new Signature(this.registryPublicKey, sig.toString('base64'));
+    payload.addSignature(signature);
+
+    return payload;
+  }
+
   /**
    * Sign message.
-   * @param {object} msg
+   * @param {object} message
    */
-  sign(msg) {
-    const messageToSignSha256 = sha256(msg);
+  sign(message) {
+    assert(message);
+
+    const messageToSignSha256 = sha256(message);
     const messageToSignSha256InBytes = Buffer.from(messageToSignSha256, 'hex');
     const sigObj = secp256k1.sign(messageToSignSha256InBytes, this.privateKey);
 
