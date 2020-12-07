@@ -30,9 +30,9 @@ describe('Transactions.', () => {
   test('Generate proper transaction signature.', () => {
     const acc = new Account(Buffer.from(PRIVATE_KEY_2, 'hex'));
 
-    const record = new Record(bot.record, acc);
-
-    const payload = acc.signPayload(new Payload(record));
+    const record = new Record(bot.record);
+    const payload = new Payload(record);
+    acc.signPayload(payload);
     const message = new Msg('nameservice/SetRecord', {
       'Payload': payload.serialize(),
       'Signer': acc.formattedCosmosAddress.toString()

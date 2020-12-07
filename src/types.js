@@ -96,6 +96,10 @@ export class Payload {
     return this._record;
   }
 
+  get signatures() {
+    return this._signatures;
+  }
+
   /**
    * Add message signature to payload.
    * @param {object} signature

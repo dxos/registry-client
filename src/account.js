@@ -143,7 +143,7 @@ export class Account {
     const signature = new Signature(this.registryPublicKey, sig.toString('base64'));
     payload.addSignature(signature);
 
-    return payload;
+    return signature;
   }
 
   /**

@@ -11,7 +11,7 @@ import { RegistryClient } from './registry_client';
 import { Account } from './account';
 import { Util } from './util';
 import { createTransaction } from './txbuilder';
-import { Msg, Record, Payload } from './types';
+import { Msg, Record, Payload, Signature } from './types';
 
 import { createSchema } from './mock/schema';
 
@@ -84,6 +84,8 @@ export const createBid = async (chainId, auctionId, bidderAddress, bidAmount, no
     revealString
   };
 };
+
+export const isKeyValid = (key) => key && key.match(/^[0-9a-fA-F]{64}$/);
 
 /**
  * Wireline registry SDK.
@@ -206,7 +208,24 @@ export class Registry {
       if (process.env.MOCK_SERVER) {
         result = await this._client.insertRecord(record, bondId);
       } else {
-        result = await this._submitRecordTx(privateKey, record, 'nameservice/SetRecord', transactionPrivateKey, bondId, fee);
+        result = await this._submitRecordTx(privateKey, record, transactionPrivateKey, bondId, fee);
+      }
+    } catch (err) {
+      const error = err[0] || err;
+      throw new Error(Registry.processWriteError(error));
+    }
+
+    return parseTxResponse(result);
+  }
+
+  async publishRecordPayload(privateKey, payload, bondId, fee) {
+    let result;
+
+    try {
+      if (process.env.MOCK_SERVER) {
+        result = await this._client.insertRecord(payload.record, bondId);
+      } else {
+        result = await this._submitRecordPayloadTx(privateKey, payload, bondId, fee);
       }
     } catch (err) {
       const error = err[0] || err;
@@ -610,35 +629,48 @@ export class Registry {
    * Submit record transaction.
    * @param {string} privateKey - private key in HEX to sign message.
    * @param {object} record
-   * @param {string} operation
    * @param {string} txPrivateKey - private key in HEX to sign transaction.
    * @param {string} bondId
    * @param {object} fee
    */
-  async _submitRecordTx(privateKey, record, operation, txPrivateKey, bondId, fee) {
-    if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
+  async _submitRecordTx(privateKey, record, txPrivateKey, bondId, fee) {
+    if (!isKeyValid(privateKey)) {
       throw new Error('Registry privateKey should be a hex string.');
     }
 
-    if (!bondId || !bondId.match(/^[0-9a-fA-F]{64}$/)) {
+    if (!isKeyValid(bondId)) {
       throw new Error(`Invalid bondId: ${bondId}.`);
     }
 
-    // Generate signed record.
+    // Sign record.
     const recordSignerAccount = new Account(Buffer.from(privateKey, 'hex'));
     const registryRecord = new Record(record);
-    const payload = recordSignerAccount.signPayload(new Payload(registryRecord));
+    const payload = new Payload(registryRecord);
+    recordSignerAccount.signPayload(payload);
 
-    // Generate cosmos message.
+    // Send record payload Tx.
     const txSignerAccount = txPrivateKey ? new Account(Buffer.from(txPrivateKey, 'hex')) : recordSignerAccount;
-    const message = new Msg(operation, {
+    return this._submitRecordPayloadTx(txSignerAccount.getPrivateKey(), payload, bondId, fee);
+  }
+
+  async _submitRecordPayloadTx(privateKey, payload, bondId, fee) {
+    if (!isKeyValid(privateKey)) {
+      throw new Error('Registry privateKey should be a hex string.');
+    }
+
+    if (!isKeyValid(bondId)) {
+      throw new Error(`Invalid bondId: ${bondId}.`);
+    }
+
+    const account = new Account(Buffer.from(privateKey, 'hex'));
+    const message = new Msg('nameservice/SetRecord', {
       'bondId': bondId,
       'payload': payload.serialize(),
-      'signer': txSignerAccount.formattedCosmosAddress.toString()
+      'signer': account.formattedCosmosAddress.toString()
     });
 
     // 3. Generate transaction.
-    return this._submitTx(message, txSignerAccount.getPrivateKey(), fee);
+    return this._submitTx(message, account.getPrivateKey(), fee);
   }
 
   /**
@@ -649,7 +681,7 @@ export class Registry {
    */
   async _submitTx(message, privateKey, fee) {
     // Check private key.
-    if (!privateKey.match(/^[0-9a-fA-F]{64}$/)) {
+    if (!isKeyValid(privateKey)) {
       throw new Error('Registry privateKey should be a hex string.');
     }
 
@@ -673,4 +705,4 @@ export class Registry {
   }
 }
 
-export { Account, Util, createSchema };
+export { Account, Record, Payload, Signature, Util, createSchema };
