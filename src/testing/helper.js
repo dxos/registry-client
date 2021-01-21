@@ -1,5 +1,5 @@
 //
-// Copyright 2019 Wireline, Inc.
+// Copyright 2020 DXOS.org
 //
 
 import yaml from 'node-yaml';
@@ -48,9 +48,9 @@ export const provisionBondId = async (registry, privateKey, mock) => {
 export const getConfig = () => ({
   mockServer: process.env.MOCK_SERVER || false,
   wns: {
-    chainId: process.env.WIRE_WNS_CHAIN_ID || 'wireline',
+    chainId: process.env.DX_REGISTRY_CHAIN_ID || 'wireline',
     privateKey: DEFAULT_PRIVATE_KEY,
-    endpoint: process.env.WIRE_WNS_ENDPOINT || 'http://localhost:9473/api',
+    endpoint: process.env.DX_REGISTRY_ENDPOINT || 'http://localhost:9473/api',
     fee: {
       amount: [
         {

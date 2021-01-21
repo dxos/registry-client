@@ -1,5 +1,5 @@
 //
-// Copyright 2019 Wireline, Inc.
+// Copyright 2020 DXOS.org
 //
 
 const path = require('path');
@@ -48,7 +48,7 @@ module.exports = {
           loader: 'babel-loader',
           options: {
             presets: [
-              ['@babel/preset-env', { targets: { chrome: "60" } }]
+              ['@babel/preset-env', { targets: { chrome: '60' } }]
             ]
           }
         }

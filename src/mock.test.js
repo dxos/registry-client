@@ -1,10 +1,10 @@
 //
-// Copyright 2019 Wireline, Inc.
+// Copyright 2020 DXOS.org
 //
 
 import { DEFAULT_CHAIN_ID, Registry, createSchema } from './index';
 
-const WIRE_WNS_CHAIN_ID = process.env.WIRE_WNS_CHAIN_ID || DEFAULT_CHAIN_ID;
+const DX_REGISTRY_CHAIN_ID = process.env.DX_REGISTRY_CHAIN_ID || DEFAULT_CHAIN_ID;
 
 const data = [
   {
@@ -26,7 +26,7 @@ describe('Querying mock schema.', () => {
 
   beforeAll(async () => {
     schema = await createSchema(data);
-    registry = new Registry(undefined, WIRE_WNS_CHAIN_ID, { schema });
+    registry = new Registry(undefined, DX_REGISTRY_CHAIN_ID, { schema });
   });
 
   test('List records.', async () => {
