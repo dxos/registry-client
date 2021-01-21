@@ -1,6 +1,6 @@
 record:
   type: pad
   name: Chess Pad
-  version: 1.0.0
+  version: 1.0.1
   protocol:
     /: QmdeazkS38aCrqG6qKwaio2fQnShE6RGpmNdqStLkkZcQN

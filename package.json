@@ -1,7 +1,7 @@
 {
   "name": "@dxos/registry-client",
   "version": "1.1.0",
-  "description": "Wireline Registry JavaScript Client.",
+  "description": "DXOS Registry JavaScript Client.",
   "repository": "https://github.com/dxos/registry-client",
   "author": "",
   "license": "UNLICENSED",
@@ -15,10 +15,11 @@
   ],
   "devDependencies": {
     "@babel/cli": "^7.0.0",
+    "@babel/compat-data": "7.9.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.3.0",
     "@babel/plugin-transform-runtime": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-env": "=7.9.0",
     "@babel/preset-react": "^7.0.0",
     "apollo-server": "^2.9.3",
     "babel-eslint": "^10.0.1",
@@ -82,9 +83,9 @@
     "build:node": "NODE_ENV=production babel ./src --out-dir ./dist/es --ignore \"*.test.js\"  --copy-files",
     "build:web": "NODE_ENV=production webpack",
     "lint:staged": "lint-staged",
-    "start:memory": "BABEL_DISABLE_CACHE=1 WIRE_WNS_CHAIN_ID=memnet DEBUG=test babel-node src/mock/main.js",
+    "start:memory": "BABEL_DISABLE_CACHE=1 DX_REGISTRY_CHAIN_ID=memnet DEBUG=test babel-node src/mock/main.js",
     "test": "jest --runInBand --no-cache",
-    "test:memory": "MOCK_SERVER=1 WIRE_WNS_CHAIN_ID=memnet jest --runInBand --no-cache"
+    "test:memory": "MOCK_SERVER=1 DX_REGISTRY_CHAIN_ID=memnet jest --runInBand --no-cache"
   },
   "publishConfig": {
     "access": "public"

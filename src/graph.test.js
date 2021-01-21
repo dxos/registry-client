@@ -1,10 +1,10 @@
 //
-// Copyright 2019 Wireline, Inc.
+// Copyright 2020 DXOS.org
 //
 
 import graphviz from 'graphviz';
 
-import records from './mock/data/records';
+import records from './mock/data/records.json';
 import { Util } from './util';
 
 const COLOR_MAP = {

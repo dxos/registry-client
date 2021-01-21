@@ -1,5 +1,5 @@
 //
-// Copyright 2019 Wireline, Inc.
+// Copyright 2020 DXOS.org
 //
 
 import sha256 from 'js-sha256';

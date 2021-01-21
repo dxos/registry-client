@@ -1,5 +1,5 @@
 //
-// Copyright 2019 Wireline, Inc.
+// Copyright 2020 DXOS.org
 //
 
 import isUrl from 'is-url';
@@ -31,7 +31,7 @@ import {
 
 export const DEFAULT_CHAIN_ID = 'wireline';
 
-const DEFAULT_WRITE_ERROR = 'Unable to write to WNS.';
+const DEFAULT_WRITE_ERROR = 'Unable to write to Registry.';
 
 // Parse Tx response from cosmos-sdk.
 export const parseTxResponse = result => {
@@ -49,7 +49,7 @@ export const parseTxResponse = result => {
 };
 
 /**
- * Wireline registry SDK.
+ * DXOS registry SDK.
  */
 export class Registry {
 

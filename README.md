@@ -3,7 +3,7 @@
 ## Usage
 
 ```JavaScript
-import { Account, Registry } from '@wirelineio/registry-client';
+import { Account, Registry } from '@dxos/registry-client';
 const endpoint = 'http://localhost:9473/api';
 const registry = new Registry(endpoint);
 ```
@@ -20,7 +20,7 @@ if (!mnemonic) {
 const key = Account.generateFromMnemonic(mnemonic);
 ```
 
-### Query WNS
+### Query Registry
 
 Get accounts:
 
@@ -57,7 +57,7 @@ let owner = 'cosmos1zk8etz23phxgtse8re6tggsr3nrfk2vtsesegy';
 const result = await registry.queryBonds({ owner });
 ```
 
-### Write to WNS
+### Write to Registry
 
 Publish record:
 
@@ -67,8 +67,8 @@ let payloadKey = '31c90b358117ea94bb45f1e6bbef7dc5bb20b6cb39f71790dd510a2190fe22
 let bondId = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
 
 let record = {
-  "type": "wrn:protocol",
-  "name": "wireline.io/chess",
+  "type": "dxn:protocol",
+  "name": "dxos.org/chess",
   "version": "1.5.2"
 };
 
@@ -165,29 +165,29 @@ const result = await registry.reassociateRecords(oldBondId, newBondId, privateKe
 
 ## Tests
 
-`yarn test` allows to run tests against an external GQL endpoint (of a real WNS server). By default `http://localhost:9473/api` endpoint is used, but could be changed by `WIRE_WNS_ENDPOINT` ENV var.
+`yarn test` allows to run tests against an external GQL endpoint (of a real Registry server). By default `http://localhost:9473/api` endpoint is used, but could be changed by `DX_REGISTRY_ENDPOINT` ENV var.
 
 ```bash
-$ WIRE_WNS_ENDPOINT=http://xbox.local:9473/api yarn test
+$ DX_REGISTRY_ENDPOINT=http://xbox.local:9473/api yarn test
 ```
 
-`yarn test:in-mem-wns` spins up an in-process mock GQL server for the duration of the tests.
+`yarn test:memory` spins up an in-process mock GQL server for the duration of the tests.
 
 ```bash
-$ yarn test:in-mem-wns
+$ yarn test:memory
 ```
 
 It's also possible to run the mock GQL server standalone and interact with it using the GQL Playground (http://127.0.0.1:4000/).
 
 ```bash
-$ yarn start:in-mem-wns --help
+$ yarn start:memory --help
 Options:
   --help     Show help                                                 [boolean]
   --version  Show version number                                       [boolean]
   --host     GQL server host                     [string] [default: "127.0.0.1"]
   --port     GQL server port                            [number] [default: 4000]
 
-$ yarn start:in-mem-wns
+$ yarn start:memory
 yarn run v1.17.3
 $ BABEL_DISABLE_CACHE=1 DEBUG=test babel-node src/mock/main.js
 Mock server running on http://127.0.0.1:4000/
