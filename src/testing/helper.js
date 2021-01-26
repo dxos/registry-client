@@ -38,7 +38,7 @@ export const provisionBondId = async (registry, privateKey, mock) => {
 
   let bonds = await registry.queryBonds();
   if (!bonds.length) {
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey);
+    await registry.createBond([{ denom: 'udxt', amount: '1000000000' }], privateKey);
     bonds = await registry.queryBonds();
   }
 
@@ -47,15 +47,15 @@ export const provisionBondId = async (registry, privateKey, mock) => {
 
 export const getConfig = () => ({
   mockServer: process.env.MOCK_SERVER || false,
-  wns: {
-    chainId: process.env.DX_REGISTRY_CHAIN_ID || 'wireline',
+  registry: {
+    chainId: process.env.DX_REGISTRY_CHAIN_ID || 'devnet',
     privateKey: DEFAULT_PRIVATE_KEY,
     endpoint: process.env.DX_REGISTRY_ENDPOINT || 'http://localhost:9473/api',
     fee: {
       amount: [
         {
           amount: '200000',
-          denom: 'uwire'
+          denom: 'udxt'
         }
       ],
       gas: '200000'

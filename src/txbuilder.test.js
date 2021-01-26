@@ -10,7 +10,7 @@ import { Msg, Record } from './types';
 import { getBaseConfig } from './testing/helper';
 
 const PRIVATE_KEY_2 = '7f7d35607229d9b86ed790dcdd30baf79783b816dab5a17b68827928bcd589dd';
-const CHAIN = 'wireline';
+const CHAIN = 'devnet';
 
 // TODO: you could change me, but the test will fail.
 const ACC_NUM = '1';
@@ -42,7 +42,7 @@ describe('Transactions.', () => {
       amount: [
         {
           amount: '100',
-          denom: 'uwire'
+          denom: 'udxt'
         }
       ],
       gas: '200000'

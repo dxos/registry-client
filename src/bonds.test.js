@@ -9,7 +9,7 @@ import { getConfig, ensureUpdatedConfig } from './testing/helper';
 
 const BOT_YML_PATH = path.join(__dirname, './testing/data/bot.yml');
 
-const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
+const { mockServer, registry: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 jest.setTimeout(90 * 1000);
 
@@ -39,7 +39,7 @@ const bondTests = () => {
   test('Create bond.', async () => {
     bondId1 = await registry.getNextBondId(privateKey);
     expect(bondId1).toBeDefined();
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey, fee);
+    await registry.createBond([{ denom: 'udxt', amount: '1000000000' }], privateKey, fee);
   });
 
   test('Get bond by ID.', async () => {
@@ -47,7 +47,7 @@ const bondTests = () => {
     expect(bond).toBeDefined();
     expect(bond.id).toBe(bondId1);
     expect(bond.balance).toHaveLength(1);
-    expect(bond.balance[0]).toEqual({ type: 'uwire', quantity: '1000000000' });
+    expect(bond.balance[0]).toEqual({ type: 'udxt', quantity: '1000000000' });
     bondOwner = bond.owner;
   });
 
@@ -66,23 +66,23 @@ const bondTests = () => {
   });
 
   test('Refill bond.', async () => {
-    await registry.refillBond(bondId1, [{ denom: 'uwire', amount: '500' }], privateKey, fee);
+    await registry.refillBond(bondId1, [{ denom: 'udxt', amount: '500' }], privateKey, fee);
 
     const [bond] = await registry.getBondsByIds([bondId1]);
     expect(bond).toBeDefined();
     expect(bond.id).toBe(bondId1);
     expect(bond.balance).toHaveLength(1);
-    expect(bond.balance[0]).toEqual({ type: 'uwire', quantity: '1000000500' });
+    expect(bond.balance[0]).toEqual({ type: 'udxt', quantity: '1000000500' });
   });
 
   test('Withdraw bond.', async () => {
-    await registry.withdrawBond(bondId1, [{ denom: 'uwire', amount: '500' }], privateKey, fee);
+    await registry.withdrawBond(bondId1, [{ denom: 'udxt', amount: '500' }], privateKey, fee);
 
     const [bond] = await registry.getBondsByIds([bondId1]);
     expect(bond).toBeDefined();
     expect(bond.id).toBe(bondId1);
     expect(bond.balance).toHaveLength(1);
-    expect(bond.balance[0]).toEqual({ type: 'uwire', quantity: '1000000000' });
+    expect(bond.balance[0]).toEqual({ type: 'udxt', quantity: '1000000000' });
   });
 
   test('Cancel bond.', async () => {
@@ -94,7 +94,7 @@ const bondTests = () => {
   test('Associate/Dissociate bond.', async () => {
     bondId1 = await registry.getNextBondId(privateKey);
     expect(bondId1).toBeDefined();
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey, fee);
+    await registry.createBond([{ denom: 'udxt', amount: '1000000000' }], privateKey, fee);
 
     // Create a new record.
     version1 = await publishNewBotVersion(bondId1);
@@ -126,7 +126,7 @@ const bondTests = () => {
     // Create another bond.
     bondId2 = await registry.getNextBondId(privateKey);
     expect(bondId2).toBeDefined();
-    await registry.createBond([{ denom: 'uwire', amount: '1000000000' }], privateKey, fee);
+    await registry.createBond([{ denom: 'udxt', amount: '1000000000' }], privateKey, fee);
     const [bond] = await registry.getBondsByIds([bondId2]);
     expect(bond.id).toBe(bondId2);
 

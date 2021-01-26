@@ -8,9 +8,9 @@ import records from './mock/data/records.json';
 import { Util } from './util';
 
 const COLOR_MAP = {
-  'wrn:protocol': 'red',
-  'wrn:bot': 'blue',
-  'wrn:pad': 'green'
+  'dxn:protocol': 'red',
+  'dxn:bot': 'blue',
+  'dxn:pad': 'green'
 };
 
 test.skip('graph', async () => {
@@ -23,13 +23,13 @@ test.skip('graph', async () => {
 
   /* eslint-disable no-restricted-syntax */
   for (const [, record] of Object.entries(recordsById)) {
-    const wrn = `${record.type}:${record.name}#${record.version}`;
-    g.addNode(wrn, { color: COLOR_MAP[record.type] });
+    const dxn = `${record.type}:${record.name}#${record.version}`;
+    g.addNode(dxn, { color: COLOR_MAP[record.type] });
     for (const [, propValue] of Object.entries(record)) {
-      if (typeof (propValue) === 'object' && propValue.type === 'wrn:reference') {
+      if (typeof (propValue) === 'object' && propValue.type === 'dxn:reference') {
         const refRecord = recordsById[propValue.id];
-        const refWrn = `${refRecord.type}:${refRecord.name}#${refRecord.version}`;
-        g.addEdge(wrn, refWrn, {});
+        const refDxn = `${refRecord.type}:${refRecord.name}#${refRecord.version}`;
+        g.addEdge(dxn, refDxn, {});
       }
     }
   }

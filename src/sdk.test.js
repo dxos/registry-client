@@ -15,14 +15,14 @@ const log = debug('test');
 
 jest.setTimeout(40 * 1000);
 
-const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
+const { mockServer, registry: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 describe('Querying', () => {
   let bot;
 
   let mock;
 
-  let wnsEndpoint;
+  let registryEndpoint;
   let registry;
 
   let bondId;
@@ -33,8 +33,8 @@ describe('Querying', () => {
       log('Started mock server:', mock.serverInfo.url);
     }
 
-    wnsEndpoint = mock ? mock.serverInfo.url : endpoint;
-    registry = new Registry(wnsEndpoint, chainId);
+    registryEndpoint = mock ? mock.serverInfo.url : endpoint;
+    registry = new Registry(registryEndpoint, chainId);
     bondId = await provisionBondId(registry, privateKey, mockServer);
 
     const publishNewBotVersion = async () => {
