@@ -1,6 +1,6 @@
 {
   "name": "@dxos/registry-client",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "DXOS Registry JavaScript Client.",
   "repository": "https://github.com/dxos/registry-client",
   "author": "",
