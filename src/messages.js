@@ -356,16 +356,16 @@ export class MsgSetName {
 
   /**
    * @constructor
-   * @param {string} wrn
+   * @param {string} dxn
    * @param {string} id
    * @param {string} owner
    */
-  constructor(wrn, id, owner) {
-    assert(wrn);
+  constructor(dxn, id, owner) {
+    assert(dxn);
     assert(id);
     assert(owner);
 
-    this._wrn = wrn;
+    this._dxn = dxn;
     this._id = id;
     this._owner = owner;
   }
@@ -377,7 +377,7 @@ export class MsgSetName {
     return Util.sortJSON({
       'type': 'nameservice/SetName',
       'value': {
-        'wrn': this._wrn,
+        'dxn': this._dxn,
         'id': this._id,
         'signer': this._owner
       }
@@ -392,14 +392,14 @@ export class MsgDeleteName {
 
   /**
    * @constructor
-   * @param {string} wrn
+   * @param {string} dxn
    * @param {string} owner
    */
-  constructor(wrn, owner) {
-    assert(wrn);
+  constructor(dxn, owner) {
+    assert(dxn);
     assert(owner);
 
-    this._wrn = wrn;
+    this._dxn = dxn;
     this._owner = owner;
   }
 
@@ -410,7 +410,7 @@ export class MsgDeleteName {
     return Util.sortJSON({
       'type': 'nameservice/DeleteName',
       'value': {
-        'wrn': this._wrn,
+        'dxn': this._dxn,
         'signer': this._owner
       }
     });

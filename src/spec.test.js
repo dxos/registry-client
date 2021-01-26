@@ -17,7 +17,7 @@ const log = debug('test');
 
 jest.setTimeout(120 * 1000);
 
-const { mockServer, wns: { chainId, endpoint, privateKey, fee } } = getConfig();
+const { mockServer, registry: { chainId, endpoint, privateKey, fee } } = getConfig();
 
 async function sleep(timeout = 1 * 1000) {
   await new Promise(r => setTimeout(r, timeout));

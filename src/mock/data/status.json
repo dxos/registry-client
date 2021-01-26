@@ -2,8 +2,8 @@
   "version": "0.3.0",
   "node": {
     "id": "57706d1ce3f23d22da8eb958c7cd148544c1b8ae",
-    "network": "wireline",
-    "moniker": "WIRELINE"
+    "network": "devnet",
+    "moniker": "DEVNET"
   },
   "sync": {
     "latest_block_hash": "FC47172BCEFADF612ACB24CBD2C2EF72AB414C37CDD6F3A353E318FA77559D31",
@@ -37,8 +37,8 @@
     {
       "node": {
         "id": "9380b3f500ae36d256a8e3f6b5a81ceb62768308",
-        "network": "wireline",
-        "moniker": "WIRELINE"
+        "network": "devnet",
+        "moniker": "DEVNET"
       },
       "is_outbound": true,
       "remote_ip": "139.178.68.131"
@@ -46,8 +46,8 @@
     {
       "node": {
         "id": "cf258070947018977f8d6f8a16b6f9f0c1cd0fdb",
-        "network": "wireline",
-        "moniker": "WIRELINE"
+        "network": "devnet",
+        "moniker": "DEVNET"
       },
       "is_outbound": true,
       "remote_ip": "139.178.68.130"

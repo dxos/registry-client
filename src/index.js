@@ -29,7 +29,7 @@ import {
   MsgDeleteName
 } from './messages';
 
-export const DEFAULT_CHAIN_ID = 'wireline';
+export const DEFAULT_CHAIN_ID = 'devnet';
 
 const DEFAULT_WRITE_ERROR = 'Unable to write to Registry.';
 
@@ -456,19 +456,19 @@ export class Registry {
   }
 
   /**
-   * Set name (WRN) to record ID (CID).
-   * @param {string} wrn
+   * Set name (dxn) to record ID (CID).
+   * @param {string} dxn
    * @param {string} id
    * @param {string} privateKey
    * @param {object} fee
    */
-  async setName(wrn, id, privateKey, fee) {
+  async setName(dxn, id, privateKey, fee) {
     let result;
 
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgSetName(wrn, id, fromAddress), privateKey, fee);
+      result = await this._submitTx(new MsgSetName(dxn, id, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));
@@ -487,18 +487,18 @@ export class Registry {
   }
 
   /**
-   * Delete name (WRN) mapping.
-   * @param {string} wrn
+   * Delete name (dxn) mapping.
+   * @param {string} dxn
    * @param {string} privateKey
    * @param {object} fee
    */
-  async deleteName(wrn, privateKey, fee) {
+  async deleteName(dxn, privateKey, fee) {
     let result;
 
     try {
       const account = new Account(Buffer.from(privateKey, 'hex'));
       const fromAddress = account.formattedCosmosAddress;
-      result = await this._submitTx(new MsgDeleteName(wrn, fromAddress), privateKey, fee);
+      result = await this._submitTx(new MsgDeleteName(dxn, fromAddress), privateKey, fee);
     } catch (err) {
       const error = err[0] || err;
       throw new Error(Registry.processWriteError(error));

@@ -39,7 +39,7 @@ let result = await registry.getRecordsByIds(ids);
 Query records by attributes:
 
 ```JavaScript
-let attributes = { type: 'wrn:bot' };
+let attributes = { type: 'dxn:bot' };
 let result = await registry.queryRecords(attributes);
 ```
 
@@ -81,14 +81,14 @@ Send coins:
 let privateKey = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 let toAddress = 'cosmos1w5q7xy9sk8hqvlklftdfdkc3kgsd90cxlkwvty';
 
-await registry.sendCoins([{ denom: 'wire', amount: '100' }], toAddress, privateKey);
+await registry.sendCoins([{ denom: 'dxt', amount: '100' }], toAddress, privateKey);
 ```
 
 Create bond:
 
 ```JavaScript
 let privateKey = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
-let denom = 'uwire';
+let denom = 'udxt';
 let amount = '10000';
 
 const result = await registry.createBond([{ denom, amount }], privateKey);
@@ -99,7 +99,7 @@ Refill bond:
 ```JavaScript
 let privateKey = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 let bondId = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
-let denom = 'uwire';
+let denom = 'udxt';
 let amount = '500';
 
 const result = await registry.refillBond(bondId, [{ denom, amount }], privateKey);
@@ -110,7 +110,7 @@ Withdraw funds from bond:
 ```JavaScript
 let privateKey = 'b1e4e95dd3e3294f15869b56697b5e3bdcaa24d9d0af1be9ee57d5a59457843a';
 let bondId = '8e340dd7cf6fc91c27eeefce9cca1406c262e93fd6f3a4f3b1e99b01161fcef3';
-let denom = 'uwire';
+let denom = 'udxt';
 let amount = '500';
 
 const result = await registry.withdrawBond(bondId, [{ denom, amount }], privateKey);

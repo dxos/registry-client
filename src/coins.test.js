@@ -12,7 +12,7 @@ const FEE = {
   amount: [
     {
       amount: '200000',
-      denom: 'uwire'
+      denom: 'udxt'
     }
   ],
   gas: '200000'
@@ -26,6 +26,6 @@ describe('coins', () => {
   });
 
   test.skip('send', async () => {
-    await registry.sendCoins([{ denom: 'wire', amount: '100' }], 'cosmos1w5q7xy9sk8hqvlklftdfdkc3kgsd90cxlkwvty', PRIVATE_KEY, FEE);
+    await registry.sendCoins([{ denom: 'dxt', amount: '100' }], 'cosmos1w5q7xy9sk8hqvlklftdfdkc3kgsd90cxlkwvty', PRIVATE_KEY, FEE);
   });
 });
